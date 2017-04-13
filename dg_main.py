@@ -31,25 +31,25 @@ end_time = time.clock()
 
 myGC = GranuleCell()
 
-#myMC = MossyCell()
+myMC = MossyCell()
 
-#myBC = BasketCell()
+myBC = BasketCell()
 
-#myHC = HippCell()
+myHC = HippCell()
 
 GC_volt, GC_time = myGC.somatic_recording()
 
-#MC_volt, MC_time = myMC.somatic_recording()
+MC_volt, MC_time = myMC.somatic_recording()
 
-#BC_volt, BC_time = myBC.somatic_recording()
+BC_volt, BC_time = myBC.somatic_recording()
 
-#HC_volt, HC_time = myHC.somatic_recording()
+HC_volt, HC_time = myHC.somatic_recording()
 
 myGC.simulate()
 
 plt.figure()
 plt.plot(GC_time, GC_volt)
-"""
+
 plt.figure()
 plt.plot(MC_time, MC_volt)
 
@@ -57,4 +57,4 @@ plt.figure()
 plt.plot(BC_time, BC_volt)
 
 plt.figure()
-plt.plot(HC_time, HC_volt)"""
+plt.plot(HC_time, HC_volt)

@@ -40,11 +40,8 @@ class GenericCell(object):
             for y in x:
                 self.all_sections.append(y)
 
-        self.connect_soma()
-
-    def connect_soma(self):
-        for curr_dend in self.dendrites:
-            curr_dend[0].connect(self.soma())
+        for x in self.dendrites:
+            x.connect_segments(self.soma)
 
     def mk_geometry(self, soma_diam,soma_L, dend_L, dend_diam):
         """Sets up the geometry of the sections
@@ -103,7 +100,6 @@ class Dendrite(object):
         self.segs = []
         self.i = 0
         self.mk_segments(n_segs = n_segs)
-        self.connect_segments()
         if bool(diam):
             self.set_diam(diam)
         if bool(L):
@@ -114,9 +110,12 @@ class Dendrite(object):
         for curr_n in range(n_segs):
             self.segs.append(h.Section(name = self.name + 'seg' + str(curr_n)))
 
-    def connect_segments(self):
-        for idx, curr_seg in enumerate(self.segs[:len(self.segs)-1]):
-            curr_seg.connect(self.segs[idx + 1](0))
+    def connect_segments(self, soma):
+        for idx, curr_seg in enumerate(self.segs):
+            if idx == 0:
+                soma.connect(curr_seg)
+            else:
+                curr_seg.connect(self.segs[idx -1])
 
     def set_diam(self, diam):
         if not bool(self.segs):
