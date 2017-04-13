@@ -4,11 +4,7 @@ Created on Wed Apr 12 14:36:11 2017
 
 @author: DanielM
 """
-
 from genericcell import GenericCell
-
-
-#h.nrn_load_dll("C:\\nrn\\dentate_gyrus_python_translate\\nrnmech_new.dll")
 
 class GranuleCell(GenericCell):
     """Create a granule cell, by using the methods provided by GenericCell"""
@@ -17,17 +13,15 @@ class GranuleCell(GenericCell):
         self.all_sections = []
         # Set up the sections with topology
         self.mk_sections(2,4)
-        # Set up geometry of sectionss
+        # Set up geometry of sections
         self.mk_geometry(16.8, 16.8, [[50,150,150,150], [50,150,150,150]],[[3,3,3,3],[3,3,3,3]])
         # The Mechanisms that are equal in all sections
         for x in self.all_sections:
-            print(x.name())
             x.insert('ccanl')
             x.catau_ccanl = 10
             x.caiinf_ccanl = 5 * (10 ** (-6))
             x.Ra = 210
 
-            
         # The Mechanisms in the soma
         self.soma.insert('ichan2')
         self.soma.gnatbar_ichan2 = 0.12
@@ -56,7 +50,7 @@ class GranuleCell(GenericCell):
             x[0].gkfbar_ichan2 = 0.004
             x[0].gksbar_ichan2 = 0.006
             x[0].insert('nca')
-            x[0].gncabar_nca = 0.004
+            x[0].gncabar_nca = 0.003
             x[0].insert('lca')
             x[0].glcabar_lca = 0.0075
             x[0].insert('cat')
@@ -134,6 +128,4 @@ class GranuleCell(GenericCell):
             x.etca = 130
             x.esk = -90
             x.el_ichan2 = -70
-            x.cai_ccanl = 2.0
-            
-        print("GranuleCell initialized")
+            # x.cao_ccanl = 2.0 defined in the soltesz model but not available here

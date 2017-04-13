@@ -7,8 +7,6 @@ Created on Wed Apr 12 14:33:43 2017
 
 from neuron import h, gui
 
-h.nrn_load_dll("C:\\nrn\\dentate_gyrus_python_translate\\nrnmech_new.dll")
-
 class GenericCell(object):
     """This is a generic cell which implements the five compontents of neuron:
     Sections - the cell sections
@@ -20,32 +18,34 @@ class GenericCell(object):
     should not need to overwrite the components, but could just call the
     methods to initialize it's parameters.
     """
-    
+
     def __init__(self):
         """Generic __init__ mostly for debugging"""
-        self.mk_sections(2,4)
-        self.mk_geometry(16.8, 16.8, [[50,150,150,150], [50,150,150,150]],[[3,3,3,3],[3,3,3,3]])
-        self.all_sections = []
-    def mk_sections(self, num_dend, num_sec):
+    def mk_sections(self, num_dend, num_seg):
         """Sets up the Sections WITH Topology"""
-        self.soma = h.Section(name = 'soma')
+        self.soma = h.Section(name='soma')
         self.all_sections.append(self.soma)
         self.dendrites = []
+        self.num_dend = num_dend
+        self.i = 0  # Counter for __iter__
         
-        for x in range(num_dend):
-            self.dendrites.append([])
-            for y in range(num_sec):
-                curr_seg = h.Section(name = "dend_" + str(x) + "_sec_" + str(y))
-                if y == 0:
-                    curr_seg.connect(self.soma)
-                else:
-                    curr_seg.connect(prev_seg)
-                prev_seg = curr_seg
-                self.dendrites[x].append(curr_seg)
-                self.all_sections.append(curr_seg)
-            self.num_dend = len(self.dendrites)
-    #def mk_topology():
-                
+        if hasattr(num_seg, '__iter'):
+            for curr_dend in range(num_dend):
+                for curr_num_segs in num_seg:
+                    self.dendrites.append(Dendrite(n_segs = curr_num_segs))
+        else:
+            for curr_dend in range(num_dend):
+                self.dendrites.append(Dendrite(n_segs = num_seg))
+        for x in self.dendrites:
+            for y in x:
+                self.all_sections.append(y)
+
+        self.connect_soma()
+
+    def connect_soma(self):
+        for curr_dend in self.dendrites:
+            curr_dend[0].connect(self.soma())
+
     def mk_geometry(self, soma_diam,soma_L, dend_L, dend_diam):
         """Sets up the geometry of the sections
         dend_L - scalar or iterable matching the number of dendrites
@@ -78,11 +78,94 @@ class GenericCell(object):
         soma_v_vec.record(self.soma(0.5)._ref_v)
         t_vec.record(h._ref_t)
         
-        print("Somatic recording set up")
         return soma_v_vec, t_vec
         
     def simulate(self):
-        print("Starting simulation")
         h.tstop = 10000
         h.run()
-        print("Stimulation finished")
+        
+    def __iter__(self):
+        return self
+        
+    def next(self):
+        if self.i < (len(self.segs)):
+            i = self.i
+            self.i += 1
+            return self.all_sections[i]
+        else:
+            self.i = 0
+            raise StopIteration()
+            
+        
+class Dendrite(object):
+    def __init__(self, name = "dendrite", n_segs= 0, diam = None, L = None):
+        self.name = name
+        self.segs = []
+        self.i = 0
+        self.mk_segments(n_segs = n_segs)
+        self.connect_segments()
+        if bool(diam):
+            self.set_diam(diam)
+        if bool(L):
+            self.set_L(L)
+
+    def mk_segments(self, n_segs = 1):
+        self.segs = []
+        for curr_n in range(n_segs):
+            self.segs.append(h.Section(name = self.name + 'seg' + str(curr_n)))
+
+    def connect_segments(self):
+        for idx, curr_seg in enumerate(self.segs[:len(self.segs)-1]):
+            curr_seg.connect(self.segs[idx + 1](0))
+
+    def set_diam(self, diam):
+        if not bool(self.segs):
+            raise Warning("Can't set diameter before segments are made")
+            return
+        if hasattr(diam, '__iter__'):
+            if len(diam) != len(self.segs):
+                raise Warning("List of diameters does not fit number of segments")
+                return
+            for idx, curr_seg in enumerate(self.segs):
+                curr_seg.diam = diam[idx]
+            return
+        else:
+            for curr_seg in self.segs:
+                curr_seg.diam = diam
+
+    def set_L(self, L):
+        if not bool(self.segs):
+            raise Warning("Can't set L before segments are made")
+            return
+        if hasattr(L, '__iter__'):
+            if len(L) != len(self.segs):
+                raise Warning("List of diameters does not fit number of segments")
+                return
+            for idx, curr_seg in enumerate(self.segs):
+                curr_seg.L = L[idx]
+            return
+        else:
+            for curr_seg in self.segs:
+                curr_seg.L = L
+
+    def __iter__(self):
+        return self
+        
+    def next(self):
+        if self.i < (len(self.segs)):
+            i = self.i
+            self.i += 1
+            return self.segs[i]
+        else:
+            self.i = 0
+            raise StopIteration()
+            
+    def __getitem__(self, key):
+        return self.segs[key]
+    
+    def __len__(self):
+        return len(self.segs)
+    
+    
+    
+    
