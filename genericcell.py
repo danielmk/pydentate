@@ -28,7 +28,7 @@ class GenericCell(object):
         self.dendrites = []
         self.num_dend = num_dend
         self.i = 0  # Counter for __iter__
-        
+
         if hasattr(num_seg, '__iter'):
             for curr_dend in range(num_dend):
                 for curr_num_segs in num_seg:
@@ -50,7 +50,7 @@ class GenericCell(object):
         """
         self.soma.diam = soma_diam
         self.soma.L = soma_L
-        
+
         if len(dend_L) != self.num_dend:
             raise ValueError("dend_L must match the number of dendrites or be a scalar")
         if len(dend_diam) != self.num_dend:
@@ -69,21 +69,21 @@ class GenericCell(object):
         self.stim.delay = 500
         self.stim.dur = 500
         self.stim.amp = .3
-    
+
         soma_v_vec = h.Vector()
         t_vec = h.Vector()
         soma_v_vec.record(self.soma(0.5)._ref_v)
         t_vec.record(h._ref_t)
-        
+
         return soma_v_vec, t_vec
-        
+
     def simulate(self):
         h.tstop = 10000
         h.run()
-        
+
     def __iter__(self):
         return self
-        
+
     def next(self):
         if self.i < (len(self.segs)):
             i = self.i
@@ -92,8 +92,7 @@ class GenericCell(object):
         else:
             self.i = 0
             raise StopIteration()
-            
-        
+
 class Dendrite(object):
     def __init__(self, name = "dendrite", n_segs= 0, diam = None, L = None):
         self.name = name
@@ -113,9 +112,9 @@ class Dendrite(object):
     def connect_segments(self, soma):
         for idx, curr_seg in enumerate(self.segs):
             if idx == 0:
-                soma.connect(curr_seg)
+                curr_seg.connect(soma(1))
             else:
-                curr_seg.connect(self.segs[idx -1])
+                curr_seg.connect(self.segs[idx -1](1))
 
     def set_diam(self, diam):
         if not bool(self.segs):
@@ -149,7 +148,7 @@ class Dendrite(object):
 
     def __iter__(self):
         return self
-        
+
     def next(self):
         if self.i < (len(self.segs)):
             i = self.i
@@ -158,13 +157,13 @@ class Dendrite(object):
         else:
             self.i = 0
             raise StopIteration()
-            
+
     def __getitem__(self, key):
         return self.segs[key]
-    
+
     def __len__(self):
         return len(self.segs)
-    
+
     
     
     
