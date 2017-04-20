@@ -43,7 +43,7 @@ class GenericCell(object):
         for x in self.dendrites:
             x.connect_segments(self.soma)
 
-    def mk_geometry(self, soma_diam,soma_L, dend_L, dend_diam):
+    def mk_geometry(self, soma_diam, soma_L, dend_L, dend_diam):
         """Sets up the geometry of the sections
         dend_L - scalar or iterable matching the number of dendrites
         dend_diam - scalar or iterable matching the number of dendrites
@@ -63,6 +63,18 @@ class GenericCell(object):
             for seg_idx, y in enumerate(x):
                 y.L = dend_L[dend_idx][seg_idx]
                 y.diam = dend_diam[dend_idx][seg_idx]
+                
+    def connect_post(self, source, synapse, thr = 10, delay = 1, weight = 0):
+        if not hasattr(self, 'synapses'):
+            self.synapses = []
+        if not hasattr(self, 'netcons'):
+            self.netcons = []
+
+        self.synapses.append(synapse)
+        netcon = h.NetCon(source, synapse, thr, delay, weight)
+        self.netcons.append(netcon)
+
+        return netcon
 
     def somatic_recording(self):
         """self.stim = h.IClamp(self.soma(1))
@@ -93,8 +105,7 @@ class GenericCell(object):
             self.i = 0
             raise StopIteration()
             
-    def connect_post(self, target, source):
-        pass
+
     
 
 class Dendrite(object):

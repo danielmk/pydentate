@@ -130,9 +130,9 @@ class GranuleCell(GenericCell):
             x.esk = -90
             x.el_ichan2 = -70
             # x.cao_ccanl = 2.0 defined in the soltesz model but not available here
-        self.pp_stim()
+        #self.pp_stim()
 
-    """def pp_stim(self):
+    def pp_stim(self):
         self.netstim = h.NetStim()
         self.netstim.interval = 100
         self.netstim.number = 1
@@ -146,7 +146,7 @@ class GranuleCell(GenericCell):
         #netstim.number = 1
         #netstim.start = 5
         netcon = h.NetCon(self.netstim, self.synapse, 10,1,1)
-        self.netcon = netcon"""
+        self.netcon = netcon
         
         
         

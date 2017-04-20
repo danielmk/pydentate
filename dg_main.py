@@ -28,23 +28,23 @@ for x in range(n_GCs):
     GCs.append(GranuleCell(h))
 
 end_time = time.clock()
-
-
+"""
+"""
 myGC = GranuleCell()
 
-#myMC = MossyCell()
+myMC = MossyCell()
 
-#myBC = BasketCell()
+myBC = BasketCell()
 
-#myHC = HippCell()
+myHC = HippCell()
 
 GC_volt, GC_time = myGC.somatic_recording()
 
-#MC_volt, MC_time = myMC.somatic_recording()
+MC_volt, MC_time = myMC.somatic_recording()
 
-#BC_volt, BC_time = myBC.somatic_recording()
+BC_volt, BC_time = myBC.somatic_recording()
 
-#HC_volt, HC_time = myHC.somatic_recording()
+HC_volt, HC_time = myHC.somatic_recording()
 
 myGC.simulate()
 
@@ -58,10 +58,38 @@ plt.figure()
 plt.plot(BC_time, BC_volt)
 
 plt.figure()
-plt.plot(HC_time, HC_volt)"""
+plt.plot(HC_time, HC_volt)
+"""
 
-celltypes = [GranuleCell, MossyCell, BasketCell, HippCell]
 
-cellnums = [10,5,5,5]
+celltypes = [GranuleCell]
+
+cellnums = [2]
 
 test_network = network.Network(celltypes, cellnums)
+
+curr_GC = test_network.cells[GranuleCell][0]
+
+curr_GC.pp_stim()
+
+volt, time = curr_GC.somatic_recording()
+
+curr_GC.simulate()
+
+plt.plot(time,volt)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
