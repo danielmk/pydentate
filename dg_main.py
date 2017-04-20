@@ -16,6 +16,7 @@ from basketcell import BasketCell
 from hippcell import HippCell
 from neuron import h, gui
 import matplotlib.pyplot as plt
+import network
 
 #h.nrn_load_dll("C:\\nrn\\dentate_gyrus_python_translate\\nrnmech_new.dll")
 """
@@ -27,23 +28,23 @@ for x in range(n_GCs):
     GCs.append(GranuleCell(h))
 
 end_time = time.clock()
-"""
+
 
 myGC = GranuleCell()
 
-myMC = MossyCell()
+#myMC = MossyCell()
 
-myBC = BasketCell()
+#myBC = BasketCell()
 
-myHC = HippCell()
+#myHC = HippCell()
 
 GC_volt, GC_time = myGC.somatic_recording()
 
-MC_volt, MC_time = myMC.somatic_recording()
+#MC_volt, MC_time = myMC.somatic_recording()
 
-BC_volt, BC_time = myBC.somatic_recording()
+#BC_volt, BC_time = myBC.somatic_recording()
 
-HC_volt, HC_time = myHC.somatic_recording()
+#HC_volt, HC_time = myHC.somatic_recording()
 
 myGC.simulate()
 
@@ -57,4 +58,10 @@ plt.figure()
 plt.plot(BC_time, BC_volt)
 
 plt.figure()
-plt.plot(HC_time, HC_volt)
+plt.plot(HC_time, HC_volt)"""
+
+celltypes = [GranuleCell, MossyCell, BasketCell, HippCell]
+
+cellnums = [10,5,5,5]
+
+test_network = network.Network(celltypes, cellnums)

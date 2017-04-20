@@ -65,10 +65,10 @@ class GenericCell(object):
                 y.diam = dend_diam[dend_idx][seg_idx]
 
     def somatic_recording(self):
-        self.stim = h.IClamp(self.soma(1))
+        """self.stim = h.IClamp(self.soma(1))
         self.stim.delay = 500
         self.stim.dur = 500
-        self.stim.amp = .3
+        self.stim.amp = .3"""
 
         soma_v_vec = h.Vector()
         t_vec = h.Vector()
@@ -92,6 +92,10 @@ class GenericCell(object):
         else:
             self.i = 0
             raise StopIteration()
+            
+    def connect_post(self, target, source):
+        pass
+    
 
 class Dendrite(object):
     def __init__(self, name = "dendrite", n_segs= 0, diam = None, L = None):

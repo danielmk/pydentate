@@ -5,6 +5,7 @@ Created on Wed Apr 12 14:36:11 2017
 @author: DanielM
 """
 from genericcell import GenericCell
+from neuron import h, gui
 
 class GranuleCell(GenericCell):
     """Create a granule cell, by using the methods provided by GenericCell"""
@@ -118,7 +119,7 @@ class GranuleCell(GenericCell):
             x[3].gkbar_cagk = 0.0024
             x[3].gl_ichan2 = 0.000063
             x[3].cm = 1.6
-        
+
         for x in self.all_sections:
             x.enat = 45
             x.ekf = -90
@@ -129,3 +130,29 @@ class GranuleCell(GenericCell):
             x.esk = -90
             x.el_ichan2 = -70
             # x.cao_ccanl = 2.0 defined in the soltesz model but not available here
+        self.pp_stim()
+
+    """def pp_stim(self):
+        self.netstim = h.NetStim()
+        self.netstim.interval = 100
+        self.netstim.number = 1
+        self.netstim.start = 1000
+        self.synapse = h.Exp2Sid(self.dendrites[0][3](0.5))
+        self.synapse.tau1 = 1.5
+        self.synapse.tau2 = 5.5
+        self.synapse.e = 0
+        self.synapse.sid = 0
+        #netstim.interval = 100
+        #netstim.number = 1
+        #netstim.start = 5
+        netcon = h.NetCon(self.netstim, self.synapse, 10,1,1)
+        self.netcon = netcon"""
+        
+        
+        
+        
+        
+
+
+
+
