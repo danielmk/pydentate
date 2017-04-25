@@ -13,7 +13,8 @@ class MossyCell(GenericCell):
         self.all_sections = []
         # Set up the sections with topology
         self.mk_sections(4,4)
-        # Set up geometry of sectionss
+        # Set up geometry of sections
+        #NOTE! There is a discrepancy here between the diameter of the third section of the dendrite. Publication: 25; Code: 2.5 The number in the code seems to be more physiological
         self.mk_geometry(20, 20, [[50,50,50,50], [50,50,50,50], [50,50,50,50], [50,50,50,50]],[[5.78,4,2.5,1],[5.78,4,2.5,1], [5.78,4,2.5,1], [5.78,4,2.5,1]])
         
         for x in self.all_sections:
@@ -33,20 +34,20 @@ class MossyCell(GenericCell):
             x.insert('hyperde3')
             x.ghyfbar_hyperde3 = 0.000005
             x.ghysbar_hyperde3 = 0.000005
-            
+
         self.soma.insert('ichan2')
         self.soma.gnatbar_ichan2 = 0.12
         self.soma.gkfbar_ichan2 = 0.0005
         self.soma.gl_ichan2 = 0.000011
         self.soma.cm = 0.6
-        
+
         for x in self.dendrites:
             x[0].insert('ichan2')
             x[0].gnatbar_ichan2 = 0.12
             x[0].gkfbar_ichan2 = 0.0005
             x[0].gl_ichan2 = 0.000044
             x[0].cm = 2.4
-            
+
         for x in self.dendrites:
             for y in x[1:]:
                 y.insert('ichan2')

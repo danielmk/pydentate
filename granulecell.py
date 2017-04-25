@@ -8,8 +8,7 @@ from genericcell import GenericCell
 from neuron import h, gui
 
 class GranuleCell(GenericCell):
-    """Create a granule cell, by using the methods provided by GenericCell"""
-    
+    """Create a granule cell, by using the methods provided by GenericCell"""    
     def __init__(self):
         self.all_sections = []
         # Set up the sections with topology
@@ -42,7 +41,7 @@ class GranuleCell(GenericCell):
         self.soma.gkbar_cagk = 0.0006
         self.soma.gl_ichan2 = 0.00004
         self.soma.cm = 1
-        
+
         #The Dendrite mechanisms
         for x in self.dendrites:
             #Mechanisms of the gcldend which is in [0]
@@ -62,7 +61,7 @@ class GranuleCell(GenericCell):
             x[0].gkbar_cagk = 0.0006
             x[0].gl_ichan2 = 0.00004
             x[0].cm = 1
-        
+
         for x in self.dendrites:
             #Mechanisms of the proximal dend which is in [1]
             x[1].insert('ichan2')
@@ -132,7 +131,7 @@ class GranuleCell(GenericCell):
             # x.cao_ccanl = 2.0 defined in the soltesz model but not available here
         #self.pp_stim()
 
-    def pp_stim(self):
+"""    def pp_stim(self):
         self.netstim = h.NetStim()
         self.netstim.interval = 100
         self.netstim.number = 1
@@ -146,7 +145,7 @@ class GranuleCell(GenericCell):
         #netstim.number = 1
         #netstim.start = 5
         netcon = h.NetCon(self.netstim, self.synapse, 10,1,1)
-        self.netcon = netcon
+        self.netcon = netcon"""
         
         
         

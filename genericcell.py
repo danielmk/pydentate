@@ -77,21 +77,17 @@ class GenericCell(object):
         return netcon
 
     def somatic_recording(self):
-        """self.stim = h.IClamp(self.soma(1))
+        self.stim = h.IClamp(self.soma(1))
         self.stim.delay = 500
         self.stim.dur = 500
-        self.stim.amp = .3"""
-
+        self.stim.amp = 300
+        
         soma_v_vec = h.Vector()
         t_vec = h.Vector()
-        soma_v_vec.record(self.soma(0.5)._ref_v)
+        soma_v_vec.record(self.soma(1)._ref_v)
         t_vec.record(h._ref_t)
 
         return soma_v_vec, t_vec
-
-    def simulate(self):
-        h.tstop = 10000
-        h.run()
 
     def __iter__(self):
         return self
