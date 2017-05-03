@@ -1,8 +1,9 @@
-dg_main.py - The main script creating the network
-genericcell.py - Defines a generic cell object that encapsualtes the neuron logic of creating sections
-connecting the topology, defining geometry and the simulation of a current clamp experiment to test
-cell properties
-granulecell.py - Defines the specific properties of a granule cell and inherits from genericcell.py
-nrnmech.dll - Contains the compiled neuron mechanisms. This file is added to the h object by
-default when using from neuron import h, gui
-nrnmech_old - A buggy version of the mechanisms, does not give the desired cellular properties
+# Project Title
+
+This python project is based on a dentate gyrus network model developed in the [Soltesz Lab](https://med.stanford.edu/ivansolteszlab.html).
+This project is maintained by Daniel Müller at the [Laboratory for Experimental Epileptology](https://med.stanford.edu/ivansolteszlab.html) Contact: danielmuellermsc@gmail.com
+We are in very early development. No testing has been done. Some low-level design choices are still to be made and may change along the way. This project is in no way ready for distribution.
+
+# References
+
+* [The original Soltesz Model](http://www.opensourcebrain.org/projects/dentate)
