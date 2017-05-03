@@ -76,17 +76,21 @@ class GenericCell(object):
 
         return netcon
 
-    def somatic_recording(self):
+    def _current_clamp_soma(self, amp, dur, delay):
+        """Setup a current clamp recording"""
         self.stim = h.IClamp(self.soma(1))
-        self.stim.delay = 500
-        self.stim.dur = 500
-        self.stim.amp = 300
-        
+        self.stim.amp = amp     #Too high amps crash the simulation without raising an error!
+        self.stim.dur = dur        
+        self.stim.delay = delay
+
+        return self._voltage_recording()
+
+    def _voltage_recording(self):
         soma_v_vec = h.Vector()
         t_vec = h.Vector()
         soma_v_vec.record(self.soma(1)._ref_v)
         t_vec.record(h._ref_t)
-
+        
         return soma_v_vec, t_vec
 
     def __iter__(self):
