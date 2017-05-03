@@ -1,4 +1,4 @@
-# Project Title
+# pyDentate
 
 This python project is based on a dentate gyrus network model developed in the [Soltesz Lab](https://med.stanford.edu/ivansolteszlab.html).
 This project is maintained by Daniel Müller at the [Laboratory for Experimental Epileptology](https://med.stanford.edu/ivansolteszlab.html) Contact: danielmuellermsc@gmail.com
