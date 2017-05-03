@@ -16,7 +16,7 @@ from basketcell import BasketCell
 from hippcell import HippCell
 from neuron import h, gui
 import matplotlib.pyplot as plt
-import network
+#import network
 
 #h.nrn_load_dll("C:\\nrn\\dentate_gyrus_python_translate\\nrnmech_new.dll")
 """
@@ -52,7 +52,7 @@ plt.figure()
 plt.plot(HC_time, HC_volt)
 """
 
-
+"""
 #Setup the cells of the network
 celltypes = [GranuleCell, MossyCell, BasketCell, HippCell]
 cellnums = [10, 2,1,1]
@@ -117,7 +117,7 @@ plt.plot(MC_time, MC_volt)
 
 plt.show()
 
-
+"""
 
 
 
