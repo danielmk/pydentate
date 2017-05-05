@@ -52,10 +52,10 @@ plt.figure()
 plt.plot(HC_time, HC_volt)
 """
 
-"""
+
 #Setup the cells of the network
 celltypes = [GranuleCell, MossyCell, BasketCell, HippCell]
-cellnums = [10, 2,1,1]
+cellnums = [10,2,1,1]
 my_nw = network.Network(celltypes, cellnums)
 
 
@@ -89,13 +89,11 @@ my_nw.connect_cells(GranuleCell, MossyCell, [1,5,9,13], divergence = 1,
 my_nw.connect_cells(GranuleCell, BasketCell, [1,5,9,13], divergence = 1,
                         tau1 = 0.3, tau2 = 0.6, e = 0, g_max = 0.0047, thr = 10,
                         delay = 0.8, weight = 1, name = "GC->BC")
-                        
+
 #Setup GC to HC connection
 my_nw.connect_cells(GranuleCell, HippCell, [1,4,7,10], divergence = 1,
                     tau1 = 0.3, tau2 = 0.6, e = 0, g_max = 0.5, thr = 10,
                     delay = 1.5, weight = 1, name = "GC->HC")
-
-
 
 GC_volt, GC_time = my_nw.voltage_recording(GranuleCell)
 
