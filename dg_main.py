@@ -115,8 +115,5 @@ plt.plot(MC_time, MC_volt)
 
 plt.show()
 
-"""
-
-
 
 
