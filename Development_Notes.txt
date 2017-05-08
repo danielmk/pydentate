@@ -16,3 +16,15 @@ http://neuron.yale.edu/neuron/static/docs/neuronpython/ballandstick5.html
 
 The standard installation of neuron does not support parallel computing. To test if your neuron
 supports parallel computing, execute test_parallel.py
+This file prints the status of 4 processes. If your parallel computing is setup it should print
+something like:
+I am 3 of 4
+I am 0 of 4
+I am 1 of 4
+I am 2 of 4
+
+If parallel computing is not setup is prints:
+I am 0 of 1
+I am 0 of 1
+I am 0 of 1
+I am 0 of 1

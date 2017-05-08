@@ -63,7 +63,7 @@ class GenericCell(object):
             for seg_idx, y in enumerate(x):
                 y.L = dend_L[dend_idx][seg_idx]
                 y.diam = dend_diam[dend_idx][seg_idx]
-                
+
     def connect_post(self, source, synapse, thr = 10, delay = 1, weight = 0):
         if not hasattr(self, 'synapses'):
             self.synapses = []
@@ -80,7 +80,7 @@ class GenericCell(object):
         """Setup a current clamp recording"""
         self.stim = h.IClamp(self.soma(1))
         self.stim.amp = amp     #Too high amps crash the simulation without raising an error!
-        self.stim.dur = dur        
+        self.stim.dur = dur
         self.stim.delay = delay
 
         return self._voltage_recording()
