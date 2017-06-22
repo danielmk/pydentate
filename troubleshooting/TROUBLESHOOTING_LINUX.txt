@@ -14,3 +14,15 @@ convenient package manager. The error messages should give an ok idea
 on what packages are missing. You can confirm that compilation works
 on windows. Also make sure to delete all residual files from compilations
 on windows in the directory.
+
+# Parallel networks with neuron
+The default installation of neuron does not come with parallel capabilities.
+For parallel capabilities neuron needs to be compiled from source. Kristian
+had a lot of problems getting neuron to compile with functioning parallel
+processing and python as an alternative interpreter. Details follow.
+
+# Testing parallel capabilities of compiled neuron
+Tests are located in /neuron/nrn/src/parallel
+To execute the tests you need to have root access for currently unknown reasons
+To execute test0.hoc: mpiexec -np 4 /usr/local/neuron/nrn/x86_64/bin/nrniv -mpi test0.hoc
+To execute test0.py: mpiexec -np 4 /usr/local/neuron/nrn/x86_64/bin/nrniv -mpi test0.py

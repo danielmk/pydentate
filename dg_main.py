@@ -17,49 +17,49 @@ from hippcell import HippCell
 from neuron import h, gui
 import matplotlib.pyplot as plt
 import network
-
-print(len(dir(h)))
-
-#h.nrn_load_dll("C:\\nrn\\dentate_gyrus_python_translate\\nrnmech_new.dll")
 """
 myGC = GranuleCell()
-
 myMC = MossyCell()
-
 myBC = BasketCell()
-
 myHC = HippCell()
 
-GC_volt, GC_time = myGC.somatic_recording()
+GC_volt, GC_time = myGC._current_clamp_soma(delay = 200)
+MC_volt, MC_time = myMC._current_clamp_soma(delay = 200)
+BC_volt, BC_time = myBC._current_clamp_soma(delay = 200)
+HC_volt, HC_time = myHC._current_clamp_soma(delay = 200)
 
-MC_volt, MC_time = myMC.somatic_recording()
-
-BC_volt, BC_time = myBC.somatic_recording()
-
-HC_volt, HC_time = myHC.somatic_recording()
-
-h.tstop = 10000.0
-h.run(10000.0)
+h.tstop = 800.0
+h.run()
 
 plt.figure()
 plt.plot(GC_time, GC_volt)
-
+plt.xlabel('time (ms)')
+plt.ylabel('voltage (mV)')
+plt.ylim(-100, 60)
 plt.figure()
 plt.plot(MC_time, MC_volt)
-
+plt.xlabel('time (ms)')
+plt.ylabel('voltage (mV)')
+plt.ylim(-100, 60)
 plt.figure()
 plt.plot(BC_time, BC_volt)
-
+plt.xlabel('time (ms)')
+plt.ylabel('voltage (mV)')
+plt.ylim(-100, 60)
 plt.figure()
 plt.plot(HC_time, HC_volt)
+plt.xlabel('time (ms)')
+plt.ylabel('voltage (mV)')
+plt.ylim(-100, 60)
 """
 
-"""
+
+
+
 #Setup the cells of the network
 celltypes = [GranuleCell, MossyCell, BasketCell, HippCell]
-cellnums = [10,2,1,1]
+cellnums = [4,2,1,1]
 my_nw = network.Network(celltypes, cellnums)
-
 
 #Setup pp inputs
 my_nw.make_connection('pp_stim')
@@ -73,19 +73,18 @@ for x in my_nw.connections['pp_stim'].synapses:
     x.sid = sid
     x.g = 0.02 #microSiemens
     sid += 1
-
+    
 netstim = h.NetStim()
 netstim.interval = 100
 netstim.number = 1
 netstim.start = 500
 
-my_nw.connect_synapses_artificial(netstim, my_nw.connections['pp_stim'], 10, 3, 1)
-
+my_nw.connect_synapses_artificial(netstim, my_nw.connections['pp_stim'], 10, 3,0.1)
 
 #Setup GC to MC connection
 my_nw.connect_cells(GranuleCell, MossyCell, [1,5,9,13], divergence = 1,
                         tau1 = 0.5, tau2 = 6.2, e = 0, g_max = 0.0002, thr = 10,
-                        delay = 1.5, weight = 1, name = "GC->MC")
+                        delay = 1.5, weight = 0.01, name = "GC->MC")
 
 #Setup GC to BC connection
 my_nw.connect_cells(GranuleCell, BasketCell, [1,5,9,13], divergence = 1,
@@ -105,8 +104,6 @@ BC_volt, BC_time = my_nw.voltage_recording(BasketCell)
 
 HC_volt, HC_time = my_nw.voltage_recording(HippCell)
 
-#MC_volt, MC_time = my_nw.current_clamp(MossyCell, 0.2, 500, 500)
-
 my_nw.run_network(tstop = 2000)
 
 plt.figure()
@@ -114,8 +111,13 @@ plt.plot(GC_time, GC_volt)
 
 plt.plot(MC_time, MC_volt)
 
+plt.plot(BC_time, BC_volt)
+
+plt.plot(HC_time, HC_volt)
 
 plt.show()
-"""
 
+
+
+#h.nrn_load_dll("C:\\nrn\\dentate_gyrus_python_translate\\nrnmech_new.dll")
 

@@ -9,7 +9,8 @@ from neuron import h, gui
 
 class GranuleCell(GenericCell):
     """Create a granule cell, by using the methods provided by GenericCell"""    
-    def __init__(self):
+    def __init__(self, parallel = False):
+        self.parallel = parallel
         self.all_sections = []
         # Set up the sections with topology
         self.mk_sections(2,4)

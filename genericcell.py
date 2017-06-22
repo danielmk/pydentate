@@ -76,7 +76,7 @@ class GenericCell(object):
 
         return netcon
 
-    def _current_clamp_soma(self, amp, dur, delay):
+    def _current_clamp_soma(self, amp = 0.3, dur = 500, delay = 500):
         """Setup a current clamp recording"""
         self.stim = h.IClamp(self.soma(1))
         self.stim.amp = amp     #Too high amps crash the simulation without raising an error!
