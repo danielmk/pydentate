@@ -5,12 +5,29 @@ Created on Thu Apr 13 10:42:49 2017
 @author: DanielM
 """
 
-from genericcell import GenericCell
+from ouropy.genneuron import GenNeuron
+import ouropy.parameters as params
 
-class HippCell(GenericCell):
+class HippCell(GenNeuron):
+    def __init__(self, name = None):
+        self.name = name
+        self.all_secs = []
+        self.dendrites = []
+        
+        self.mk_soma(name='soma', diam=10, L=20)
+        
+        self.mk_dendrite(3, dend_name = 'short_1', sec_names = ['proxd', 'midd', 'distd'], diam = [3,2,1], L = [50,50,50], soma_loc = 0.0)
+        self.mk_dendrite(3, dend_name = 'short_2', sec_names = ['proxd', 'midd', 'distd'], diam = [3,2,1], L = [50,50,50], soma_loc = 0.0)
+        self.mk_dendrite(3, dend_name = 'long_1', sec_names = ['proxd', 'midd', 'distd'], diam = [3,2,1], L = [75,75,75], soma_loc = 1.0)
+        self.mk_dendrite(3, dend_name = 'long_2', sec_names = ['proxd', 'midd', 'distd'], diam = [3,2,1], L = [75,75,75], soma_loc = 1.0)
 
-    def __init__(self):
-            self.all_sections = []
+        parameters = params.read_parameters('hippcellparams.txt')
+
+        self.parameters = parameters
+
+        self.insert_mechs(parameters)
+
+"""self.all_sections = []
             # Set up the sections with topology
             self.mk_sections(4,3)
             # Set up geometry of sectionss
@@ -41,7 +58,7 @@ class HippCell(GenericCell):
             self.soma.cm = 1.1
         
             for x in self.dendrites:
-            #Mechanisms of the pdend which is in [0]
+            #Mechanisms of the proxd which is in [0]
                 x[0].insert('ichan2')
                 x[0].gnatbar_ichan2 = 0.2
                 x[0].gkfbar_ichan2 = 0.006
@@ -49,7 +66,7 @@ class HippCell(GenericCell):
                 x[0].cm = 1.1
                 
             for x in self.dendrites:
-            #Mechanisms of the ddend which is in [1] and [2]
+            #Mechanisms of the midd, distd which is in [1] and [2]
                 for y in x[1:]:
                     y.insert('ichan2')
                     y.gnatbar_ichan2 = 0.0
@@ -67,4 +84,4 @@ class HippCell(GenericCell):
                 x.el_ichan2 = -70.45
                 x.ehyf = -40
                 x.ehys = -40
-                # x.cao_ccanl = 2.0 defined in the soltesz model but not available here
+                # x.cao_ccanl = 2.0 defined in the soltesz model but not available here"""
