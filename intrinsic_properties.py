@@ -5,7 +5,7 @@ Created on Fri Jul 21 10:46:35 2017
 @author: DanielM
 """
 
-from basketcell import BasketCell
+from mossycell_cat import MossyCell
 from neuron import h, gui
 import matplotlib.pyplot as plt
 import numpy as np
@@ -53,8 +53,8 @@ def _run_current_injections(cell_type, input_current, v_init):
     return np.array(traces), t
 
 if __name__ == '__main__':
-    v_init = -50
-    cell_type = BasketCell
+    v_init = -60
+    cell_type = MossyCell
     input_current_passive = np.arange(-0.5,0,0.05)
     input_current_active = np.arange(0,1.1,0.1)
 

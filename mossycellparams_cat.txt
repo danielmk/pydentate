@@ -3,8 +3,8 @@ caiinf_ccanl	all	0.000005
 gkabar_borgka	all	0.00001
 gncabar_nca	all	0.00008
 glcabar_lca	all	0.0006
-gskbar_gskch	all	0.00105
-gkbar_cagk	all	0.0165
+gskbar_gskch	all	0.00025
+gkbar_cagk	all	0.018
 ghyfbar_hyperde3	all	0.000005
 ghysbar_hyperde3	all	0.000005
 Ra	all	100
