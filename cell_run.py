@@ -5,7 +5,7 @@ Created on Mon Sep 18 09:49:04 2017
 @author: DanielM
 """
 
-from granulecell_corrected import GranuleCell
+from granulecell import GranuleCell
 from neuron import h, gui
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,7 +31,6 @@ stim.delay = 300
 stim.amp = 0.2
 stim.dur = 500
 t.record(h._ref_t)
-
 
 """Initialization for -2000 to -100"""
 h.cvode.active(0)
