@@ -20,7 +20,7 @@ h.nrn_load_dll("C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santha
 
 class MFStimNetwork(ouropy.gennetwork.GenNetwork):
     
-    def __init__(self, seed = None):
+    def __init__(self, seed = None, n_cells = 200, stim_int = 20):
         #Setup cells
         self.mk_population(GranuleCell, 500)
         self.mk_population(MossyCell, 15) 
@@ -37,7 +37,7 @@ class MFStimNetwork(ouropy.gennetwork.GenNetwork):
         self.populations[3].record_aps()
 
         # Set up artificial mf stimulation
-        self.iclamped_cells = self.populations[0].current_clamp_rnd(200, amp=1, dur=6, delay=np.arange(100,305,20))
+        self.iclamped_cells = self.populations[0].current_clamp_rnd(n_cells, amp=1, dur=6, delay=np.arange(100,100+10*stim_int,stim_int))
 
 
         self.vclamp_vec = h.Vector()

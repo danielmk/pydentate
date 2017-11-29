@@ -13,7 +13,7 @@ import time
 
 for trial in range(20):
     print("Initializing trial " + str(trial))
-    nw = MFStimNetwork(seed=10000+trial)
+    nw = MFStimNetwork(seed=10000+trial, n_cells=200, stim_int=20)
 
     """Initialization for -2000 to -100"""
     print("Running trial " + str(trial))
