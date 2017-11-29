@@ -16,7 +16,7 @@ from ouropy.gennetwork import GenNetwork
 import numpy as np
 import time
 
-h.nrn_load_dll("C:\Users\DanielM\Repos\models_dentate\dentate_gyrus_Santhakumar2005_and_Yim_patterns\dentategyrusnet2005\\nrnmech.dll")
+h.nrn_load_dll("C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
 
 class MFStimNetwork(ouropy.gennetwork.GenNetwork):
     
@@ -89,7 +89,7 @@ class MFStimNetwork(ouropy.gennetwork.GenNetwork):
                                    'soma', 100, 0.26, 5.5, -70, -10, 0.85, 1.6*10**(-3))"""
         
         self.mk_Exp2SynConnection(self.populations[2], self.populations[0], 140,
-                                   'soma', 100, 3, 20, -70, -10, 0.85, 1.6*10**(-3))
+                                   'soma', 100, 1, 18, -70, -10, 0.85, 1.6*10**(-3))
         
         
         # BC -> MC
@@ -105,7 +105,7 @@ class MFStimNetwork(ouropy.gennetwork.GenNetwork):
         """self.mk_Exp2SynConnection(self.populations[3], self.populations[0], 260,
                                    'dd', 160, 0.5, 6, -70, 10, 1.6, 0.5*10**(-3))"""
         self.mk_Exp2SynConnection(self.populations[3], self.populations[0], 260,
-                                   'dd', 160, 3, 20, -70, 10, 1.6, 0.5*10**(-3))
+                                   'dd', 160, 1, 18, -70, 10, 1.6, 0.5*10**(-3))
         
         # HC -> MC
         self.mk_Exp2SynConnection(self.populations[3], self.populations[1], 5,
