@@ -13,7 +13,7 @@ import time
 
 for trial in range(20):
     print("Initializing trial " + str(trial))
-    nw = MFStimNetwork(seed=10000+trial, n_cells=200, stim_int=20)
+    nw = MFStimNetwork(seed=10000+trial, n_cells=200, stim_int=33)
 
     """Initialization for -2000 to -100"""
     print("Running trial " + str(trial))
@@ -33,7 +33,7 @@ for trial in range(20):
 
     """Setup run control for -100 to 1500"""
     h.frecord_init()  # Necessary after changing t to restart the vectors
-    while h.t < 400:
+    while h.t < 500:
         h.fadvance()
 
     print("Saving trial " + str(trial))

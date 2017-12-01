@@ -90,8 +90,7 @@ class MFStimNetwork(ouropy.gennetwork.GenNetwork):
         
         self.mk_Exp2SynConnection(self.populations[2], self.populations[0], 140,
                                    'soma', 100, 1, 18, -70, -10, 0.85, 1.6*10**(-3))
-        
-        
+
         # BC -> MC
         self.mk_Exp2SynConnection(self.populations[2], self.populations[1], 7,
                                    'proxd', 3, 0.3, 3.3, -70, -10, 1.5, 1.5*10**(-3))
