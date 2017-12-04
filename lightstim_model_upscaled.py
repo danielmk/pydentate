@@ -1,31 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-This is a fully wired network that functions with 50000 GCs and 1 PP input
-Auto init and run
+Created on Tue Nov 28 13:01:38 2017
 
 @author: DanielM
 """
 
 from neuron import h, gui
+import ouropy
+import matplotlib.pyplot as plt
+import numpy as np
 from granulecell import GranuleCell
 from mossycell_cat import MossyCell
 from basketcell import BasketCell
 from hippcell import HippCell
-import matplotlib.pyplot as plt
-from ouropy
-import numpy as np
 
 h.nrn_load_dll("C:\Users\Holger\danielm\models_dentate\dentate_gyrus_Santhakumar2005_and_Yim_patterns\dentategyrusnet2005\\nrnmech.dll")
 
-class PatternNetwork(ouropy.gennetwork.GenNetwork):
+class LightStimNetwork(ouropy.gennetwork.GenNetwork):
     """ This model implements the ring model from Santhakumar et al. 2005.
     It features inhibition but omits the MC->GC connection.
     Perforant Path input is delivered to the first 100 granule cells.
     """
-
-    def __init__(self, temporal_pattern, spatial_pattern, seed=None, sprouting=0):
+    def __init__(self, seed=None, n_cells=40, target_pool = range(40)):
         # Setup cells
-        # The model is scaled up x4
         self.mk_population(GranuleCell, 2000)
         self.mk_population(MossyCell, 60)
         self.mk_population(BasketCell, 24)
@@ -40,27 +37,24 @@ class PatternNetwork(ouropy.gennetwork.GenNetwork):
         self.populations[1].record_aps()
         self.populations[2].record_aps()
         self.populations[3].record_aps()
-
-        # Setup the PP stimulator
-        self.pp_stim = h.NetStim()
-        self.pp_stim.number = 1
-        self.pp_stim.start = 5
-
-        # Target poools have to be scaled up as well
-        # PP -> GC
-        self.mk_PerforantPathStimulation(self.pp_stim, self.populations[0],
-                                         np.arange(400), 'dd',
-                                         1.5, 5.5, 0, 10, 3, 2*10**(-2))
-
-        # PP -> MC
-        self.mk_PerforantPathStimulation(self.pp_stim, self.populations[1],
-                                         8, 'dd',
-                                         1.5, 5.5, 0, 10, 3, 0.5*10**(-2))
-
-        # PP -> BC
-        self.mk_PerforantPathStimulation(self.pp_stim, self.populations[2],
-                                         8, 'ddend',
-                                         2, 6.3, 0, 10, 3, 1*10**(-2))
+        
+        self.vclamp_vec = h.Vector()
+        vclamp_cell = self.populations[0].cells[500]
+        vclamp_cell._vclamp()
+        self.vclamp_vec.record(vclamp_cell.vclamp._ref_i)
+        self.volt_record = vclamp_cell._voltage_recording()
+        
+        target_pop = []
+        for idx in target_pool:
+            target_pop.append(self.populations[0].cells[idx])
+        
+        clamp_pop = np.random.choice(target_pop, n_cells, replace = False)
+        while vclamp_cell in clamp_pop:
+            clamp_pop = np.random.choice(target_pop, n_cells, replace = False)
+        
+        for cell in clamp_pop:
+            cell._current_clamp_soma(amp=1, dur=6, delay=100)
+        
         
         """
         Call signature of mk_Exp2SynConnection:
@@ -143,40 +137,41 @@ class PatternNetwork(ouropy.gennetwork.GenNetwork):
                                   20, 'ddend',
                                   4, 0.4, 5.8, -70, 10, 1.6, 0.5*10**(-3))
 
-        # Sprouting
-        self.mk_Exp2SynConnection(self.populations[0], self.populations[0],
-                                  100, 'proxd', sprouting,
-                                  1.5, 5.5, 0, 10, 0.8, 2*10**(-3))
-        
-if __name__ == '__main__':        
+if __name__ == '__main__':
 
-    temporal_patterns = np.random.poisson(10, (100, 3)).cumsum()
+    stimulations = 20
+    for trial in range(stimulations):
+        for rep in range(3):
+            target_pool = range(250*trial - 150 * trial, 250*(trial+1) - 150 * (trial+1))
     
-    nw = PatternNetwork(temporal_pattern, spatial_pattern, seed=10000, sprouting=0)
+            nw = LightStimNetwork(seed=10000+rep, n_cells=40, target_pool=target_pool)
     
-    """Initialization for -2000 to -100"""
-    h.cvode.active(0)
-    dt = 0.1
-    h.steps_per_ms = 1.0/dt
-    h.tstop = 1500
-    h.finitialize(-60)
-    h.t = -2000
-    h.secondorder = 0
-    h.dt = 10
-    while h.t < -100:
-        h.fadvance()
-        print(h.t)
-    h.secondorder = 2
-    h.t = 0
-    h.dt = 0.1
+            h.cvode.active(0)
+            dt = 0.1
+            h.steps_per_ms = 1.0/dt
+            h.tstop = 1500
+            h.finitialize(-60)
+            h.t = -2000
+            h.secondorder = 0
+            h.dt = 10
+            while h.t < -100:
+                h.fadvance()
+                #print(h.t)
+            h.secondorder = 2
+            h.t = 0
+            h.dt = 0.1
     
-    """Setup run control for -100 to 1500"""
-    h.frecord_init() # Necessary after changing t to restart the vectors
+            """Setup run control for -100 to 1500"""
+            h.frecord_init() # Necessary after changing t to restart the vectors
+            while h.t < 200:
+                h.fadvance()
     
-    """pp_stim.start = 50
-    pp_stim.forcestop = 300
-    pp_stim.nspk = 3
-    pp_stim.status = 1"""
+            print("Saving trial " + str(trial))
+            nw.populations[0].write_aps("GranuleCells_trial_" + str(trial) + "_rep_" + str(rep))
+            nw.populations[1].write_aps("MossyCells_" + str(trial) + "_rep_" + str(rep))
+            nw.populations[2].write_aps("BasketCells_" + str(trial) + "_rep_" + str(rep))
+            nw.populations[3].write_aps("HIPPCells_" + str(trial) + "_rep_" + str(rep))
     
-    while h.t < 300:
-        h.fadvance()
+            f_name = "volt_clamp_trial_" + str(trial) + "_rep_" +str(rep)
+    
+            np.savez(f_name, nw.vclamp_vec.as_numpy())
