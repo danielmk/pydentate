@@ -105,7 +105,7 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
         
         self.mk_Exp2SynConnection(self.populations[2], self.populations[0],
                                   560, 'soma',
-                                  100, 0.26, 20, -70, -10, 0.85, 1.6*10**(-3))
+                                  100, 0.26, 5.5, -70, -10, 0.85, 1.6*10**(-3))
         
         
         # BC -> MC
@@ -125,7 +125,7 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
                                      160, 0.5, 6, -70, 10, 1.6, 0.5*10**(-3))"""
         self.mk_Exp2SynConnection(self.populations[3], self.populations[0],
                                   1040, 'dd',
-                                  160, 0.5, 20, -70, 10, 1.6, 0.5*10**(-3))
+                                  160, 0.5, 6, -70, 10, 1.6, 0.5*10**(-3))
         
         # HC -> MC
         self.mk_Exp2SynConnection(self.populations[3], self.populations[1],
@@ -143,11 +143,11 @@ if __name__ == '__main__':
     for trial in range(stimulations):
         for rep in range(3):
             target_pool = range(250*trial - 150 * trial, 250*(trial+1) - 150 * (trial+1))
-    
-            nw = LightStimNetwork(seed=10000+rep, n_cells=40, target_pool=target_pool)
-    
+
+            nw = LightStimNetwork(seed=10000+rep, n_cells=60, target_pool=target_pool)
+
             h.cvode.active(0)
-            dt = 0.1
+            dt = 0.01
             h.steps_per_ms = 1.0/dt
             h.tstop = 1500
             h.finitialize(-60)
@@ -159,19 +159,19 @@ if __name__ == '__main__':
                 #print(h.t)
             h.secondorder = 2
             h.t = 0
-            h.dt = 0.1
-    
+            h.dt = 0.01
+
             """Setup run control for -100 to 1500"""
             h.frecord_init() # Necessary after changing t to restart the vectors
             while h.t < 200:
                 h.fadvance()
-    
+
             print("Saving trial " + str(trial))
             nw.populations[0].write_aps("GranuleCells_trial_" + str(trial) + "_rep_" + str(rep))
             nw.populations[1].write_aps("MossyCells_" + str(trial) + "_rep_" + str(rep))
             nw.populations[2].write_aps("BasketCells_" + str(trial) + "_rep_" + str(rep))
             nw.populations[3].write_aps("HIPPCells_" + str(trial) + "_rep_" + str(rep))
-    
+
             f_name = "volt_clamp_trial_" + str(trial) + "_rep_" +str(rep)
-    
+
             np.savez(f_name, nw.vclamp_vec.as_numpy())
