@@ -119,7 +119,7 @@ if __name__ == '__main__':
     
             stim = range(20 * stim_pos + offset * stim_pos, 20 * (stim_pos+1) + offset * stim_pos)
             nw = LightStimk(seed=10000+trial, n_cells=200, stim_int=20)
-        
+
             """Initialization for -2000 to -100"""
             print("Running trial " + str(trial))
             h.cvode.active(0)
