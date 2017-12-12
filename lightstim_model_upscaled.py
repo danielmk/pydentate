@@ -43,19 +43,14 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
         vclamp_cell._vclamp()
         self.vclamp_vec.record(vclamp_cell.vclamp._ref_i)
         self.volt_record = vclamp_cell._voltage_recording()
-        
-        target_pop = []
-        for idx in target_pool:
-            target_pop.append(self.populations[0].cells[idx])
-        
-        clamp_pop = np.random.choice(target_pop, n_cells, replace = False)
-        while vclamp_cell in clamp_pop:
-            clamp_pop = np.random.choice(target_pop, n_cells, replace = False)
-        
-        for cell in clamp_pop:
-            cell._current_clamp_soma(amp=1, dur=6, delay=100)
-        
-        
+
+        targets = np.random.choice(target_pool, n_cells, replace = False)
+        while 500 in targets:
+            targets = np.random.choice(target_pool, n_cells, replace = False)
+
+        for idx in targets:
+            self.populations[0].cells[idx]._current_clamp_soma(amp=1, dur=6, delay=100)
+
         """
         Call signature of mk_Exp2SynConnection:
         (self, pre_pop, post_pop, target_pool,
@@ -140,11 +135,15 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
 if __name__ == '__main__':
 
     stimulations = 20
-    for trial in range(stimulations):
+    
+    stim_start = range(0,1900,50)
+    
+    #for trial in range(stimulations):
+    for trial in range(39):
         for rep in range(3):
-            target_pool = range(250*trial - 150 * trial, 250*(trial+1) - 150 * (trial+1))
+            target_pool = range(stim_start[trial], stim_start[trial] + 100)
 
-            nw = LightStimNetwork(seed=10000+rep, n_cells=60, target_pool=target_pool)
+            nw = LightStimNetwork(seed=10000+rep, n_cells=20, target_pool=target_pool)
 
             h.cvode.active(0)
             dt = 0.01
