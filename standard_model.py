@@ -109,7 +109,7 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         """self.mk_Exp2SynConnection(self.populations[2], self.populations[0],
                                      140, 'soma',
                                      100, 0.26, 5.5, -70, -10, 0.85, 1.6*10**(-3))"""
-        
+
         self.mk_Exp2SynConnection(self.populations[2], self.populations[0],
                                   140, 'soma',
                                   100, 0.26, 20, -70, -10, 0.85, 1.6*10**(-3))
