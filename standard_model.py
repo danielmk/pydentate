@@ -133,7 +133,7 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         self.mk_Exp2SynConnection(self.populations[3], self.populations[0],
                                   260, 'dd',
                                   160, 0.5, 20, -70, 10, 1.6, 0.5*10**(-3))
-        
+
         # HC -> MC
         self.mk_Exp2SynConnection(self.populations[3], self.populations[1],
                                   5, ['mid1d', 'mid2d'],
