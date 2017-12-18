@@ -14,7 +14,7 @@ from mossycell_cat import MossyCell
 from basketcell import BasketCell
 from hippcell import HippCell
 
-h.nrn_load_dll("C:\Users\Holger\danielm\models_dentate\dentate_gyrus_Santhakumar2005_and_Yim_patterns\dentategyrusnet2005\\nrnmech.dll")
+h.nrn_load_dll("C:\Users\DanielM\Repos\models_dentate\dentate_gyrus_Santhakumar2005_and_Yim_patterns\dentategyrusnet2005\\nrnmech.dll")
 
 class StandardNetwork(ouropy.gennetwork.GenNetwork):
     """ This model implements the ring model from Santhakumar et al. 2005.
