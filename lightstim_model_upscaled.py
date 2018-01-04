@@ -14,14 +14,14 @@ from mossycell_cat import MossyCell
 from basketcell import BasketCell
 from hippcell import HippCell
 
-h.nrn_load_dll("C:\Users\Holger\danielm\models_dentate\dentate_gyrus_Santhakumar2005_and_Yim_patterns\dentategyrusnet2005\\nrnmech.dll")
+h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
 
 class LightStimNetwork(ouropy.gennetwork.GenNetwork):
     """ This model implements the ring model from Santhakumar et al. 2005.
     It features inhibition but omits the MC->GC connection.
     Perforant Path input is delivered to the first 100 granule cells.
     """
-    def __init__(self, seed=None, n_cells=40, target_pool = range(40)):
+    def __init__(self, seed=None, targets = range(40)):
         # Setup cells
         self.mk_population(GranuleCell, 2000)
         self.mk_population(MossyCell, 60)
@@ -44,12 +44,7 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
         self.vclamp_vec.record(vclamp_cell.vclamp._ref_i)
         self.volt_record = vclamp_cell._voltage_recording()
 
-        targets = np.random.choice(target_pool, n_cells, replace = False)
-        while 500 in targets:
-            targets = np.random.choice(target_pool, n_cells, replace = False)
-
-        for idx in targets:
-            self.populations[0].cells[idx]._current_clamp_soma(amp=1, dur=6, delay=100)
+        self.populations[0].current_clamp_range(targets, amp=1, dur=6, delay=100)
 
         """
         Call signature of mk_Exp2SynConnection:
@@ -58,17 +53,17 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
         """
         
         # GC -> MC
-        self.mk_Exp2SynConnection(self.populations[0], self.populations[1],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[1],
                                   12, 'proxd',
                                   1, 0.5,6.2, 0, 10, 1.5, 0.2*10**(-3))
     
         # GC -> BC
-        self.mk_Exp2SynConnection(self.populations[0], self.populations[2],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[2],
                                   12, 'proxd',
                                   1, 0.3, 0.6, 0, 10, 0.8, 4.7*10**(-3))
 
         # GC -> HC
-        self.mk_Exp2SynConnection(self.populations[0], self.populations[3],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[3],
                                   20, 'proxd',
                                   3, 0.3, 0.6, 0, 10, 1.5, 0.5*10**(-3))
 
@@ -78,17 +73,17 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
                                      200, 1.5, 5.5, 0, 10, 3, 0.3*10**(-3))"""
 
         # MC -> MC
-        self.mk_Exp2SynConnection(self.populations[1], self.populations[1],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[1], self.populations[1],
                                   24, 'proxd',
                                   3, 0.45, 2.2, 0, 10, 2, 0.5*10**(-3))
 
         # MC -> BC
-        self.mk_Exp2SynConnection(self.populations[1], self.populations[2],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[1], self.populations[2],
                                   12, 'proxd',
                                   1, 0.1, 0.1, 1, 10, 3, 0.3*10**(-3))
 
         # MC -> HC
-        self.mk_Exp2SynConnection(self.populations[1], self.populations[3],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[1], self.populations[3],
                                   20, 'midd',
                                   2, 0.9, 3.6, 0, 10, 3,0.2*10**(-3))
         
@@ -98,18 +93,18 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
                                      140, 'soma',
                                      100, 0.26, 5.5, -70, -10, 0.85, 1.6*10**(-3))"""
         
-        self.mk_Exp2SynConnection(self.populations[2], self.populations[0],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[0],
                                   560, 'soma',
                                   100, 0.26, 5.5, -70, -10, 0.85, 1.6*10**(-3))
         
         
         # BC -> MC
-        self.mk_Exp2SynConnection(self.populations[2], self.populations[1],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[1],
                                   28, 'proxd',
                                   3, 0.3, 3.3, -70, -10, 1.5, 1.5*10**(-3))
         
         # BC -> BC
-        self.mk_Exp2SynConnection(self.populations[2], self.populations[2],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[2],
                                   12, 'proxd',
                                   2, 0.16, 1.8, -70, -10, 0.8, 7.6*10**(-3))
         
@@ -118,32 +113,36 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
         """self.mk_Exp2SynConnection(self.populations[3], self.populations[0],
                                      260, 'dd',
                                      160, 0.5, 6, -70, 10, 1.6, 0.5*10**(-3))"""
-        self.mk_Exp2SynConnection(self.populations[3], self.populations[0],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[0],
                                   1040, 'dd',
                                   160, 0.5, 6, -70, 10, 1.6, 0.5*10**(-3))
         
         # HC -> MC
-        self.mk_Exp2SynConnection(self.populations[3], self.populations[1],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[1],
                                   20, ['mid1d', 'mid2d'],
                                   4, 0.5, 6, -70, 10, 1, 1.5*10**(-3))
         
         # HC -> BCa
-        self.mk_Exp2SynConnection(self.populations[3], self.populations[2],
+        ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[2],
                                   20, 'ddend',
                                   4, 0.4, 5.8, -70, 10, 1.6, 0.5*10**(-3))
 
 if __name__ == '__main__':
 
     stimulations = 20
-    
-    stim_start = range(0,1900,50)
+    n_cells = 160
+    stim_start = range(0,1850,50)
     
     #for trial in range(stimulations):
-    for trial in range(39):
-        for rep in range(3):
-            target_pool = range(stim_start[trial], stim_start[trial] + 100)
-
-            nw = LightStimNetwork(seed=10000+rep, n_cells=20, target_pool=target_pool)
+    #for trial in range(39):
+        #for rep in range(3):
+    for trial in [9]:
+        for rep in [0]:
+            target_pool = range(stim_start[trial], stim_start[trial] + 200)
+            targets = np.random.choice(target_pool, n_cells, replace = False)
+            targets = np.delete(targets,np.argwhere(targets == 500))
+            
+            nw = LightStimNetwork(seed=10000+rep, targets=targets)
 
             h.cvode.active(0)
             dt = 0.01
