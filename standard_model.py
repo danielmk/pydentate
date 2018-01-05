@@ -19,9 +19,10 @@ h.nrn_load_dll("C:\Users\DanielM\Repos\models_dentate\dentate_gyrus_Santhakumar2
 class StandardNetwork(ouropy.gennetwork.GenNetwork):
     """ This model implements the ring model from Santhakumar et al. 2005.
     It features inhibition but omits the MC->GC connection.
-    Perforant Path input is delivered to the first 100 granule cells.
+    
     """
-    def __init__(self, seed=None, sprouting=0):
+    def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
+                 spatial_patterns_bcs=np.array([]), sprouting=0):
         # Setup cells
         self.mk_population(GranuleCell, 500)
         self.mk_population(MossyCell, 15)
@@ -42,28 +43,38 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         # Setup the PP stimulator
         self.pp_stim = h.NetStim()
         self.pp_stim.number = 1
-        self.pp_stim.start = 5
+        self.pp_stim.start = 5    
+        
+        if spatial_patterns_gcs.any() and temporal_patterns.any():
+            spatial_patterns_gcs = np.atleast_2d(spatial_patterns_gcs)
+            for pat in range(len(spatial_patterns_gcs)):
+                # PP -> GC
+                ouropy.gennetwork.PerforantPathPoissonStimulation(self.populations[0],
+                                                           temporal_patterns[pat],
+                                                           spatial_patterns_gcs[pat],
+                                                           'dd',
+                                                           1.5, 5.5, 0, 2*10**(-2))
+    
+        if spatial_patterns_bcs.any() and temporal_patterns.any():
+            spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
+            for pat in range(len(spatial_patterns_bcs)):
+                # PP -> BC
+                ouropy.gennetwork.PerforantPathPoissonStimulation(self.populations[2],
+                                                           temporal_patterns[pat],
+                                                           spatial_patterns_bcs[pat],
+                                                           'ddend',
+                                                           2, 6.3, 0, 1*10**(-2))
 
-        # PP -> GC
-        ouropy.gennetwork.PerforantPathStimulation(self.pp_stim, self.populations[0],
-                                         np.arange(100), 'dd',
-                                         1.5, 5.5, 0, 10, 3, 2*10**(-2))
-
-        # PP -> MC
-        ouropy.gennetwork.PerforantPathStimulation(self.pp_stim, self.populations[1],
+        # PP -> MC Not in Yim et al. 2017
+        """ouropy.gennetwork.PerforantPathStimulation(self.pp_stim, self.populations[1],
                                          2, 'dd',
-                                         1.5, 5.5, 0, 10, 3, 0.5*10**(-2))
-
-        # PP -> BC
-        ouropy.gennetwork.PerforantPathStimulation(self.pp_stim, self.populations[2],
-                                         2, 'ddend',
-                                         2, 6.3, 0, 10, 3, 1*10**(-2))
+                                         1.5, 5.5, 0, 10, 3, 0.5*10**(-2))"""
 
         # Sprouting
         ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[0],
                                   100, 'proxd', sprouting,
                                   1.5, 5.5, 0, 10, 0.8, 2*10**(-3))
-        
+
         """
         Call signature of mk_Exp2SynConnection:
         (self, pre_pop, post_pop, target_pool,
@@ -104,7 +115,7 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.Exp2SynConnection(self.populations[1], self.populations[3],
                                   5, 'midd',
                                   2, 0.9, 3.6, 0, 10, 3,0.2*10**(-3))
-        
+
         # BC -> GC
         #ORIGINAL
         """self.mk_Exp2SynConnection(self.populations[2], self.populations[0],
@@ -114,18 +125,17 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[0],
                                   140, 'soma',
                                   100, 0.26, 20, -70, -10, 0.85, 1.6*10**(-3))
-        
-        
+
         # BC -> MC
         ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[1],
                                   7, 'proxd',
                                   3, 0.3, 3.3, -70, -10, 1.5, 1.5*10**(-3))
-        
+
         # BC -> BC
         ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[2],
                                   3, 'proxd',
                                   2, 0.16, 1.8, -70, -10, 0.8, 7.6*10**(-3))
-        
+
         # HC -> GC
         #ORIGINAL
         """self.mk_Exp2SynConnection(self.populations[3], self.populations[0],
@@ -139,15 +149,21 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[1],
                                   5, ['mid1d', 'mid2d'],
                                   4, 0.5, 6, -70, 10, 1, 1.5*10**(-3))
-        
+
         # HC -> BCa
         ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[2],
                                   5, 'ddend',
                                   4, 0.4, 5.8, -70, 10, 1.6, 0.5*10**(-3))
 
 if __name__ == '__main__':
-    nw = StandardNetwork(seed = 10000, sprouting = 20)
+    temporal_patterns = np.array([50,70,90])
+    spatial_patterns_gcs = np.random.choice(500,200,replace=False)
+    spatial_patterns_bcs = np.random.choice(6,2,replace=False)
     
+    nw = StandardNetwork(seed = 10000, temporal_patterns = temporal_patterns,
+                         spatial_patterns_gcs = spatial_patterns_gcs,
+                         spatial_patterns_bcs = spatial_patterns_bcs, sprouting = 0)
+
     h.cvode.active(0)
     dt = 0.1
     h.steps_per_ms = 1.0/dt
@@ -162,7 +178,7 @@ if __name__ == '__main__':
     h.secondorder = 2
     h.t = 0
     h.dt = 0.1
-    
+
     """Setup run control for -100 to 1500"""
     h.frecord_init() # Necessary after changing t to restart the vectors
     while h.t < 300:
