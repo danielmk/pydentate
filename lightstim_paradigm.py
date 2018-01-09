@@ -21,7 +21,7 @@ stim_dur = 6
 stim_delay = 100
 idx_measured_cell = 500
 
-for x in range 
+
 # Create a standard networks
 nw = standard_net.StandardNetwork()
 
