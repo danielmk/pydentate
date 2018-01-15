@@ -23,7 +23,7 @@ class MossyCell(GenNeuron):
         self.mk_dendrite(4, dend_name = 'dend_3', sec_names = ['proxd', 'mid1d', 'mid2d', 'dd'], diam = [5.78,4,2.5,1], L = [50,50,50,50], soma_loc = 0)
         self.mk_dendrite(4, dend_name = 'dend_4', sec_names = ['proxd', 'mid1d', 'mid2d', 'dd'], diam = [5.78,4,2.5,1], L = [50,50,50,50], soma_loc = 0)
 
-        parameters = params.read_parameters('mossycellparams.txt')
+        parameters = params.read_parameters('mossycellparams_cat.txt')
 
         self.insert_mechs(parameters)
 

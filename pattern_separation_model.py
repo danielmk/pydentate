@@ -149,8 +149,6 @@ class PatternNetwork(ouropy.gennetwork.GenNetwork):
         self.mk_Exp2SynConnection(self.populations[0], self.populations[0],
                                   25, 'proxd', sprouting,
                                   1.5, 5.5, 0, 10, 0.8, 2*10**(-3))
-                                  
-                                  
 
 if __name__ == '__main__':
 
