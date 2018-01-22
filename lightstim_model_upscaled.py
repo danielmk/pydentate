@@ -121,7 +121,7 @@ class LightStimNetwork(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[1],
                                   20, ['mid1d', 'mid2d'],
                                   4, 0.5, 6, -70, 10, 1, 1.5*10**(-3))
-        
+
         # HC -> BCa
         ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[2],
                                   20, 'ddend',
