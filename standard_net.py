@@ -154,7 +154,7 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
 
 if __name__ == '__main__':
     """A testrun for StandardNetwork"""
-    h.nrn_load_dll("C:\Users\DanielM\Repos\models_dentate\dentate_gyrus_Santhakumar2005_and_Yim_patterns\dentategyrusnet2005\\nrnmech.dll")
+    h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
     np.random.seed(1000)
     temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)
     spatial_patterns_gcs = np.random.choice(2000,800,replace=False)
