@@ -82,7 +82,7 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[1],
                                   12, 'proxd',
                                   1, 0.5,6.2, 0, 10, 1.5, 0.2*10**(-3))
-    
+
         # GC -> BC
         ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[2],
                                   12, 'proxd',
