@@ -34,7 +34,7 @@ for period in stim_periods:
                                                dur = stim_dur,
                                                delays = stim_times)
         ctrl_vclamp_cell = ctrl_nw.populations[1].cells[12]
-        ctrl_vclamp_cell._vclamp(dur1=200, amp1=-70, rs=0.001)
+        ctrl_vclamp_cell._vclamp(dur1=100+10*period+500, amp1=-70, rs=0.001)
         ctrl_i_vec = h.Vector()
         ctrl_i_vec.record(ctrl_vclamp_cell.vclamp._ref_i)
         ctrl_volt_rec = ctrl_vclamp_cell._voltage_recording()
