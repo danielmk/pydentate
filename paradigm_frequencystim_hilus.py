@@ -67,7 +67,7 @@ for period in stim_periods:
         ctrl_nw.populations[3].write_aps("HIPPCells_period_" + str(period) + "_rep_" + str(rep))
         
         f_name = "volt_clamp_period_" + str(period) + "_rep_" + str(rep)
-        
         np.savez(f_name, ctrl_i_vec.as_numpy())
+        f_name = "volt_clamp_period_" + str(period) + "_rep_" + str(rep)
         
         stop_save = time.clock()
