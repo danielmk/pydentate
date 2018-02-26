@@ -24,7 +24,7 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
     It features inhibition but omits the MC->GC connection.
     """
     def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
-                 spatial_patterns_bcs=np.array([]), sprouting=0):
+                 spatial_patterns_bcs=np.array([]), sprouting=10):
         # Setup cells
         self.mk_population(GranuleCell, 2000)
         self.mk_population(MossyCell, 60)
@@ -154,15 +154,19 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
 
 if __name__ == '__main__':
     """A testrun for StandardNetwork"""
-    h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+    h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
     np.random.seed(1000)
-    temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)
-    spatial_patterns_gcs = np.random.choice(2000,800,replace=False)
-    spatial_patterns_bcs = np.random.choice(6,2,replace=False)
+    #temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)
+    temporal_patterns = np.array([3])
+    #spatial_patterns_gcs = np.random.choice(2000,400,replace=False)
+    spatial_patterns_gcs = np.arange(400)
+    spatial_patterns_bcs = np.random.choice(24,2,replace=False)
     
     nw = StandardNetwork(seed = 10000, temporal_patterns = temporal_patterns,
                          spatial_patterns_gcs = spatial_patterns_gcs,
                          spatial_patterns_bcs = spatial_patterns_bcs, sprouting = 0)
+
+    print("TEST")
 
     h.cvode.active(0)
     dt = 0.1
@@ -178,8 +182,12 @@ if __name__ == '__main__':
     h.secondorder = 2
     h.t = 0
     h.dt = 0.1
-
+    print("Test2")
     """Setup run control for -100 to 1500"""
     h.frecord_init() # Necessary after changing t to restart the vectors
-    while h.t < 300:
+    while h.t < 200:
         h.fadvance()
+        print(h.t)
+        
+    nw.populations[0].plot_aps()
+    
