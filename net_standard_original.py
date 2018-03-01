@@ -156,10 +156,11 @@ class StandardNetworkOriginal(ouropy.gennetwork.GenNetwork):
 
 if __name__ == '__main__':
     """A testrun for StandardNetwork"""
-    np.random.seed(10000)
-    temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)
+    """np.random.seed(10000)
+    temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)"""
     spatial_patterns_gcs = np.random.choice(500,200,replace=False)
     spatial_patterns_bcs = np.random.choice(6,2,replace=False)
+    temporal_patterns = np.array([50])
     
     nw = StandardNetwork(seed = 10000, temporal_patterns = temporal_patterns,
                          spatial_patterns_gcs = spatial_patterns_gcs,
