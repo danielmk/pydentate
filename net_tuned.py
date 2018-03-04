@@ -81,7 +81,7 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         # GC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[1],
                                   12, 'proxd',
-                                  1, 6.2, 250, 0.02, 0, 0, 10, 1.5, 0.2*10**(-3))
+                                  1, 6.2, 250, 0.04, 0, 0, 10, 1.5, 0.2*10**(-2))
 
         # GC -> BC
         ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[2],
@@ -154,7 +154,11 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
 
 if __name__ == '__main__':
     """A testrun for StandardNetwork"""
-    h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+    # Insert path for your relevant nrnmech.dll
+    """Path on PhD room office PC"""
+    #h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+    """Path on home PC"""
+    h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
     np.random.seed(1000)
     #temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)
     temporal_patterns = np.array([3])
@@ -165,6 +169,7 @@ if __name__ == '__main__':
     nw = StandardNetwork(seed = 10000, temporal_patterns = temporal_patterns,
                          spatial_patterns_gcs = spatial_patterns_gcs,
                          spatial_patterns_bcs = spatial_patterns_bcs, sprouting = 0)
+    mc_current_clamp = nw.populations[1][4]._voltage_recording()
 
     
 
