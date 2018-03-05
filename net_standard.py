@@ -61,12 +61,7 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
                                                            spatial_patterns_bcs[pat],
                                                            'ddend',
                                                            2, 6.3, 0, 1*10**(-2))
-
-        # PP -> MC Not in Yim et al. 2017
-        """ouropy.gennetwork.PerforantPathStimulation(self.pp_stim, self.populations[1],
-                                         2, 'dd',
-                                         1.5, 5.5, 0, 10, 3, 0.5*10**(-2))"""
-
+		   
         # Sprouting
         ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[0],
                                   100, 'proxd', sprouting,

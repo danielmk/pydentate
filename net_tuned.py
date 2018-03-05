@@ -18,7 +18,7 @@ from mossycell_cat import MossyCell
 from basketcell import BasketCell
 from hippcell import HippCell
 
-class StandardNetwork(ouropy.gennetwork.GenNetwork):
+class TunedNetwork(ouropy.gennetwork.GenNetwork):
     """ This model implements the ring model from Santhakumar et al. 2005.
     with some changes as in Yim et al. 2015.
     It features inhibition but omits the MC->GC connection.
@@ -42,8 +42,8 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
         self.populations[3].record_aps()
 
         temporal_patterns = np.atleast_2d(temporal_patterns)
-        if spatial_patterns_gcs.any() and temporal_patterns.any():
-            spatial_patterns_gcs = np.atleast_2d(spatial_patterns_gcs)
+        if type(spatial_patterns_gcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
+            #spatial_patterns_gcs = np.atleast_2d(spatial_patterns_gcs)
             for pat in range(len(spatial_patterns_gcs)):
                 # PP -> GC
                 ouropy.gennetwork.PerforantPathPoissonStimulation(self.populations[0],
@@ -52,8 +52,8 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
                                                            'dd',
                                                            1.5, 5.5, 0, 2*10**(-2))
 
-        if spatial_patterns_bcs.any() and temporal_patterns.any():
-            spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
+        if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
+            #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
             for pat in range(len(spatial_patterns_bcs)):
                 # PP -> BC
                 ouropy.gennetwork.PerforantPathPoissonStimulation(self.populations[2],
@@ -61,37 +61,36 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
                                                            spatial_patterns_bcs[pat],
                                                            'ddend',
                                                            2, 6.3, 0, 1*10**(-2))
-
-        # PP -> MC Not in Yim et al. 2017
-        """ouropy.gennetwork.PerforantPathStimulation(self.pp_stim, self.populations[1],
-                                         2, 'dd',
-                                         1.5, 5.5, 0, 10, 3, 0.5*10**(-2))"""
-
-        # Sprouting
-        ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[0],
-                                  100, 'proxd', sprouting,
-                                  1.5, 5.5, 0, 10, 0.8, 2*10**(-3))
+        """
+        call signature of tmgsynConnection
+        tmgsynConnection(self, pre_pop, post_pop, target_pool, target_segs,
+                divergence, tau_1, tau_facil, U, tau_rec, e, thr, delay, weight)
+        """
+		# Sprouting
+        ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[0],
+                                           100, 'proxd', sprouting, 5.5, 0, 1,
+                                           0, 0, 10, 0.8, 2*10**(-3))
 
         """
         Call signature of mk_Exp2SynConnection:
         (self, pre_pop, post_pop, target_pool,
          target_segs, divergence, tau1, tau2, e, thr, delay, weight)
         """
-        
+
         # GC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[1],
                                   12, 'proxd',
-                                  1, 6.2, 250, 0.04, 0, 0, 10, 1.5, 0.2*10**(-2))
+                                  1, 6.2, 250, 0.1, 0, 0, 10, 1.5, 0.2*10**(-2) * 10)
 
         # GC -> BC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[2],
-                                  12, 'proxd',
-                                  1, 0.3, 0.6, 0, 10, 0.8, 4.7*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[2],
+                                           12, 'proxd',
+                                           1, 0.6, 0, 1, 0, 0, 10, 0.8, 4.7*10**(-3))
 
         # GC -> HC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[3],
-                                  20, 'proxd',
-                                  3, 0.3, 0.6, 0, 10, 1.5, 0.5*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
+                                           20, 'proxd',
+                                           3, 0.6, 0, 1, 0, 0, 10, 1.5, 0.5*10**(-3))
 
         # MC -> GC
         """self.mk_Exp2SynConnection(self.populations[1], self.populations[0],
@@ -99,79 +98,72 @@ class StandardNetwork(ouropy.gennetwork.GenNetwork):
                                      200, 1.5, 5.5, 0, 10, 3, 0.3*10**(-3))"""
 
         # MC -> MC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[1], self.populations[1],
-                                  24, 'proxd',
-                                  3, 0.45, 2.2, 0, 10, 2, 0.5*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[1], self. populations[1],
+                                           24, 'proxd',
+                                           3, 2.2, 0, 1, 0, 0, 10, 2, 0.5*10**(-3))
 
         # MC -> BC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[1], self.populations[2],
-                                  12, 'proxd',
-                                  1, 0.1, 0.1, 1, 10, 3, 0.3*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[1], self.populations[2],
+                                           12, 'proxd',
+                                           1, 0.1, 0, 1, 0, 0, 10, 3, 0.3*10**(-3))
 
         # MC -> HC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[1], self.populations[3],
-                                  20, 'midd',
-                                  2, 0.9, 3.6, 0, 10, 3,0.2*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[1], self.populations[3],
+                                           20, 'midd',
+                                           2, 3.6, 0, 1, 0, 0, 10, 3, 0.2*10**(-3))
 
         # BC -> GC
-        #ORIGINAL
-        ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[0],
-                                     560, 'soma',
-                                     100, 0.26, 5.5, -70, -10, 0.85, 1.6*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
+                                           560, 'soma',
+                                           100, 5.5, 0, 1, 0, -70, 10, 0.85, 1.6*10**(-3))
 
-        """"ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[0],
-                                  140, 'soma',
-                                  100, 0.26, 20, -70, -10, 0.85, 1.6*10**(-3))"""
-
-        # BC -> MC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[1],
-                                  28, 'proxd',
-                                  3, 0.3, 3.3, -70, -10, 1.5, 1.5*10**(-3))
+        # BC -> MC        
+        ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[1],
+                                           28, 'proxd',
+                                           3, 3.3, 0, 1, 0, -70, -10, 1.5, 1.5*10**(-3))
 
         # BC -> BC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[2],
-                                  12, 'proxd',
-                                  2, 0.16, 1.8, -70, -10, 0.8, 7.6*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[2],
+                                           12,'proxd',
+                                           2, 1.8, 0,1,0,-70, -10, 0.8, 7.6*10**(-3))
 
         # HC -> GC
         #ORIGINAL
-        ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[0],
-                                     1040, 'dd',
-                                     160, 0.5, 6, -70, 10, 1.6, 0.5*10**(-3))
-        """ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[0],
-                                  260, 'dd',
-                                  160, 0.5, 20, -70, 10, 1.6, 0.5*10**(-3))"""
+        ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
+                                           1040, 'dd',
+                                           160, 6, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-3))
 
         # HC -> MC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[1],
-                                  20, ['mid1d', 'mid2d'],
-                                  4, 0.5, 6, -70, 10, 1, 1.5*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],
+                                           20, ['mid1d', 'mid2d'],
+                                           4, 6, 0, 1, 0, -70, 10, 1, 1.5*10**(-3))
 
         # HC -> BC
-        ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[2],
-                                  20, 'ddend',
-                                  4, 0.4, 5.8, -70, 10, 1.6, 0.5*10**(-3))
+        ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[2],
+                                           20, 'ddend',
+                                           4, 5.8, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-3))
 
 if __name__ == '__main__':
     """A testrun for StandardNetwork"""
     # Insert path for your relevant nrnmech.dll
     """Path on PhD room office PC"""
-    #h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+    h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
     """Path on home PC"""
-    h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+    #h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
     np.random.seed(1000)
     #temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)
     temporal_patterns = np.array([3])
     spatial_patterns_gcs = np.random.choice(2000,400,replace=False)
-    spatial_patterns_gcs = np.arange(400)
+    #spatial_patterns_gcs = np.arange(400)
     spatial_patterns_bcs = np.random.choice(24,2,replace=False)
     
     nw = StandardNetwork(seed = 10000, temporal_patterns = temporal_patterns,
                          spatial_patterns_gcs = spatial_patterns_gcs,
                          spatial_patterns_bcs = spatial_patterns_bcs, sprouting = 0)
-    mc_current_clamp = nw.populations[1][4]._voltage_recording()
 
-    
+    cell_measured = []
+    for x in nw.populations[1]:
+        cell_measured.append(x._voltage_recording())
 
     print("TEST")
 
