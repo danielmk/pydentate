@@ -23,6 +23,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
     with some changes as in Yim et al. 2015.
     It features inhibition but omits the MC->GC connection.
     """
+    name = "TunedNetwork"
     def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
                  spatial_patterns_bcs=np.array([]), sprouting=0):
         # Setup cells
@@ -46,21 +47,24 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
             #spatial_patterns_gcs = np.atleast_2d(spatial_patterns_gcs)
             for pat in range(len(spatial_patterns_gcs)):
                 # PP -> GC
-                ouropy.gennetwork.PerforantPathPoissonStimulation(self.populations[0],
+                #Original
+                """ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_gcs[pat],
-                                                           'dd',
-                                                           1.5, 5.5, 0, 2*10**(-2))
+                                                           'dd', 5.5, 0, 1, 0, 0, 2*10**(-2))"""
+                ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
+                                                           temporal_patterns[pat],
+                                                           spatial_patterns_gcs[pat],
+                                                           'dd', 5.5, 0, 1, 0, 0, 0.40825*10**(-2))   
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
             for pat in range(len(spatial_patterns_bcs)):
                 # PP -> BC
-                ouropy.gennetwork.PerforantPathPoissonStimulation(self.populations[2],
+                ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[2],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_bcs[pat],
-                                                           'ddend',
-                                                           2, 6.3, 0, 1*10**(-2))
+                                                           'ddend', 6.3, 0, 1, 0, 0, 1*10**(-2))
         """
         call signature of tmgsynConnection
         tmgsynConnection(self, pre_pop, post_pop, target_pool, target_segs,
@@ -88,9 +92,13 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            1, 0.6, 0, 1, 0, 0, 10, 0.8, 4.7*10**(-3))
 
         # GC -> HC
+        # Divergence x4; Weight doubled; Connected randomly.
+        """ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
+                                           24, 'proxd',
+                                           3, 0.6, 0, 1, 0, 0, 10, 1.5, 0.5*10**(-3))"""
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
-                                           20, 'proxd',
-                                           3, 0.6, 0, 1, 0, 0, 10, 1.5, 0.5*10**(-3))
+                                           24, 'proxd',
+                                           12, 0.6, 0, 1, 0, 0, 10, 1.5, 1.0*10**(-3))
 
         # MC -> GC
         """self.mk_Exp2SynConnection(self.populations[1], self.populations[0],
@@ -130,17 +138,17 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         # HC -> GC
         #ORIGINAL
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
-                                           1040, 'dd',
+                                           2000, 'dd',
                                            160, 6, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-3))
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],
-                                           20, ['mid1d', 'mid2d'],
+                                           60, ['mid1d', 'mid2d'],
                                            4, 6, 0, 1, 0, -70, 10, 1, 1.5*10**(-3))
 
         # HC -> BC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[2],
-                                           20, 'ddend',
+                                           24, 'ddend',
                                            4, 5.8, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-3))
 
 if __name__ == '__main__':
@@ -157,7 +165,7 @@ if __name__ == '__main__':
     #spatial_patterns_gcs = np.arange(400)
     spatial_patterns_bcs = np.random.choice(24,2,replace=False)
     
-    nw = StandardNetwork(seed = 10000, temporal_patterns = temporal_patterns,
+    nw = TunedNetwork(seed = 10000, temporal_patterns = temporal_patterns,
                          spatial_patterns_gcs = spatial_patterns_gcs,
                          spatial_patterns_bcs = spatial_patterns_bcs, sprouting = 0)
 

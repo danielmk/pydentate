@@ -9,7 +9,7 @@ from ouropy.genneuron import GenNeuron
 import ouropy.parameters as params
 
 class BasketCell(GenNeuron):
-
+    name = "BasketCell"
     def __init__(self, name = None):
         
         self.name = name

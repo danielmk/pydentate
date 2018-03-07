@@ -11,6 +11,7 @@ import ouropy.parameters as params
 
 class GranuleCell(GenNeuron):
     """Create a granule cell, by using the methods provided by GenericCell"""
+    name = 'GranuleCell'
     def __init__(self, name=None):
         # Make soma
         self.mk_soma(name='soma', diam=16.8, L=16.8)

@@ -9,6 +9,7 @@ from ouropy.genneuron import GenNeuron
 import ouropy.parameters as params
 
 class HippCell(GenNeuron):
+    name = "HippCell"
     def __init__(self, name = None):
         self.name = name
         self.all_secs = []
