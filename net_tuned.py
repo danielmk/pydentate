@@ -75,21 +75,15 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            100, 'proxd', sprouting, 5.5, 0, 1,
                                            0, 0, 10, 0.8, 2*10**(-3))
 
-        """
-        Call signature of mk_Exp2SynConnection:
-        (self, pre_pop, post_pop, target_pool,
-         target_segs, divergence, tau1, tau2, e, thr, delay, weight)
-        """
-
         # GC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[1],
                                   12, 'proxd',
-                                  1, 6.2, 250, 0.1, 0, 0, 10, 1.5, 0.2*10**(-2) * 10)
+                                  1, 6.2, 500, 0.1, 0, 0, 10, 1.5, 0.2*10**(-2) * 10)
 
         # GC -> BC
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[2],
                                            12, 'proxd',
-                                           1, 0.6, 0, 1, 0, 0, 10, 0.8, 4.7*10**(-3))
+                                           1, 0.6, 500, 1, 0, 0, 10, 0.8, 4.7*10**(-3))
 
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.
@@ -98,7 +92,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            3, 0.6, 0, 1, 0, 0, 10, 1.5, 0.5*10**(-3))"""
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
                                            24, 'proxd',
-                                           12, 0.6, 0, 1, 0, 0, 10, 1.5, 1.0*10**(-3))
+                                           12, 0.6, 500, 1, 0, 0, 10, 1.5, 1.0*10**(-3))
 
         # MC -> GC
         """self.mk_Exp2SynConnection(self.populations[1], self.populations[0],
