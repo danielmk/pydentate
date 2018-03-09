@@ -11,9 +11,9 @@ import numpy as np
 import net_tuned
 import time
 # Office PC
-#h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
 #Home PC
-h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+#h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
 np.random.seed(10000)
 # Generate temporal patterns for the 100 PP inputs
 temporal_patterns = np.random.poisson(10, (400, 3)).cumsum(axis = 1)
