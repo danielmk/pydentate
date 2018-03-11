@@ -23,9 +23,12 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
     with some changes as in Yim et al. 2015.
     It features inhibition but omits the MC->GC connection.
     """
+    
     name = "TunedNetwork"
     def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
                  spatial_patterns_bcs=np.array([]), sprouting=0):
+        self.init_params = locals()
+        self.init_params['self'] = str(self.init_params['self'])
         # Setup cells
         self.mk_population(GranuleCell, 2000)
         self.mk_population(MossyCell, 60)
@@ -81,9 +84,10 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                   1, 6.2, 500, 0.1, 0, 0, 10, 1.5, 0.2*10**(-2) * 10)
 
         # GC -> BC
+        #Weight x4
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[2],
                                            12, 'proxd',
-                                           1, 0.6, 500, 1, 0, 0, 10, 0.8, 4.7*10**(-3))
+                                           1, 0.6, 500, 1, 0, 0, 10, 0.8, 18.8*10**(-3))
 
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.

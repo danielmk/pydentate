@@ -11,9 +11,9 @@ import numpy as np
 import net_tuned
 import time
 # Office PC
-h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+#h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
 #Home PC
-#h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
 np.random.seed(10000)
 # Generate temporal patterns for the 100 PP inputs
 temporal_patterns = np.random.poisson(10, (400, 3)).cumsum(axis = 1)
@@ -39,28 +39,36 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-nw = net_tuned.TunedNetwork(10000, temporal_patterns[0:6], PP_to_GCs[0:6], PP_to_BCs[0:6], sprouting=0)
+save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-11"
 
-# Run the model
-"""Initialization for -2000 to -100"""
-h.cvode.active(0)
-dt = 0.1
-h.steps_per_ms = 1.0/dt
-h.tstop = 1500
-h.finitialize(-60)
-h.t = -2000
-h.secondorder = 0
-h.dt = 10
-while h.t < -100:
-    h.fadvance()
-    print(h.t)
-
-h.secondorder = 2
-h.t = 0
-h.dt = 0.1
-
-"""Setup run control for -100 to 1500"""
-h.frecord_init() # Necessary after changing t to restart the vectors
-
-while h.t < 200:
-    h.fadvance()
+runs = range(50)
+for run in runs:
+    nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
+    
+    # Run the model
+    """Initialization for -2000 to -100"""
+    h.cvode.active(0)
+    dt = 0.1
+    h.steps_per_ms = 1.0/dt
+    h.tstop = 1500
+    h.finitialize(-60)
+    h.t = -2000
+    h.secondorder = 0
+    h.dt = 10
+    while h.t < -100:
+        h.fadvance()
+        print(h.t)
+    
+    h.secondorder = 2
+    h.t = 0
+    h.dt = 0.1
+    
+    """Setup run control for -100 to 1500"""
+    h.frecord_init() # Necessary after changing t to restart the vectors
+    
+    while h.t < 200:
+        h.fadvance()
+    
+    save_file_name = str(nw) + '_run_' + str(run)
+    nw.shelve_network(save_dir, save_file_name)
+    
