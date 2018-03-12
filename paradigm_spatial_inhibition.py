@@ -13,9 +13,9 @@ import net_tuned
 import time
 
 # Office PC
-#h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
 #Home PC
-h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+#h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
 
 # Setup specs for stimulation
 n_cells = 100 # Number of cells that are stimulated

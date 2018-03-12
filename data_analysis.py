@@ -7,7 +7,10 @@ Created on Sun Mar 11 10:25:41 2018
 import shelve
 import numpy as np
 
-directory = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_pattern-separation_saves_2018-03-11\\"
+#Home PC
+#directory = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_pattern-separation_saves_2018-03-11\\"
+#Office PC
+directory = "Y:\\DanielM\\023_Dentate Gyrus Model\\paradigm_pattern-separation_saves_2018-03-11\\"
 file_name = "net_tuned.TunedNetwork_run_"
 
 shelve_files = []
