@@ -73,7 +73,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         tmgsynConnection(self, pre_pop, post_pop, target_pool, target_segs,
                 divergence, tau_1, tau_facil, U, tau_rec, e, thr, delay, weight)
         """
-		# Sprouting
+		  # Sprouting
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[0],
                                            100, 'proxd', sprouting, 5.5, 0, 1,
                                            0, 0, 10, 0.8, 2*10**(-3))
@@ -84,7 +84,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                   1, 6.2, 500, 0.1, 0, 0, 10, 1.5, 0.2*10**(-2) * 10)
 
         # GC -> BC
-        #Weight x4
+        #Weight x4, target_pool = 3
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[2],
                                            12, 'proxd',
                                            1, 0.6, 500, 1, 0, 0, 10, 0.8, 18.8*10**(-3))

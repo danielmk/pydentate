@@ -44,7 +44,7 @@ save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_sav
 runs = range(50)
 for run in runs:
     nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
-    
+
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)

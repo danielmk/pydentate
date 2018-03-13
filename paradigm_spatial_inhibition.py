@@ -26,7 +26,7 @@ stim_dur = 6
 stim_delay = 100
 
 # Setup specs for measurements
-cells_to_measure = range(0,2000, 5)
+cells_to_measure = range(0,2000, 50)
 
 for run in range(1):
     # Create a standard networks and add the stimulation
