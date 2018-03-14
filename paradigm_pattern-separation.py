@@ -11,9 +11,9 @@ import numpy as np
 import net_tuned
 import time
 # Office PC
-#h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
 #Home PC
-h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+#h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
 np.random.seed(10000)
 # Generate temporal patterns for the 100 PP inputs
 temporal_patterns = np.random.poisson(10, (400, 3)).cumsum(axis = 1)
@@ -41,7 +41,7 @@ all_targets = np.array([y for x in PP_to_GCs for y in x])
 
 save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-11"
 
-runs = range(50)
+runs = range(1)
 for run in runs:
     nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
 
@@ -69,6 +69,6 @@ for run in runs:
     while h.t < 200:
         h.fadvance()
     
-    save_file_name = str(nw) + '_run_' + str(run)
-    nw.shelve_network(save_dir, save_file_name)
+    #save_file_name = str(nw) + '_run_' + str(run)
+    #nw.shelve_network(save_dir, save_file_name)
     
