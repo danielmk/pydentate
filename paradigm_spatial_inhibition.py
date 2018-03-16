@@ -28,6 +28,8 @@ stim_delay = 100
 # Setup specs for measurements
 cells_to_measure = range(0,2000, 50)
 
+save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-03-11"
+
 for run in range(1):
     # Create a standard networks and add the stimulation
     nw = net_tuned.TunedNetwork(seed = 10000 + run)
@@ -38,16 +40,8 @@ for run in range(1):
                                                delay = stim_delay)
     
     nw.populations[0].SEClamp(cells_to_measure)
-    nw.populations[0].voltage_recording(cells_to_measure)
+    nw.populations[0].voltage_recording(stim_cells)
 
-    """measured_cells = []
-    for x in cells_to_measure:
-        ctrl_vclamp_cell = nww.populations[0].cells[x]
-        ctrl_vclamp_cell._SEClamp(dur1=200, amp1=0, rs=0.001)()
-        ctrl_i_vec = h.Vector()
-        ctrl_i_vec.record(ctrl_vclamp_cell.vclamp._ref_i)
-        ctrl_volt_rec = ctrl_vclamp_cell._voltage_recording()"""
-    
     """Initialization for -2000 to -100"""
     #print("Running trial " + str(trial))
     h.cvode.active(0)

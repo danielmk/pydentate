@@ -39,7 +39,7 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-11"
+save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-11"
 
 runs = range(1)
 for run in runs:
@@ -69,6 +69,9 @@ for run in runs:
     while h.t < 200:
         h.fadvance()
     
-    #save_file_name = str(nw) + '_run_' + str(run)
-    #nw.shelve_network(save_dir, save_file_name)
+    save_file_name = str(nw) + '_run_' + str(run)
+    nw.shelve_network(save_dir, save_file_name)
+    fig = nw.plot_aps()
+    fig_file_name = str(nw) + '_spike_plot_run_' + str(run)
+    nw.save_ap_fig(fig, save_dir, fig_file_name)
     
