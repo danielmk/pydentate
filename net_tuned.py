@@ -134,7 +134,6 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            2, 1.8, 0,1,0,-70, -10, 0.8, 7.6*10**(-3))
 
         # HC -> GC
-        #ORIGINAL
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
                                            2000, 'dd',
                                            160, 6, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-3))
