@@ -119,9 +119,10 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            2, 3.6, 0, 1, 0, 0, 10, 3, 0.2*10**(-3))
 
         # BC -> GC
+        # Nr. synapses x2.5; Weight halfed
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
                                            560, 'soma',
-                                           100, 5.5, 0, 1, 0, -70, 10, 0.85, 1.6*10**(-3))
+                                           250, 5.5, 0, 1, 0, -70, 10, 0.85, 0.8*10**(-3))
 
         # BC -> MC        
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[1],
@@ -134,9 +135,10 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            2, 1.8, 0,1,0,-70, -10, 0.8, 7.6*10**(-3))
 
         # HC -> GC
+        # Weight x10; Nr synapses x2
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
                                            2000, 'dd',
-                                           160, 6, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-3))
+                                           320, 6, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-2))
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],

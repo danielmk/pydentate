@@ -12,9 +12,9 @@ import net_tuned
 import matplotlib.pyplot as plt
 
 # Office PC
-# h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
 # Home PC
-h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+#h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
 
 # Setup specs for stimulation
 n_cells = 100  # Number of cells that are stimulated
@@ -27,9 +27,9 @@ stim_delay = 50
 # Setup specs for measurements
 cells_to_measure = range(0, 2000, 50)
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-03-18"
+save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-03-22_2"
 
-for run in range(2,10):
+for run in range(0,1):
     # Create a standard networks and add the stimulation
     nw = net_tuned.TunedNetwork(seed=10000+run)
     np.random.seed(10000 + run)
@@ -38,7 +38,7 @@ for run in range(2,10):
                                           amp=stim_amp,
                                           dur=stim_dur,
                                           delay=stim_delay)
-    
+
     nw.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
     nw.populations[0].voltage_recording(stim_cells)
 
