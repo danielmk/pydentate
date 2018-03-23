@@ -25,15 +25,21 @@ stim_dur = 15
 stim_delay = 50
 
 # Setup specs for measurements
-cells_to_measure = range(0, 2000, 50)
+cells_to_measure = np.arange(0, 2000, 50)
 
-save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-03-22_2"
+save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-03-23"
 
-for run in range(0,1):
+for run in range(2,10):
     # Create a standard networks and add the stimulation
     nw = net_tuned.TunedNetwork(seed=10000+run)
     np.random.seed(10000 + run)
+    
+    # Make sure we are not stimulating a cell we measure
     stim_cells = np.random.choice(range(stim_location, stim_location+stim_pool), n_cells, replace = False)
+    while np.intersect1d(stim_cells, cells_to_measure).any():
+        stim_cells = np.random.choice(range(stim_location, stim_location+stim_pool), n_cells, replace = False)
+    print("Done intersecting")
+    
     nw.populations[0].current_clamp_range(stim_cells,
                                           amp=stim_amp,
                                           dur=stim_dur,
