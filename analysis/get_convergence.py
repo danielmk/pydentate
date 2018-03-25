@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 #Home PC
 #directory = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_pattern-separation_saves_2018-03-11\\"
 #Office PC
-def get_convergence():
-    pass
+#directory = "Y:\\DanielM\\023_Dentate Gyrus Model\\paradigm_spatial-inhibition\\"
+#Dropbox
+directory = "C:\\Users\\daniel\\Dropbox\\paradigm_spatial-inhibition\\paradigm_spatial_inhibition_saves_2018-03-23\\"
 
-directory = "Y:\\DanielM\\023_Dentate Gyrus Model\\paradigm_spatial-inhibition\\"
-file_name = "run_1_data"
+file_name = "run_2_data"
 
 data = shelve.open(directory + file_name)
 # Get to BasketCell Connection

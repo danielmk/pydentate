@@ -10,11 +10,16 @@ from neuron import h
 import numpy as np
 import net_tuned
 import matplotlib.pyplot as plt
+import os
 
-# Office PC
-h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
-# Home PC
-#h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+# Locate and load the nrnmech.dll file. Must to be adjusted for your machine.
+dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
+            "C:\\Users\\daniel\\repos\\nrnmech.dll"]
+for x in dll_files:
+    if os.path.isfile(x):
+        dll_dir = x
+print("DLL loaded from: " + str(dll_dir))
+h.nrn_load_dll(dll_dir)
 
 # Setup specs for stimulation
 n_cells = 100  # Number of cells that are stimulated
@@ -27,9 +32,9 @@ stim_delay = 50
 # Setup specs for measurements
 cells_to_measure = np.arange(0, 2000, 50)
 
-save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-03-23"
+save_dir = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_spatial_inhibition_saves_2018-03-24_2"
 
-for run in range(2,10):
+for run in range(19,30):
     # Create a standard networks and add the stimulation
     nw = net_tuned.TunedNetwork(seed=10000+run)
     np.random.seed(10000 + run)
