@@ -10,12 +10,12 @@ import numpy as np
 #Home PC
 #directory = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_pattern-separation_saves_2018-03-11\\"
 #Office PC
-directory = "Y:\\DanielM\\023_Dentate Gyrus Model\\paradigm_pattern-separation_saves_2018-03-11\\"
+directory = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-31_patterns_10ECSpikes\\"
 file_name = "net_tuned.TunedNetwork_run_"
 
 shelve_files = []
 active_cells = []
-for run in range(30):
+for run in range(1):
     shelve_files.append(shelve.open(directory + file_name + str(run)))
     ap_n_array = np.array(shelve_files[run]['net_tuned.TunedNetwork']['populations'][0]['ap_number'])
     active_cells.append(len(np.argwhere(ap_n_array)))
