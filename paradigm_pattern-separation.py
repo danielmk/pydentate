@@ -52,14 +52,16 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-31_patterns_10ECSpikes"
+save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-31_patterns_10ECSpikes"
 
-runs = range(2,10)
+runs = range(20)
 for run in runs:
     nw_tuned = net_tuned_10ECInputs.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_global = net_global.GlobalNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_nonfacilitating = net_nonfacilitating.NonfacilitatingNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_disinhibited = net_disinhibited.DisinhibitedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
+
+    nw_tuned.populations[0].voltage_recording(range(0,2000,10))
 
     # Run the model
     """Initialization for -2000 to -100"""

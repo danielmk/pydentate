@@ -6,12 +6,13 @@ Created on Sun Mar 11 10:25:41 2018
 """
 import shelve
 import numpy as np
+import matplotlib.pyplot as plt
 
 #Home PC
 #directory = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_pattern-separation_saves_2018-03-11\\"
 #Office PC
-directory = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-31_patterns_10ECSpikes\\"
-file_name = "net_tuned.TunedNetwork_run_"
+directory = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_saves_2018-04-13_patterns_10ECSpikes\\"
+file_name = "net_tuned_10ECInputs.TunedNetwork_run_1"
 
 shelve_files = []
 active_cells = []
