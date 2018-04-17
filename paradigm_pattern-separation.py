@@ -56,7 +56,7 @@ save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_sa
 
 runs = range(20)
 for run in runs:
-    nw_tuned = net_tuned_10ECInputs.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
+    nw_tuned = net_tuned.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_global = net_global.GlobalNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_nonfacilitating = net_nonfacilitating.NonfacilitatingNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_disinhibited = net_disinhibited.DisinhibitedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)

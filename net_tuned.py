@@ -58,7 +58,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_gcs[pat],
-                                                           'dd', 5.5, 0, 1, 0, 0, 0.40825*10**(-2))   
+                                                           'proxd', 5.5, 0, 1, 0, 0, 0.40825*10**(-2))   
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
@@ -138,7 +138,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         # Weight x10; Nr synapses x4
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
                                            2000, 'dd',
-                                           640, 6, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-2))
+                                           640, 6, 0, 1, 0, -70, 10, 1.6, 0.55*10**(-2))
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],
