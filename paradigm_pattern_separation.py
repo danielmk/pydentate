@@ -12,9 +12,10 @@ import net_tuned
 import net_nonfacilitating
 import net_global
 import net_disinhibited
-import net_tuned_10ECInputs
+#import net_tuned_10ECInputs
 import time
 import os
+from burst_generator import poisson_burst_generator
 
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
             "C:\\Users\\daniel\\repos\\nrnmech.dll"]
@@ -24,12 +25,20 @@ for x in dll_files:
 print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
-np.random.seed(10000)
 # Generate temporal patterns for the 100 PP inputs
-temporal_patterns = np.random.poisson(10, (400, 10)).cumsum(axis = 1)
-
+temporal_patterns = poisson_burst_generator(inter_burst_interval=100,
+                                            nr_bursts=20,
+                                            nr_trains=400,
+                                            intra_burst_interval=10,
+                                            spikes_per_burst=5,
+                                            numpy_seed=10000,
+                                            train_t_stop=1000,
+                                            burst_t_stop=None)
 # Original from Yim
+#np.random.seed(10000)
 #temporal_patterns = np.random.poisson(10, (400, 3)).cumsum(axis = 1)
+
+
 
 # Generate the PP -> GC mapping so that each GC receives inputs from 20/400
 # randomly chosen PP inputs
@@ -52,11 +61,11 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-03-31_patterns_10ECSpikes"
+save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-04-22_patterns"
 
-runs = range(2,10)
+runs = range(1)
 for run in runs:
-    nw_tuned = net_tuned_10ECInputs.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
+    nw_tuned = net_tuned.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_global = net_global.GlobalNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_nonfacilitating = net_nonfacilitating.NonfacilitatingNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_disinhibited = net_disinhibited.DisinhibitedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
@@ -82,8 +91,9 @@ for run in runs:
     """Setup run control for -100 to 1500"""
     h.frecord_init() # Necessary after changing t to restart the vectors
     
-    while h.t < 200:
+    while h.t < 400:
         h.fadvance()
+    print("Done Running")
 
     tuned_save_file_name = str(nw_tuned) + '_run_' + str(run)
     #global_save_file_name = str(nw_global) + '_run_' + str(run)
@@ -94,7 +104,7 @@ for run in runs:
     #nw_nonfacilitating.shelve_network(save_dir, nonfacilitating_save_file_name)
     #nw_disinhibited.shelve_network(save_dir, disinhibited_save_file_name)
 
-    fig = nw_tuned.plot_aps()
+    fig = nw_tuned.plot_aps(time=1000)
     tuned_fig_file_name = str(nw_tuned) + '_spike_plot_run_' + str(run)
     nw_tuned.save_ap_fig(fig, save_dir, tuned_fig_file_name)
     """

@@ -17,13 +17,14 @@ from granulecell import GranuleCell
 from mossycell_cat import MossyCell
 from basketcell import BasketCell
 from hippcell import HippCell
+import os
 
 class TunedNetwork(ouropy.gennetwork.GenNetwork):
     """ This model implements the ring model from Santhakumar et al. 2005.
     with some changes as in Yim et al. 2015.
     It features inhibition but omits the MC->GC connection.
     """
-    
+
     name = "TunedNetwork"
     def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
                  spatial_patterns_bcs=np.array([]), sprouting=0):
@@ -45,7 +46,9 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         self.populations[2].record_aps()
         self.populations[3].record_aps()
 
-        temporal_patterns = np.atleast_2d(temporal_patterns)
+        temporal_patterns = np.array(temporal_patterns)
+        print(np.shape(temporal_patterns))
+        #temporal_patterns = np.atleast_2d(temporal_patterns)
         if type(spatial_patterns_gcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_gcs = np.atleast_2d(spatial_patterns_gcs)
             for pat in range(len(spatial_patterns_gcs)):
@@ -58,7 +61,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_gcs[pat],
-                                                           'proxd', 5.5, 0, 1, 0, 0, 0.40825*10**(-2))   
+                                                           'dd', 5.5, 0, 1, 0, 0, 0.40825*10**(-2))   
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
@@ -152,10 +155,13 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
 
 if __name__ == '__main__':
     """A testrun for StandardNetwork"""
-    # Insert path for your relevant nrnmech.dll
-    """Path on PhD room office PC"""
-    h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
-    """Path on home PC"""
+    dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
+                "C:\\Users\\daniel\\repos\\nrnmech.dll"]
+    for x in dll_files:
+        if os.path.isfile(x):
+            dll_dir = x
+    print("DLL loaded from: " + str(dll_dir))
+    h.nrn_load_dll(dll_dir)
     #h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
     np.random.seed(1000)
     #temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)
