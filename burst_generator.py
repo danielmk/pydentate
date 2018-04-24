@@ -38,52 +38,16 @@ def poisson_burst_generator(inter_burst_interval =100,
                             numpy_seed = None,
                             train_t_stop = None,
                             burst_t_stop=None):
-    if numpy_seed:
-        np.random.seed(numpy_seed)
 
-    # I don't get this fucking .any() thing
-
-    burst_intervals = poisson_generator(interval = inter_burst_interval,
-                               nr_spikes = nr_bursts,
-                               nr_trains = nr_trains,
-                               t_stop = train_t_stop,
-                               numpy_seed = numpy_seed)
-
-
-
-    new_trains= []
-    for train_idx, train in enumerate(burst_intervals):
-        bursts = np.array([])
-        loop=0
-        while not bursts.any():
-
-            bursts = poisson_generator(interval=intra_burst_interval,
-                                      nr_spikes=spikes_per_burst,
-                                      nr_trains=len(train),
-                                      t_stop=burst_t_stop,
-                                      numpy_seed=numpy_seed+train_idx+loop)
-            loop = loop+1
-
-        bursts = np.round(bursts,decimals=1)
-        train = np.repeat(train[:,np.newaxis],np.shape(bursts[1]),axis=1)
-
-        train = np.sort(train)
-        new_train = train + bursts
-        new_train=np.sort(new_train.flatten())
-        new_trains.append(new_train)
-
-    return new_trains
+    burst_intervals = np.repeat(np.arange(0,500,100)[np.newaxis,:],repeats=400,axis=0)
+    burst_intervals = np.repeat(burst_intervals[:,:,np.newaxis], repeats = 5, axis=2)
+    #bursts = np.cumsum(np.random.exponential(10,(400,5,5)), axis=2)
+    bursts = np.random.exponential(10,(400,5,5))
+    spike_trains = burst_intervals + bursts
+    spike_trains = spike_trains.reshape(400,25)
+    return spike_trains
 
 if __name__ == '__main__':
-    temporal_patterns_inter_burst = poisson_generator(t_stop=1000, numpy_seed=10000)
-    plt.figure()
-    plt.eventplot(temporal_patterns_inter_burst)
-    plt.title("numpy generated eventplot")
-
-    plt.figure()
-    plt.hist(np.hstack(temporal_patterns_inter_burst.flat), bins = int(np.hstack(temporal_patterns_inter_burst.flat).max()))
-    plt.title("numpy generated time histogram")
-    
     temporal_patterns = poisson_burst_generator(inter_burst_interval=100,
                                                nr_bursts=20,
                                                nr_trains=1000,
