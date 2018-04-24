@@ -21,7 +21,7 @@ def inhom_poiss():
     
     t = np.arange(0,0.5,sampling_interval.magnitude)
     
-    rate_profile = (np.sin(t*10*np.pi*2) + 1) * max_rate / 2
+    rate_profile = (np.sin(t*10*np.pi*2-np.pi/2) + 1) * max_rate / 2
 
     rate_profile_as_asig = AnalogSignal(rate_profile, units = 1*pq.Hz,t_start=0*pq.s, t_stop=0.5*pq.s, sampling_period = sampling_interval)
 
@@ -29,7 +29,7 @@ def inhom_poiss():
     for x in range(400):
         what.append(spike_train_generation.inhomogeneous_poisson_process(rate_profile_as_asig))
 
-    array_like = np.array([np.array(x.times) for x in what])
+    array_like = np.array([np.array(x.times)*1000 for x in what])
 
     return array_like
 

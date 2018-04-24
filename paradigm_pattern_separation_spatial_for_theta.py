@@ -26,6 +26,7 @@ print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
 # Generate temporal patterns for the 100 PP inputs
+np.random.seed(10000)
 temporal_patterns = inhom_poiss()
 # Original from Yim
 #np.random.seed(10000)
