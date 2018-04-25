@@ -4,7 +4,6 @@ gksbar_ichan2	soma	0.006
 gkabar_borgka	soma	0.012
 gncabar_nca	soma	0.002
 glcabar_lca	soma	0.005
-gcatbar_cat	soma	0.000037
 gskbar_gskch	soma	0.001
 gkbar_cagk	soma	0.0006
 gl_ichan2	soma	0.00004
@@ -25,7 +24,7 @@ gkfbar_ichan2	gcld	0.004
 gksbar_ichan2	gcld	0.006
 gncabar_nca	gcld	0.003
 glcabar_lca	gcld	0.0075
-gcatbar_cat	gcld	0.000075
+gcatbar_cat	gcld	0.00075
 gskbar_gskch	gcld	0.0004
 gkbar_cagk	gcld	0.0006
 gl_ichan2	gcld	0.00004
@@ -33,7 +32,7 @@ cm	gcld	1.0
 gnatbar_ichan2	proxd	0.013
 gkfbar_ichan2	proxd	0.004
 gksbar_ichan2	proxd	0.006
-gncabar_nca	proxd	0.001
+gncabar_nca	proxd	0.01
 glcabar_lca	proxd	0.0075
 gcatbar_cat	proxd	0.00025
 gskbar_gskch	proxd	0.0002
@@ -45,7 +44,7 @@ gkfbar_ichan2	midd	0.001
 gksbar_ichan2	midd	0.006
 gncabar_nca	midd	0.001
 glcabar_lca	midd	0.0005
-gcatbar_cat	midd	0.0005
+gcatbar_cat	midd	0.025
 gskbar_gskch	midd	0.0
 gkbar_cagk	midd	0.0024
 gl_ichan2	midd	0.000063
@@ -55,7 +54,7 @@ gkfbar_ichan2	dd	0.001
 gksbar_ichan2	dd	0.008
 gncabar_nca	dd	0.001
 glcabar_lca	dd	0.0
-gcatbar_cat	dd	0.001
+gcatbar_cat	dd	0.051
 gskbar_gskch	dd	0.0
 gkbar_cagk	dd	0.0024
 gl_ichan2	dd	0.000063

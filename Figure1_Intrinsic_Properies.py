@@ -6,11 +6,18 @@ Created on Sun Feb 25 16:17:11 2018
 """
 
 from neuron import h, gui
+import os
 
-h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
+dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
+            "C:\\Users\\daniel\\repos\\nrnmech.dll"]
+for x in dll_files:
+    if os.path.isfile(x):
+        dll_dir = x
+print("DLL loaded from: " + str(dll_dir))
+h.nrn_load_dll(dll_dir)
 
 from granulecell import GranuleCell
-from mossycell_cat import MossyCell
+from mossycell import MossyCell
 from basketcell import BasketCell
 from hippcell import HippCell
 import matplotlib.pyplot as plt
@@ -20,10 +27,10 @@ mc = MossyCell()
 bc = BasketCell()
 hc = HippCell()
 
-gc_stim = gc._current_clamp_soma(0.2, 500, 50)
-mc_stim = mc._current_clamp_soma(0.2, 500, 50)
-bc_stim = bc._current_clamp_soma(0.2, 500, 50)
-hc_stim = hc._current_clamp_soma(0.2, 500, 50)
+gc_stim = gc._current_clamp_soma(0.8, 10, 5)
+mc_stim = mc._current_clamp_soma(0.36, 500, 5)
+bc_stim = bc._current_clamp_soma(0.5, 500, 50)
+hc_stim = hc._current_clamp_soma(0.5, 500, 50)
 
 gc_rec = gc._voltage_recording()
 mc_rec = mc._voltage_recording()
@@ -36,8 +43,8 @@ h.cvode.active(0)
 dt = 0.1
 h.steps_per_ms = 1.0/dt
 h.tstop = 1000
-h.finitialize(-60)
-h.t = -2000
+h.finitialize(-70)
+h.t = 0
 h.secondorder = 0
 h.dt = 10
 while h.t < -100:
