@@ -34,7 +34,7 @@ temporal_patterns = inhom_poiss()
 
 # Generate the PP -> GC mapping so that each GC receives inputs from 20/400
 # randomly chosen PP inputs
-innervation_pattern_gc = np.array([np.random.choice(400,20, replace = False) for x in range(2000)])
+innervation_pattern_gc = np.array([np.random.choice(400,80, replace = False) for x in range(2000)])
 innervation_pattern_gc = innervation_pattern_gc.swapaxes(0,1)
 
 PP_to_GCs = []
@@ -43,7 +43,7 @@ for x in range(0,400):
 
 PP_to_GCs = np.array(PP_to_GCs)
 
-innervation_pattern_bc = np.array([np.random.choice(400,20, replace = False) for x in range(24)])
+innervation_pattern_bc = np.array([np.random.choice(400,80, replace = False) for x in range(24)])
 innervation_pattern_bc = innervation_pattern_bc.swapaxes(0,1)
 
 PP_to_BCs = []
@@ -53,9 +53,9 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-04-24_patterns"
+save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_saves_2018-04-25_patterns"
 
-runs = range(1)
+runs = range(13,14)
 for run in runs:
     nw_tuned = net_tuned_theta.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
     #nw_global = net_global.GlobalNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
