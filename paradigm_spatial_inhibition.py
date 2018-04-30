@@ -8,7 +8,7 @@ Auto init and run
 
 from neuron import h
 import numpy as np
-import net_tuned
+import net_tuned_theta
 import net_global
 import matplotlib.pyplot as plt
 import os
@@ -33,12 +33,12 @@ stim_delay = 50
 # Setup specs for measurements
 cells_to_measure = np.arange(0, 2000, 50)
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_spatial_inhibition_saves_2018-03-31"
+save_dir = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_spatial_inhibition_saves_2018-04-27"
 
 for run in range(2,19):
     # Create a standard networks and add the stimulation
-    nw_tuned = net_tuned.TunedNetwork(seed=10000+run)
-    nw_global = net_global.GlobalNetwork(seed=10000+run)
+    nw_tuned = net_tuned_theta.TunedNetwork(seed=10000+run)
+    #nw_global = net_global.GlobalNetwork(seed=10000+run)
     np.random.seed(10000 + run)
 
     # Make sure we are not stimulating a cell we measure
@@ -51,15 +51,15 @@ for run in range(2,19):
                                           amp=stim_amp,
                                           dur=stim_dur,
                                           delay=stim_delay)
-    nw_global.populations[0].current_clamp_range(stim_cells,
+    """nw_global.populations[0].current_clamp_range(stim_cells,
                                           amp=stim_amp,
                                           dur=stim_dur,
-                                          delay=stim_delay)
+                                          delay=stim_delay)"""
 
     nw_tuned.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
-    nw_global.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
+    #nw_global.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
     nw_tuned.populations[0].voltage_recording(stim_cells)
-    nw_global.populations[0].voltage_recording(stim_cells)
+    #nw_global.populations[0].voltage_recording(stim_cells)
 
     """Initialization for -2000 to -100"""
     #print("Running trial " + str(trial))
@@ -82,14 +82,15 @@ for run in range(2,19):
     while h.t < 100:
         h.fadvance()
 
-    spike_plot = nw_global.plot_aps()
+    #spike_plot = nw_global.plot_aps()
     spike_plot_file_name = "run_" + str(run) + "_spike_plot"
-    nw_tuned.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_tuned')
-    nw_global.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_global')
+
+    #nw_global.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_global')
     data_file_name = "run_" + str(run) + "_data"
     spike_plot = nw_tuned.plot_aps()
+    nw_tuned.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_tuned')
     nw_tuned.shelve_network(directory = save_dir, file_name = data_file_name + '_nw_tuned')
-    nw_global.shelve_network(directory = save_dir, file_name = data_file_name + '_nw_global')
+    #nw_global.shelve_network(directory = save_dir, file_name = data_file_name + '_nw_global')
 
     # Calculate spatial IPSC plot
     sampling_period = h.dt
@@ -111,7 +112,7 @@ for run in range(2,19):
     full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw_tuned'
     spatial_plot.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
     spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')
-    
+    """
     IPSCs = []
     for cell_i in nw_global.populations[0].VClamps_i:
         trace = cell_i.as_numpy()
@@ -124,7 +125,7 @@ for run in range(2,19):
     plt.ylabel("Peak IPSC (nA)")
     full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw_global'
     spatial_plot.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
-    spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')
+    spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')"""
 
     
 

@@ -17,13 +17,14 @@ from granulecell import GranuleCell
 from mossycell_cat import MossyCell
 from basketcell import BasketCell
 from hippcell import HippCell
+import os
 
-class NonfacilitatingNetwork(ouropy.gennetwork.GenNetwork):
+class TunedNetwork(ouropy.gennetwork.GenNetwork):
     """ This model implements the ring model from Santhakumar et al. 2005.
     with some changes as in Yim et al. 2015.
     It features inhibition but omits the MC->GC connection.
     """
-    
+
     name = "TunedNetwork"
     def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
                  spatial_patterns_bcs=np.array([]), sprouting=0):
@@ -45,7 +46,9 @@ class NonfacilitatingNetwork(ouropy.gennetwork.GenNetwork):
         self.populations[2].record_aps()
         self.populations[3].record_aps()
 
-        temporal_patterns = np.atleast_2d(temporal_patterns)
+        temporal_patterns = np.array(temporal_patterns)
+        print(np.shape(temporal_patterns))
+        #temporal_patterns = np.atleast_2d(temporal_patterns)
         if type(spatial_patterns_gcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_gcs = np.atleast_2d(spatial_patterns_gcs)
             for pat in range(len(spatial_patterns_gcs)):
@@ -58,7 +61,7 @@ class NonfacilitatingNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_gcs[pat],
-                                                           'dd', 5.5, 0, 1, 0, 0, 0.40825*10**(-2))   
+                                                           'midd', 5.5, 0, 1, 0, 0, 1.38*10**(-3))
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
@@ -67,7 +70,7 @@ class NonfacilitatingNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[2],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_bcs[pat],
-                                                           'ddend', 6.3, 0, 1, 0, 0, 1*10**(-2))
+                                                           'ddend', 6.3, 0, 1, 0, 0, 2*10**(-3))
         """
         call signature of tmgsynConnection
         tmgsynConnection(self, pre_pop, post_pop, target_pool, target_segs,
@@ -96,7 +99,7 @@ class NonfacilitatingNetwork(ouropy.gennetwork.GenNetwork):
                                            3, 0.6, 0, 1, 0, 0, 10, 1.5, 0.5*10**(-3))"""
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
                                            24, 'proxd',
-                                           12, 0.6, 0, 1, 0, 0, 10, 1.5, 1.0*10**(-3))
+                                           12, 0.6, 0, 1, 0, 0, 10, 1.5, 1.2*10**(-3))
 
         # MC -> GC
         """self.mk_Exp2SynConnection(self.populations[1], self.populations[0],
@@ -138,7 +141,7 @@ class NonfacilitatingNetwork(ouropy.gennetwork.GenNetwork):
         # Weight x10; Nr synapses x4
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
                                            2000, 'dd',
-                                           640, 6, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-2))
+                                           640, 6, 0, 1, 0, -70, 10, 1.6, 0.6*10**(-2))
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],
@@ -152,10 +155,13 @@ class NonfacilitatingNetwork(ouropy.gennetwork.GenNetwork):
 
 if __name__ == '__main__':
     """A testrun for StandardNetwork"""
-    # Insert path for your relevant nrnmech.dll
-    """Path on PhD room office PC"""
-    h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
-    """Path on home PC"""
+    dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
+                "C:\\Users\\daniel\\repos\\nrnmech.dll"]
+    for x in dll_files:
+        if os.path.isfile(x):
+            dll_dir = x
+    print("DLL loaded from: " + str(dll_dir))
+    h.nrn_load_dll(dll_dir)
     #h.nrn_load_dll("C:\\Users\\daniel\\repos\\nrnmech.dll")
     np.random.seed(1000)
     #temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)
@@ -164,7 +170,7 @@ if __name__ == '__main__':
     #spatial_patterns_gcs = np.arange(400)
     spatial_patterns_bcs = np.random.choice(24,2,replace=False)
     
-    nw = NonfacilitatingNetwork(seed = 10000, temporal_patterns = temporal_patterns,
+    nw = TunedNetwork(seed = 10000, temporal_patterns = temporal_patterns,
                          spatial_patterns_gcs = spatial_patterns_gcs,
                          spatial_patterns_bcs = spatial_patterns_bcs, sprouting = 0)
 

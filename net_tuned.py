@@ -61,7 +61,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_gcs[pat],
-                                                           'proxd', 5.5, 0, 1, 0, 0, 0.40825*10**(-2))
+                                                           'midd', 5.5, 0, 1, 0, 0, 1.38*10**(-3))
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
@@ -70,7 +70,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[2],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_bcs[pat],
-                                                           'ddend', 6.3, 0, 1, 0, 0, 1*10**(-2))
+                                                           'ddend', 6.3, 0, 1, 0, 0, 2*10**(-3))
         """
         call signature of tmgsynConnection
         tmgsynConnection(self, pre_pop, post_pop, target_pool, target_segs,
@@ -99,7 +99,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            3, 0.6, 0, 1, 0, 0, 10, 1.5, 0.5*10**(-3))"""
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
                                            24, 'proxd',
-                                           12, 0.6, 500, 1, 0, 0, 10, 1.5, 1.0*10**(-3))
+                                           12, 0.6, 500, 1, 0, 0, 10, 1.5, 1.2*10**(-3))
 
         # MC -> GC
         """self.mk_Exp2SynConnection(self.populations[1], self.populations[0],
@@ -141,7 +141,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         # Weight x10; Nr synapses x4
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
                                            2000, 'dd',
-                                           640, 6, 0, 1, 0, -70, 10, 1.6, 0.55*10**(-2))
+                                           640, 6, 0, 1, 0, -70, 10, 1.6, 0.6*10**(-2))
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],

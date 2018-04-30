@@ -8,17 +8,15 @@ Created on Mon Mar 05 13:41:23 2018
 from neuron import h
 import ouropy
 import numpy as np
-import net_tuned_theta
+import net_tuned
 import net_nonfacilitating
 import net_global
-import net_disinhibited
 #import net_tuned_10ECInputs
-import time
 import os
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
-            "C:\\Users\\daniel\\repos\\nrnmech.dll"]
+            "C:\\Users\\daniel\\Repos\\nrnmech.dll"]
 for x in dll_files:
     if os.path.isfile(x):
         dll_dir = x
@@ -26,6 +24,7 @@ print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
 # Generate temporal patterns for the 100 PP inputs
+np.random.seed(10000)
 temporal_patterns = inhom_poiss()
 # Original from Yim
 #np.random.seed(10000)
@@ -33,7 +32,7 @@ temporal_patterns = inhom_poiss()
 
 # Generate the PP -> GC mapping so that each GC receives inputs from 20/400
 # randomly chosen PP inputs
-innervation_pattern_gc = np.array([np.random.choice(400,20, replace = False) for x in range(2000)])
+innervation_pattern_gc = np.array([np.random.choice(400,80, replace = False) for x in range(2000)])
 innervation_pattern_gc = innervation_pattern_gc.swapaxes(0,1)
 
 PP_to_GCs = []
@@ -42,7 +41,7 @@ for x in range(0,400):
 
 PP_to_GCs = np.array(PP_to_GCs)
 
-innervation_pattern_bc = np.array([np.random.choice(400,20, replace = False) for x in range(24)])
+innervation_pattern_bc = np.array([np.random.choice(400,80, replace = False) for x in range(24)])
 innervation_pattern_bc = innervation_pattern_bc.swapaxes(0,1)
 
 PP_to_BCs = []
@@ -52,14 +51,13 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-04-24_patterns"
+save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-04-28_patterns"
 
-runs = range(1)
+runs = range(2,10)
 for run in runs:
-    nw_tuned = net_tuned_theta.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
-    #nw_global = net_global.GlobalNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
-    #nw_nonfacilitating = net_nonfacilitating.NonfacilitatingNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
-    #nw_disinhibited = net_disinhibited.DisinhibitedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
+    nw_tuned = net_tuned.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
+    nw_global = net_global.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
+    nw_nonfacilitating = net_nonfacilitating.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
 
     # Run the model
     """Initialization for -2000 to -100"""
@@ -87,28 +85,18 @@ for run in runs:
     print("Done Running")
 
     tuned_save_file_name = str(nw_tuned) + '_run_' + str(run)
-    #global_save_file_name = str(nw_global) + '_run_' + str(run)
-    #nonfacilitating_save_file_name = str(nw_nonfacilitating) + '_run_' + str(run)
-    #disinhibited_save_file_name = str(nw_disinhibited) + '_run_' + str(run)
     nw_tuned.shelve_network(save_dir, tuned_save_file_name)
-    #nw_global.shelve_network(save_dir, global_save_file_name)
-    #nw_nonfacilitating.shelve_network(save_dir, nonfacilitating_save_file_name)
-    #nw_disinhibited.shelve_network(save_dir, disinhibited_save_file_name)
 
     fig = nw_tuned.plot_aps(time=1000)
     tuned_fig_file_name = str(nw_tuned) + '_spike_plot_run_' + str(run)
     nw_tuned.save_ap_fig(fig, save_dir, tuned_fig_file_name)
-    """
-    fig = nw_global.plot_aps()
+
+    fig = nw_global.plot_aps(time = 1000)
     global_fig_file_name = str(nw_global) + '_spike_plot_run_' + str(run)
     nw_global.save_ap_fig(fig, save_dir, global_fig_file_name)
 
-    fig = nw_nonfacilitating.plot_aps()
+    fig = nw_nonfacilitating.plot_aps(time = 1000)
     nonfacilitating_fig_file_name = str(nw_nonfacilitating) + '_spike_plot_run_' + str(run)
     nw_nonfacilitating.save_ap_fig(fig, save_dir, nonfacilitating_fig_file_name)
 
-    fig = nw_disinhibited.plot_aps()
-    tuned_fig_file_name = str(nw_disinhibited) + '_spike_plot_run_' + str(run)
-    nw_disinhibited.save_ap_fig(fig, save_dir, tuned_fig_file_name)
-    """
     
