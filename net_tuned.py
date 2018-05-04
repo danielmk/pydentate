@@ -61,7 +61,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_gcs[pat],
-                                                           'midd', 5.5, 0, 1, 0, 0, 1.38*10**(-3))
+                                                           'midd', 5.5, 0, 1, 0, 0, 1.26*10**(-3))
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)

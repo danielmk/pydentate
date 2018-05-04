@@ -32,7 +32,7 @@ temporal_patterns = inhom_poiss()
 
 # Generate the PP -> GC mapping so that each GC receives inputs from 20/400
 # randomly chosen PP inputs
-innervation_pattern_gc = np.array([np.random.choice(400,80, replace = False) for x in range(2000)])
+innervation_pattern_gc = np.array([np.random.choice(400,20, replace = False) for x in range(2000)])
 innervation_pattern_gc = innervation_pattern_gc.swapaxes(0,1)
 
 PP_to_GCs = []
@@ -41,7 +41,7 @@ for x in range(0,400):
 
 PP_to_GCs = np.array(PP_to_GCs)
 
-innervation_pattern_bc = np.array([np.random.choice(400,80, replace = False) for x in range(24)])
+innervation_pattern_bc = np.array([np.random.choice(400,20, replace = False) for x in range(24)])
 innervation_pattern_bc = innervation_pattern_bc.swapaxes(0,1)
 
 PP_to_BCs = []
@@ -51,14 +51,17 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-04-28_patterns"
+save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_saves_2018-05-02_patterns"
 
-runs = range(2,10)
+runs = range(1,20)
 for run in runs:
-    nw_tuned = net_tuned.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
-    nw_global = net_global.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
-    nw_nonfacilitating = net_nonfacilitating.TunedNetwork(10000+run, temporal_patterns[0+run:6+run], PP_to_GCs[0+run:6+run], PP_to_BCs[0+run:6+run], sprouting=0)
+    nw_tuned = net_tuned.TunedNetwork(10000+run, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run], sprouting=0)
 
+    # Attach voltage recordings to all cells
+    nw_tuned.populations[0].voltage_recording(range(2000))
+    nw_tuned.populations[1].voltage_recording(range(60))
+    nw_tuned.populations[2].voltage_recording(range(24))
+    nw_tuned.populations[3].voltage_recording(range(24))
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
@@ -90,13 +93,3 @@ for run in runs:
     fig = nw_tuned.plot_aps(time=1000)
     tuned_fig_file_name = str(nw_tuned) + '_spike_plot_run_' + str(run)
     nw_tuned.save_ap_fig(fig, save_dir, tuned_fig_file_name)
-
-    fig = nw_global.plot_aps(time = 1000)
-    global_fig_file_name = str(nw_global) + '_spike_plot_run_' + str(run)
-    nw_global.save_ap_fig(fig, save_dir, global_fig_file_name)
-
-    fig = nw_nonfacilitating.plot_aps(time = 1000)
-    nonfacilitating_fig_file_name = str(nw_nonfacilitating) + '_spike_plot_run_' + str(run)
-    nw_nonfacilitating.save_ap_fig(fig, save_dir, nonfacilitating_fig_file_name)
-
-    

@@ -29,11 +29,12 @@ def inhom_poiss():
     for x in range(400):
         what.append(spike_train_generation.inhomogeneous_poisson_process(rate_profile_as_asig))
 
-    array_like = np.array([np.array(x.times)*1000 for x in what])
+    array_like = np.array([np.around(np.array(x.times)*1000, decimals=1) for x in what])
 
     return array_like
 
 if __name__ == "__main__":
+    np.random.seed(10000)
     result = inhom_poiss()
     plt.eventplot(result)
 """
