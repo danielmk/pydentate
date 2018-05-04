@@ -30,7 +30,7 @@ for period in stim_periods:
     mc_tmgsyn_syn.tau_facil = 0 # This parameter gives the frequency dependence of facilitation
     mc_tmgsyn_syn.tau_1 = 6.2
     mc_tmgsyn_syn.tau_rec = 30 # ???
-    mc_tmgsyn_syn.U = 
+    mc_tmgsyn_syn.U = 0.1
     #mc_tmgsyn_syn.u0 = 0.04
     mc_tmgsyn_netcon = h.NetCon(vecstim, mc_tmgsyn_syn)
     mc_tmgsyn_netcon.weight[0] = 0.62*10**(-2)

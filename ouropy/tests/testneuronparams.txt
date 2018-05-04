@@ -1,0 +1,8 @@
+g_pas	all	0.001
+e_pas	all	-65
+Ra	all	100
+cm	all	1
+gnabar_hh	soma	0.12
+gkbar_hh	soma	0.036
+gl_hh	soma	0.0003
+el_hh	soma	-54.3
