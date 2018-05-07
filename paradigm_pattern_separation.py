@@ -51,9 +51,9 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_saves_2018-05-02_patterns"
+save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-05-07_patterns"
 
-runs = range(1,20)
+runs = range(0,20)
 for run in runs:
     nw_tuned = net_tuned.TunedNetwork(10000+run, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run], sprouting=0)
 

@@ -22,20 +22,20 @@ print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
 # Setup specs for stimulation
-n_cells = 100  # Number of cells that are stimulated
+n_cells = 60  # Number of cells that are stimulated
 stim_pool = 150  # Size of the pool from which stimulated cells are chosen
 stim_location = int(2000 / 2.0 - stim_pool / 2.0)
-stim_amp = 1.5
-stim_dur = 15
+stim_amp = 1
+stim_dur = 5
 stim_delay = 50
 stim_ints = [20]
 
 # Setup specs for measurements
 cells_to_measure = np.arange(0, 2000, 50)
 
-save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_frequency_inhibition_saves_2018-03-31"
+save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_frequency_inhibition_saves_2018-03-31"
 
-for run in range(0,5):
+for run in range(14,15):
     for interval in stim_ints:
         # Create a standard networks and add the stimulation
         nw_tuned = net_tuned.TunedNetwork(seed=10000+run)
@@ -51,14 +51,14 @@ for run in range(0,5):
             nw_tuned.populations[0].current_clamp_range(stim_cells,
                                                   amp=stim_amp,
                                                   dur=stim_dur,
-                                                  delay=10+interval*x)
+                                                  delay=100+interval*x)
 
-        nw_tuned.populations[0].SEClamp(gcs_to_measure, dur1 = 100, rs=1)
-        nw_tuned.populations[1].SEClamp([30], dur1 = 100, rs=1)
-        nw_tuned.populations[2].SEClamp([12], dur1 = 100, rs=1)
-        nw_tuned.populations[3].SEClamp([12], dur1 = 100, rs=1)
-        nw_tuned.populations[0].voltage_recording(range(2000))
-        nw_tuned.populations[1].voltage_recording(range(60))
+        nw_tuned.populations[0].SEClamp(gcs_to_measure, dur1 = 100+200+interval*10, rs=1)
+        #nw_tuned.populations[1].SEClamp([30], dur1 = 100+200+interval*10, rs=1)
+        #nw_tuned.populations[2].SEClamp([12], dur1 = 100+200+interval*10, rs=1)
+        #nw_tuned.populations[3].SEClamp([12], dur1 = 100+200+interval*10, rs=1)
+        nw_tuned.populations[0].voltage_recording(range(0,2000,100))
+        nw_tuned.populations[1].voltage_recording(range(0,60,2))
         nw_tuned.populations[2].voltage_recording(range(24))
         nw_tuned.populations[3].voltage_recording(range(24))
 
@@ -80,10 +80,10 @@ for run in range(0,5):
     
         """Setup run control for -100 to 1500"""
         h.frecord_init()  # Necessary after changing t to restart the vectors
-        while h.t < 50+200+interval*10:
+        while h.t < 100+200+interval*10:
             h.fadvance()
     
-        spike_plot = nw_tuned.plot_aps(time=1200)
+        spike_plot = nw_tuned.plot_aps(time=100+200+interval*10)
         spike_plot_file_name = "run_" + str(run) + "_spike_plot_intervals_" + str(interval)
         nw_tuned.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_tuned')
         data_file_name = "run_" + str(run) + "_data_intervals_"+ str(interval)
