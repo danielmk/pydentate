@@ -35,7 +35,7 @@ cells_to_measure = np.arange(0, 2000, 50)
 
 save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_frequency_inhibition_saves_2018-03-31"
 
-for run in range(14,15):
+for run in range(10,15):
     for interval in stim_ints:
         # Create a standard networks and add the stimulation
         nw_tuned = net_tuned.TunedNetwork(seed=10000+run)

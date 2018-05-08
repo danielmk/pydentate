@@ -122,10 +122,10 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            2, 3.6, 0, 1, 0, 0, 10, 3, 0.2*10**(-3))
 
         # BC -> GC
-        # Nr. synapses x3; Weight *1/4
+        # Nr. synapses x3; Weight *1/4; changed from 5.5 to 7.2 (Geiger et al.)
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
                                            560, 'soma',
-                                           400, 5.5, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3))
+                                           400, 7.2, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3))
 
         # BC -> MC        
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[1],
@@ -138,10 +138,10 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            2, 1.8, 0,1,0,-70, -10, 0.8, 7.6*10**(-3))
 
         # HC -> GC
-        # Weight x10; Nr synapses x4
+        # Weight x10; Nr synapses x4; changed from 6 to 9.2 because of BC->GC change
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
                                            2000, 'dd',
-                                           640, 6, 0, 1, 0, -70, 10, 1.6, 0.6*10**(-2))
+                                           640, 9.2, 0, 1, 0, -70, 10, 1.6, 0.6*10**(-2))
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],
