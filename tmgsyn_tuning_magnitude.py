@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from pyDentate.mossycell_cat import MossyCell
 from pyDentate.basketcell import BasketCell
 
-h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll")
+h.nrn_load_dll("C:\\Users\\DanielM\\Repos\\models_dentate\\DGModelFinalwtmsynrise\\nrnmech.dll")
 
 """Setup stimulation pattern"""
 #t_pattern = np.arange(100, 100+10*period, period)
@@ -27,6 +27,7 @@ mc_tmgsyn_syn = h.tmgsyn(mc_tmgsyn.all_secs[1](0.5))
 mc_tmgsyn_syn.e = 0
 mc_tmgsyn_syn.tau_facil = 250 # This parameter gives the frequency dependence of facilitation
 mc_tmgsyn_syn.tau_1 = 6.2
+mc_tmgsyn_syn.tau_2 = 2
 mc_tmgsyn_syn.tau_rec = 0 # ???
 mc_tmgsyn_syn.U = 0.1
 #mc_tmgsyn_syn.u0 = 0.04
