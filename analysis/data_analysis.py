@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 #directory = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_pattern-separation_saves_2018-03-11\\"
 #Office PC
 directory = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_frequency_inhibition_saves_2018-05-09\\"
-file_name = "run_10_data_intervals_20_nw_tuned"
+file_name = "run_1_data_intervals_20_nw_tuned"
 
 shelve_files = []
 active_cells = []

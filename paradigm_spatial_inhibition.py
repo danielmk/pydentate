@@ -8,10 +8,11 @@ Auto init and run
 
 from neuron import h
 import numpy as np
-import net_tuned_theta
+import net_tuned
 import net_global
 import matplotlib.pyplot as plt
 import os
+import sys
 
 # Locate and load the nrnmech.dll file. Must to be adjusted for your machine.
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
@@ -33,11 +34,13 @@ stim_delay = 50
 # Setup specs for measurements
 cells_to_measure = np.arange(0, 2000, 50)
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_spatial_inhibition_saves_2018-04-27"
+save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-05-12"
 
-for run in range(2,19):
+runs = range(10)
+
+for run in runs:
     # Create a standard networks and add the stimulation
-    nw_tuned = net_tuned_theta.TunedNetwork(seed=10000+run)
+    nw = net_tuned.TunedNetwork(seed=10000+run)
     #nw_global = net_global.GlobalNetwork(seed=10000+run)
     np.random.seed(10000 + run)
 
@@ -47,18 +50,14 @@ for run in range(2,19):
         stim_cells = np.random.choice(range(stim_location, stim_location+stim_pool), n_cells, replace = False)
     print("Done intersecting")
     
-    nw_tuned.populations[0].current_clamp_range(stim_cells,
+    nw.populations[0].current_clamp_range(stim_cells,
                                           amp=stim_amp,
                                           dur=stim_dur,
                                           delay=stim_delay)
-    """nw_global.populations[0].current_clamp_range(stim_cells,
-                                          amp=stim_amp,
-                                          dur=stim_dur,
-                                          delay=stim_delay)"""
 
-    nw_tuned.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
+    nw.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
     #nw_global.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
-    nw_tuned.populations[0].voltage_recording(stim_cells)
+    nw.populations[0].voltage_recording(stim_cells)
     #nw_global.populations[0].voltage_recording(stim_cells)
 
     """Initialization for -2000 to -100"""
@@ -87,9 +86,9 @@ for run in range(2,19):
 
     #nw_global.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_global')
     data_file_name = "run_" + str(run) + "_data"
-    spike_plot = nw_tuned.plot_aps()
-    nw_tuned.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_tuned')
-    nw_tuned.shelve_network(directory = save_dir, file_name = data_file_name + '_nw_tuned')
+    spike_plot = nw.plot_aps()
+    nw.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw')
+    nw.shelve_network(directory = save_dir, file_name = data_file_name + '_nw')
     #nw_global.shelve_network(directory = save_dir, file_name = data_file_name + '_nw_global')
 
     # Calculate spatial IPSC plot
@@ -100,7 +99,7 @@ for run in range(2,19):
     IPSC_dtps = IPSC_times / sampling_period
     
     IPSCs = []
-    for cell_i in nw_tuned.populations[0].VClamps_i:
+    for cell_i in nw.populations[0].VClamps_i:
         trace = cell_i.as_numpy()
         bl = trace[int(bl_dtps[0]):int(bl_dtps[1])].mean()
         peak_IPSC = trace[int(IPSC_dtps[0]):int(IPSC_dtps[1])].max()
@@ -109,7 +108,7 @@ for run in range(2,19):
     plt.plot(cells_to_measure, IPSCs)
     plt.xlabel("Granule Cell #")
     plt.ylabel("Peak IPSC (nA)")
-    full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw_tuned'
+    full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw'
     spatial_plot.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
     spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')
     """

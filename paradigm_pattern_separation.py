@@ -14,6 +14,9 @@ import net_global
 #import net_tuned_10ECInputs
 import os
 from burst_generator_inhomogeneous_poisson import inhom_poiss
+import sys
+
+print(sys.argv)
 
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
             "C:\\Users\\daniel\\Repos\\nrnmech.dll"]
@@ -51,9 +54,12 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-save_dir = "C:\\Users\\daniel\\repos\\pyDentate\\paradigm_pattern-separation_saves_2018-05-07_patterns"
-
+save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_saves_2018-05-12_patterns"
+    
 runs = range(0,20)
+
+if len(sys.argv) > 2:
+    runs = range(sys.argv[1],sys.argv[2])
 for run in runs:
     nw_tuned = net_tuned.TunedNetwork(10000+run, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run], sprouting=0)
 

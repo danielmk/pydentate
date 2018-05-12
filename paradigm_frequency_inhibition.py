@@ -35,10 +35,10 @@ cells_to_measure = np.arange(0, 2000, 50)
 
 save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_frequency_inhibition_saves_2018-05-09"
 
-for run in range(10,15):
+for run in range(10):
     for interval in stim_ints:
         # Create a standard networks and add the stimulation
-        nw_tuned = net_tuned.TunedNetwork(seed=10000+run)
+        nw = net_tuned.TunedNetwork(seed=10000+run)
         np.random.seed(10000 + run)
     
         # Make sure we are not stimulating a cell we measure
@@ -48,19 +48,19 @@ for run in range(10,15):
             gcs_to_measure = np.random.choice(2000,20)
     
         for x in range(10):
-            nw_tuned.populations[0].current_clamp_range(stim_cells,
+            nw.populations[0].current_clamp_range(stim_cells,
                                                   amp=stim_amp,
                                                   dur=stim_dur,
                                                   delay=100+interval*x)
 
-        nw_tuned.populations[0].SEClamp(gcs_to_measure, dur1 = 100+200+interval*10, rs=1)
-        #nw_tuned.populations[1].SEClamp([30], dur1 = 100+200+interval*10, rs=1)
-        #nw_tuned.populations[2].SEClamp([12], dur1 = 100+200+interval*10, rs=1)
-        #nw_tuned.populations[3].SEClamp([12], dur1 = 100+200+interval*10, rs=1)
-        nw_tuned.populations[0].voltage_recording(range(0,2000,100))
-        nw_tuned.populations[1].voltage_recording(range(0,60,2))
-        nw_tuned.populations[2].voltage_recording(range(24))
-        nw_tuned.populations[3].voltage_recording(range(24))
+        nw.populations[0].SEClamp(gcs_to_measure, dur1 = 100+200+interval*10, rs=1)
+        #nw.populations[1].SEClamp([30], dur1 = 100+200+interval*10, rs=1)
+        #nw.populations[2].SEClamp([12], dur1 = 100+200+interval*10, rs=1)
+        #nw.populations[3].SEClamp([12], dur1 = 100+200+interval*10, rs=1)
+        nw.populations[0].voltage_recording(range(0,2000,100))
+        nw.populations[1].voltage_recording(range(0,60,2))
+        nw.populations[2].voltage_recording(range(24))
+        nw.populations[3].voltage_recording(range(24))
 
         """Initialization for -2000 to -100"""
         #print("Running trial " + str(trial))
@@ -83,8 +83,8 @@ for run in range(10,15):
         while h.t < 100+200+interval*10:
             h.fadvance()
     
-        spike_plot = nw_tuned.plot_aps(time=100+200+interval*10)
+        spike_plot = nw.plot_aps(time=100+200+interval*10)
         spike_plot_file_name = "run_" + str(run) + "_spike_plot_intervals_" + str(interval)
-        nw_tuned.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_tuned')
+        nw.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_' + str(nw))
         data_file_name = "run_" + str(run) + "_data_intervals_"+ str(interval)
-        nw_tuned.shelve_network(directory = save_dir, file_name = data_file_name + '_nw_tuned')
+        nw.shelve_network(directory = save_dir, file_name = data_file_name + '_' + str(nw))
