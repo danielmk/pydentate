@@ -27,7 +27,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
 
     name = "TunedNetwork"
     def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
-                 spatial_patterns_bcs=np.array([]), sprouting=0):
+                 spatial_patterns_bcs=np.array([])):
         self.init_params = locals()
         self.init_params['self'] = str(self.init_params['self'])
         # Setup cells
@@ -61,7 +61,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_gcs[pat],
-                                                           'midd', 5.5, 0, 1, 0, 0, 1.30*10**(-3))
+                                                           'midd', 5.5, 0, 1, 0, 0, 1.25*10**(-3))
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
@@ -76,11 +76,6 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         tmgsynConnection(self, pre_pop, post_pop, target_pool, target_segs,
                 divergence, tau_1, tau_facil, U, tau_rec, e, thr, delay, weight)
         """
-		  # Sprouting
-        ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[0],
-                                           100, 'proxd', sprouting, 5.5, 0, 1,
-                                           0, 0, 10, 0.8, 2*10**(-3))
-
         # GC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[1],
                                   12, 'proxd',
@@ -99,7 +94,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            3, 0.6, 0, 1, 0, 0, 10, 1.5, 0.5*10**(-3))"""
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
                                            24, 'proxd',
-                                           12, 0.6, 500, 0.1, 0, 0, 10, 1.5, 1.2*10**(-2))
+                                           12, 0.6, 500, 0.1, 0, 0, 10, 1.5, 1.5*10**(-2))
 
         # MC -> GC
         """self.mk_Exp2SynConnection(self.populations[1], self.populations[0],
@@ -126,6 +121,11 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
                                            560, 'soma',
                                            400, 20, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3))
+
+        # We reseed here to make sure that those connections are consistent
+        # between this and net_global
+        if seed:
+            self.set_numpy_seed(seed)
 
         # BC -> MC        
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[1],

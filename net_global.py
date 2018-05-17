@@ -27,7 +27,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
 
     name = "TunedNetwork"
     def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
-                 spatial_patterns_bcs=np.array([]), sprouting=0):
+                 spatial_patterns_bcs=np.array([])):
         self.init_params = locals()
         self.init_params['self'] = str(self.init_params['self'])
         # Setup cells
@@ -61,7 +61,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_gcs[pat],
-                                                           'midd', 5.5, 0, 1, 0, 0, 1.38*10**(-3))
+                                                           'midd', 5.5, 0, 1, 0, 0, 1.25*10**(-3))
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
@@ -70,17 +70,12 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[2],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_bcs[pat],
-                                                           'ddend', 6.3, 0, 1, 0, 0, 2*10**(-3))
+                                                           'ddend', 6.3, 0, 1, 0, 0, 1*10**(-3))
         """
         call signature of tmgsynConnection
         tmgsynConnection(self, pre_pop, post_pop, target_pool, target_segs,
                 divergence, tau_1, tau_facil, U, tau_rec, e, thr, delay, weight)
         """
-		  # Sprouting
-        ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[0],
-                                           100, 'proxd', sprouting, 5.5, 0, 1,
-                                           0, 0, 10, 0.8, 2*10**(-3))
-
         # GC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[1],
                                   12, 'proxd',
@@ -90,7 +85,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         #Weight x4, target_pool = 2
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[2],
                                            8, 'proxd',
-                                           1, 0.6, 500, 1, 0, 0, 10, 0.8, 18.8*10**(-3))
+                                           1, 0.6, 500, 0.1, 0, 0, 10, 0.8, 18.8*10**(-2))
 
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.
@@ -99,7 +94,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            3, 0.6, 0, 1, 0, 0, 10, 1.5, 0.5*10**(-3))"""
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
                                            24, 'proxd',
-                                           12, 0.6, 500, 1, 0, 0, 10, 1.5, 1.2*10**(-3))
+                                           12, 0.6, 500, 0.1, 0, 0, 10, 1.5, 1.5*10**(-2))
 
         # MC -> GC
         """self.mk_Exp2SynConnection(self.populations[1], self.populations[0],
@@ -122,10 +117,15 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            2, 3.6, 0, 1, 0, 0, 10, 3, 0.2*10**(-3))
 
         # BC -> GC
-        # Nr. synapses x3; Weight *1/4
+        # Nr. synapses x3; Weight *1/4; changed from 5.5 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
                                            2000, 'soma',
-                                           400, 5.5, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3))
+                                           400, 20, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3))
+
+        # We reseed here to make sure that those connections are consistent
+        # between this and net_global
+        if seed:
+            self.set_numpy_seed(seed)
 
         # BC -> MC        
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[1],
@@ -138,10 +138,10 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            2, 1.8, 0,1,0,-70, -10, 0.8, 7.6*10**(-3))
 
         # HC -> GC
-        # Weight x10; Nr synapses x4
+        # Weight x10; Nr synapses x4; changed from 6 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
                                            2000, 'dd',
-                                           640, 6, 0, 1, 0, -70, 10, 1.6, 0.6*10**(-2))
+                                           640, 20, 0, 1, 0, -70, 10, 1.6, 0.6*10**(-2))
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],

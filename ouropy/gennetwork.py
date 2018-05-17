@@ -173,13 +173,13 @@ class GenNetwork(object):
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
-        full_file_path = directory + "\\" + file_name
+        full_file_path = directory + "\\" + file_name + '.pydd'
         if os.path.isfile(full_file_path):
             raise ValueError("The file already exists.\n" +
                              "shelve_network does not overwrite files.")
 
         curr_shelve = shelve.open(full_file_path, flag='n')
-        curr_shelve[str(self)] = self.get_properties()
+        curr_shelve[str(self)] = self.get_properties() # BUG with paradigm_frequency_inhibition
         curr_shelve.close()
         return 1
 

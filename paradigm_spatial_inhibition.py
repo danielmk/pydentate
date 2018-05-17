@@ -14,6 +14,37 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
+# Handle command line inputs with argparse
+parser = argparse.ArgumentParser(description='Run the frequency inhibition paradigm')
+parser.add_argument('-runs',
+                    nargs=3,
+                    type=int,
+                    help='start stop range for the range of runs',
+                    default=[0, 1, 1],
+                    dest='runs')
+parser.add_argument('-savedir',
+                    type=str,
+                    help='complete directory where data is saved',
+                    default=os.getcwd(),
+                    dest='savedir')
+parser.add_argument('-n_cells',
+                    type=int,
+                    help='number of cells to stimulate',
+                    default=60,
+                    dest='n_cells')
+parser.add_argument('-cellstomeasure',
+                    nargs=3,
+                    type=int,
+                    help='start stop range for the GCs that are SEClamp measured',
+                    default=[0,2000,50])
+
+args = parser.parse_args()
+runs = range(args.runs[0], args.runs[1], args.runs[2])
+savedir = args.savedir
+interval = args.interval
+n_cells = args.n_cells
+cells_to_measure = np.arange(args.runs[0], args.runs[1], args.runs[2])
+
 # Locate and load the nrnmech.dll file. Must to be adjusted for your machine.
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
             "C:\\Users\\daniel\\repos\\nrnmech.dll"]
@@ -27,8 +58,8 @@ h.nrn_load_dll(dll_dir)
 n_cells = 100  # Number of cells that are stimulated
 stim_pool = 150  # Size of the pool from which stimulated cells are chosen
 stim_location = int(2000 / 2.0 - stim_pool / 2.0)
-stim_amp = 1.5
-stim_dur = 15
+stim_amp = 1
+stim_dur = 5
 stim_delay = 50
 
 # Setup specs for measurements
@@ -36,12 +67,9 @@ cells_to_measure = np.arange(0, 2000, 50)
 
 save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-05-12"
 
-runs = range(10)
-
 for run in runs:
     # Create a standard networks and add the stimulation
     nw = net_tuned.TunedNetwork(seed=10000+run)
-    #nw_global = net_global.GlobalNetwork(seed=10000+run)
     np.random.seed(10000 + run)
 
     # Make sure we are not stimulating a cell we measure
@@ -56,9 +84,7 @@ for run in runs:
                                           delay=stim_delay)
 
     nw.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
-    #nw_global.populations[0].SEClamp(cells_to_measure, dur1 = 100, rs=1)
     nw.populations[0].voltage_recording(stim_cells)
-    #nw_global.populations[0].voltage_recording(stim_cells)
 
     """Initialization for -2000 to -100"""
     #print("Running trial " + str(trial))
@@ -82,14 +108,11 @@ for run in runs:
         h.fadvance()
 
     #spike_plot = nw_global.plot_aps()
-    spike_plot_file_name = "run_" + str(run) + "_spike_plot"
-
-    #nw_global.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw_global')
+    spike_plot_file_name = "run_spike-plot" + str(run)
     data_file_name = "run_" + str(run) + "_data"
     spike_plot = nw.plot_aps()
     nw.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw')
     nw.shelve_network(directory = save_dir, file_name = data_file_name + '_nw')
-    #nw_global.shelve_network(directory = save_dir, file_name = data_file_name + '_nw_global')
 
     # Calculate spatial IPSC plot
     sampling_period = h.dt
@@ -111,20 +134,3 @@ for run in runs:
     full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw'
     spatial_plot.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
     spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')
-    """
-    IPSCs = []
-    for cell_i in nw_global.populations[0].VClamps_i:
-        trace = cell_i.as_numpy()
-        bl = trace[int(bl_dtps[0]):int(bl_dtps[1])].mean()
-        peak_IPSC = trace[int(IPSC_dtps[0]):int(IPSC_dtps[1])].max()
-        IPSCs.append(peak_IPSC - bl)
-    spatial_plot = plt.figure()
-    plt.plot(cells_to_measure, IPSCs)
-    plt.xlabel("Granule Cell #")
-    plt.ylabel("Peak IPSC (nA)")
-    full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw_global'
-    spatial_plot.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
-    spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')"""
-
-    
-
