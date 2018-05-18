@@ -34,7 +34,8 @@ print(savedir)
 # Locate a nrnmech.dll file that has the mechanisms required by the network
 # On your own machine you have to add the path to your own file to the list dll_files
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
-            "C:\\Users\\daniel\\Repos\\nrnmech.dll"]
+            "C:\\Users\\daniel\\Repos\\nrnmech.dll",
+            "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
 for x in dll_files:
     if os.path.isfile(x):
         dll_dir = x

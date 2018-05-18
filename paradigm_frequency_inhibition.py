@@ -44,7 +44,8 @@ n_cells = args.n_cells
 
 # Locate and load the nrnmech.dll file. Must to be adjusted for your machine.
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
-            "C:\\Users\\daniel\\repos\\nrnmech.dll"]
+            "C:\\Users\\daniel\\repos\\nrnmech.dll",
+            "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
 for x in dll_files:
     if os.path.isfile(x):
         dll_dir = x
