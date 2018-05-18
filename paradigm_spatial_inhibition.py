@@ -13,6 +13,7 @@ import net_global
 import matplotlib.pyplot as plt
 import os
 import sys
+import argparse
 
 # Handle command line inputs with argparse
 parser = argparse.ArgumentParser(description='Run the frequency inhibition paradigm')
@@ -36,14 +37,14 @@ parser.add_argument('-cellstomeasure',
                     nargs=3,
                     type=int,
                     help='start stop range for the GCs that are SEClamp measured',
-                    default=[0,2000,50])
+                    default=[0,2000,50],
+                    dest='cellstomeasure')
 
 args = parser.parse_args()
 runs = range(args.runs[0], args.runs[1], args.runs[2])
 savedir = args.savedir
-interval = args.interval
 n_cells = args.n_cells
-cells_to_measure = np.arange(args.runs[0], args.runs[1], args.runs[2])
+cells_to_measure = np.arange(args.cellstomeasure[0], args.cellstomeasure[1], args.cellstomeasure[2])
 
 # Locate and load the nrnmech.dll file. Must to be adjusted for your machine.
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
@@ -107,13 +108,12 @@ for run in runs:
     while h.t < 100:
         h.fadvance()
 
-    #spike_plot = nw_global.plot_aps()
-    spike_plot_file_name = "run_spike-plot" + str(run)
-    data_file_name = "run_" + str(run) + "_data"
+    spike_plot_file_name = str(nw) + "_spikeplot_run_n-cells_cellstomeasure_" + str(run) + '_' + str(n_cells) + '_' + str(args.cellstomeasure)
+    data_file_name =  str(nw) + "_data_run_n-cells_cellstomeasure_" + str(run) + '_' + str(n_cells) + '_' + str(args.cellstomeasure)
     spike_plot = nw.plot_aps()
-    nw.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name + '_nw')
-    nw.shelve_network(directory = save_dir, file_name = data_file_name + '_nw')
-
+    nw.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name)
+    nw.shelve_network(directory = save_dir, file_name = data_file_name)
+"""
     # Calculate spatial IPSC plot
     sampling_period = h.dt
     bl_times = np.array([40, 50])  # in ms
@@ -133,4 +133,4 @@ for run in runs:
     plt.ylabel("Peak IPSC (nA)")
     full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw'
     spatial_plot.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
-    spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')
+    spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')"""
