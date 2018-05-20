@@ -57,15 +57,11 @@ print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
 # Setup specs for stimulation
-n_cells = 100  # Number of cells that are stimulated
 stim_pool = 150  # Size of the pool from which stimulated cells are chosen
 stim_location = int(2000 / 2.0 - stim_pool / 2.0)
 stim_amp = 1
 stim_dur = 5
 stim_delay = 50
-
-# Setup specs for measurements
-cells_to_measure = np.arange(0, 2000, 50)
 
 for run in runs:
     # Create a standard networks and add the stimulation
