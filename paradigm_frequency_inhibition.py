@@ -30,7 +30,6 @@ parser.add_argument('-interval',
                     default=20,
                     dest='interval')
 parser.add_argument('-n_cells',
-                    nargs=1,
                     type=int,
                     help='number of cells to stimulate',
                     default=60,
@@ -114,7 +113,7 @@ for run in runs:
         h.fadvance()
 
     spike_plot = nw.plot_aps(time=100+200+interval*10)
-    spike_plot_file_name = str(nw) + "_run_spikeplot_interval_n-cells_" + str(run) + '_' + str(interval) + '_' + str(n_cells)
+    spike_plot_file_name = str(nw) + "_spikeplot_run_interval_n-cells_" + str(run) + '_' + str(interval) + '_' + str(n_cells)
     nw.save_ap_fig(spike_plot, directory = savedir, file_name = spike_plot_file_name)
-    data_file_name = str(nw) + "_run_data_interval_n-cells_" + str(run) + '_' + str(interval) + '_' + str(n_cells)
+    data_file_name = str(nw) + "_data_run_interval_n-cells_" + str(run) + '_' + str(interval) + '_' + str(n_cells)
     nw.shelve_network(directory = savedir, file_name = data_file_name)

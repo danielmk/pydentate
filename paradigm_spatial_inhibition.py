@@ -67,8 +67,6 @@ stim_delay = 50
 # Setup specs for measurements
 cells_to_measure = np.arange(0, 2000, 50)
 
-save_dir = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_spatial_inhibition_saves_2018-05-12"
-
 for run in runs:
     # Create a standard networks and add the stimulation
     nw = net_tuned.TunedNetwork(seed=10000+run)
@@ -112,8 +110,8 @@ for run in runs:
     spike_plot_file_name = str(nw) + "_spikeplot_run_n-cells_cellstomeasure_" + str(run) + '_' + str(n_cells) + '_' + str(args.cellstomeasure)
     data_file_name =  str(nw) + "_data_run_n-cells_cellstomeasure_" + str(run) + '_' + str(n_cells) + '_' + str(args.cellstomeasure)
     spike_plot = nw.plot_aps()
-    nw.save_ap_fig(spike_plot, directory = save_dir, file_name = spike_plot_file_name)
-    nw.shelve_network(directory = save_dir, file_name = data_file_name)
+    nw.save_ap_fig(spike_plot, directory = savedir, file_name = spike_plot_file_name)
+    nw.shelve_network(directory = savedir, file_name = data_file_name)
 """
     # Calculate spatial IPSC plot
     sampling_period = h.dt
