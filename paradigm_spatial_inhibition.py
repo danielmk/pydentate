@@ -57,7 +57,7 @@ print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
 # Setup specs for stimulation
-stim_pool = 150  # Size of the pool from which stimulated cells are chosen
+stim_pool = 500  # Size of the pool from which stimulated cells are chosen
 stim_location = int(2000 / 2.0 - stim_pool / 2.0)
 stim_amp = 1
 stim_dur = 5
