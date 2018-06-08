@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 #Home PC
 #directory = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_pattern-separation_saves_2018-03-11\\"
 #Office PC
-directory = "C:\\Users\\DanielM\\Repos\\pyDentate\\"
-file_name = "net_tuned.TunedNetwork_run_1"
+directory = "C:\\Users\\Daniel\\pyDentateData\\frequency_inhibition_data\\10Hz\\"
+file_name = "net_tuned.TunedNetwork_data_run_interval_n-cells_0_100_40.pydd"
 
 shelve_files = []
 active_cells = []
