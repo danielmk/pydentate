@@ -16,7 +16,7 @@ dt = 0.01  # ms
 stim_dtp = stim_delay / dt
 
 data_path = "C:\\Users\\Daniel\\pyDentateData\\frequency_inhibition_data\\10Hz\\"
-save_path = "C:\\Users\\DanielM\\Repos\\pyDentateData\\frequency_inhibition_data\\"
+save_path = "C:\\Users\\Daniel\\pyDentateData\\frequency_inhibition_data\\10Hz\\"
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and '40' in f and not '50' in f]
 interval = 100 # in kHz because ms
 data = np.load(data_path + data_files[0])['arr_0']
@@ -41,8 +41,10 @@ peaks = np.array(peaks)
 norm_peaks = []
 for idx, x in enumerate(peaks):
     x = (x/x[0])*100
-    if (peaks[idx][0] > 0.05):
-        norm_peaks.append(x)
+    norm_peaks.append(x)
         #plt.plot(x, marker = 'o')
     
 norm_peaks = np.array(norm_peaks)
+
+np.savetxt(save_path + "paradigm-frequency-inhibition_norm-peaks_interval_n-cells_" + str(interval) + ".txt", norm_peaks, delimiter="\t")
+np.savetxt(save_path + "paradigm-frequency-inhibition_peaks_interval_n-cells_" + str(interval) + ".txt", peaks, delimiter="\t")

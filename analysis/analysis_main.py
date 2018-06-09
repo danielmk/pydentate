@@ -19,20 +19,10 @@ from burst_generator_inhomogeneous_poisson import inhom_poiss
 import shelve
 import matplotlib.pyplot as plt
 
-def sim_score(signal1, signal2, kernel_delta):
-    """Calculate the similatiry score as in Yim et al. 2015
-    
-    Parameters
-    ----------
-    signal1, signal2 - numpy arrays
-        the two signals to be correlated
-    kernal_delta - numeric
-        the size of the triangular kernel in datapoints
+def tri_filter(signal, kernel_delta)
 
-    Returns
-    -------
-    corr - correlation coefficient
-    """
+def sim_score(signal1, signal2, kernel_delta):
+
     kernel = np.append(np.arange(kernel_delta),np.arange(kernel_delta,-1,-1))
     if np.shape(signal1) == np.shape(signal2):
         kernel=np.repeat(kernel[np.newaxis,:], repeats=np.shape(signal1)[0], axis=0)
@@ -80,23 +70,3 @@ if __name__ == '__main__':
                                      dt_signal=0.1,
                                      t_start=0,
                                      t_stop=1000)
-
-#Home PC
-#directory = "C:\\Users\\daniel\\repos\\pyDentate\paradigm_pattern-separation_saves_2018-03-11\\"
-#Office PC
-directory = "C:\\Users\\DanielM\\Repos\\pyDentate\\paradigm_pattern-separation_saves_2018-05-02_patterns\\"
-file_name = "net_tuned.TunedNetwork_run_0"
-
-shelve_files = []
-active_cells = []
-for run in range(1):
-    shelve_files.append(shelve.open(directory + file_name + str(run)))
-    ap_n_array = np.array(shelve_files[run]['net_tuned.TunedNetwork']['populations'][0]['ap_number'])
-    active_cells.append(len(np.argwhere(ap_n_array)))
-
-# Percent Active Cells
-for x in shelve_files:
-    n_active_array = np.array(x['net_tuned.TunedNetwork']['populations'][0]['ap_number'])
-    n_active = len(np.argwhere(n_active_array))
-    perc_active = (n_active / 2000.0) * 100
-    print(perc_active)
