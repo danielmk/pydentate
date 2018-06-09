@@ -16,9 +16,9 @@ import sys
 import argparse
 
 # Handle command line inputs with argparse
-parser = argparse.ArgumentParser(description='Run the frequency inhibition paradigm')
+parser = argparse.ArgumentParser(description='Run the spatial inhibition paradigm')
 parser.add_argument('-runs',
-                    nargs=3,
+                    nargs=3, 
                     type=int,
                     help='start stop range for the range of runs',
                     default=[0, 1, 1],

@@ -125,7 +125,10 @@ class GenNetwork(object):
         for idx, pop in enumerate(self.populations):
             cells = []
             for ap_count in pop.ap_counters:
-                cells.append(ap_count[0].as_numpy())
+                try:
+                    cells.append(ap_count[0].as_numpy()) # as_numpy() doesn't work on windows 10???
+                except:
+                    cells.append(np.array(ap_count[0]))
             # Workaround for matplotlib bug. plt.eventplot throws error when first
             # element empty
             if not np.array(cells[0]).any():
@@ -303,7 +306,10 @@ class Population(object):
     def plot_aps(self, color='k'):
         cells = []
         for x in self.ap_counters:
-            cells.append(x[0].as_numpy())
+            try:
+                cells.append(x[0].as_numpy()) # as_numpy() doesn't work on windows 10
+            except:
+                cells.append(np.array(x[0]))
 
         # Workaround for matplotlib bug. plt.eventplot throws error when first
         # element empty
@@ -326,11 +332,17 @@ class Population(object):
         if not os.path.isdir(directory):
             os.mkdir(directory)
         path = directory + '\\' + fname + '.npz'
-        ap_list = [x[0].as_numpy() for x in self.ap_counters]
+        try:
+            ap_list = [x[0].as_numpy() for x in self.ap_counters]
+        except:
+            ap_list = [np.array(x[0]) for x in self.ap_counters]
         np.savez(path, *ap_list)
 
     def perc_active_cells(self):
-        timing_arrays = [x[0].as_numpy() for x in self.ap_counters]
+        try:
+            timing_arrays = [x[0].as_numpy() for x in self.ap_counters] # as_numpy doesn't work on windows 10
+        except:
+            timing_arrays = [np.array(x[0]) for x in self.ap_counters]
         active_counter = 0
         for x in timing_arrays:
             if x.size != 0:
@@ -379,16 +391,25 @@ class Population(object):
 
     def get_properties(self):
         """Get the properties of the network"""
-        ap_time_stamps = [x[0].as_numpy() for x in self.ap_counters]
+        try:
+            ap_time_stamps = [x[0].as_numpy() for x in self.ap_counters]
+        except:
+            ap_time_stamps = [np.array(x[0]) for x in self.ap_counters]
         ap_numbers = [x[1].n for x in self.ap_counters]
+        try:
+            v_rec = [x.as_numpy() for x in self.VRecords]
+            vclamp_i = [x.as_numpy() for x in self.VClamps_i]
+        except:
+            v_rec = [np.array(x) for x in self.VRecords]
+            vclamp_i = [np.array(x) for x in self.VClamps_i]
         properties = {'parent_network': str(self.parent_network),
                       'cell_type': self.cell_type.name,
                       'cell_number': self.get_cell_number(),
                       'connections': [conn.get_properties() for conn in self.connections],
                       'ap_time_stamps': ap_time_stamps,
                       'ap_number': ap_numbers,
-                      'v_records': [x.as_numpy() for x in self.VRecords],
-                      'VClamps_i': [x.as_numpy() for x in self.VClamps_i]}
+                      'v_records': v_rec,
+                      'VClamps_i': vclamp_i}
 
         properties
         return properties
