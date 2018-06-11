@@ -14,12 +14,41 @@ Functions
 """
 
 import numpy as np
-from scipy.signal import correlate2d, convolve2d
-from burst_generator_inhomogeneous_poisson import inhom_poiss
+from scipy.signal import correlate2d, convolve2d, convolve
+#from burst_generator_inhomogeneous_poisson import inhom_poiss
 import shelve
 import matplotlib.pyplot as plt
+import pylab
 
-def tri_filter(signal, kernel_delta)
+def tri_filter(signal, kernel_delta):
+    """
+    kernel_delta
+        width of kernel in datapoints
+    """
+    kernel = np.append(np.arange(kernel_delta/2),np.arange(kernel_delta/2,-1,-1))
+    # convolve2d has proven PAINFULLY slow for some reason
+    #signal_conv = convolve2d(signal,kernel,'same')
+    new_signal = []
+    for x in signal:
+        new_signal.append(convolve(x, kernel, 'same'))
+    signal_conv = np.array(new_signal)
+    return signal_conv
+
+def correlate_signals(signal1,signal2):
+    """Correlates two 2d signals. Signals must be equal in size.
+    The signals are correlated individually across the first dimension and then
+    averaged in the end to 
+    """
+    corrs = []
+    for idx in range(signal1.shape[0]):
+        sig1 = signal1[idx] - pylab.std(signal1[idx])
+        sig2 = signal2[idx] - pylab.std(signal2[idx])
+        cor = sum(signal1*signal2)/(len(signal1)*pylab.std(signal1)*pylab.std(signal2))
+        corrs.append(cor)
+    
+    corrs = np.array(corrs)
+    return corrs.mean()
+    
 
 def sim_score(signal1, signal2, kernel_delta):
 
@@ -35,28 +64,17 @@ def sim_score(signal1, signal2, kernel_delta):
 def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
     """Convert an array of timestamps to a signal where 0 is absence and 1 is
     presence of spikes
-    
-    Parameters
-    ----------
-    time_stamps - numpy array
-        the time stamps array to convert
-    dt_signal - numeric
-        the size of the triangular kernel in datapoints, units must be
-        consistent with time_stamps
-    t_start - numeric
-        time where the signal starts, units must be consistent with time_stamps        
-    t_stop - numeric
-        time where the signal stops, units must be consistent with time_stamps
-
-    Returns
-    -------
-    sig - correlation coefficient
     """
     # Construct a zero array with size corresponding to desired output signal
     sig = np.zeros((np.shape(time_stamps)[0],int((t_stop-t_start)/dt_signal)))
     
     # Find the indices where spikes occured according to time_stamps
-    time_idc = (time_stamps - t_start) / dt_signal
+    time_idc = []
+    for x in time_stamps:
+        curr_idc = []
+        for y in x:
+            curr_idc.append((y-t_start)/ dt_signal)
+        time_idc.append(curr_idc)
     
     # Set the spike indices to 1
     for sig_idx, idc in enumerate(time_idc):
