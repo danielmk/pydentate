@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_tuned
+import net_global
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -35,7 +35,8 @@ print(savedir)
 # On your own machine you have to add the path to your own file to the list dll_files
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
             "C:\\Users\\daniel\\Repos\\nrnmech.dll",
-            "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
+            "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
+            "C:\\Users\\Daniel\\repos\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
 for x in dll_files:
     if os.path.isfile(x):
         dll_dir = x
@@ -72,7 +73,7 @@ all_targets = np.array([y for x in PP_to_GCs for y in x])
 
 # Start the runs of the model
 for run in runs:
-    nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run])
+    nw = net_global.TunedNetwork(10000, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run])
 
     # Attach voltage recordings to all cells
     nw.populations[0].voltage_recording(range(2000))
