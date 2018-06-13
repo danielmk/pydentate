@@ -10,14 +10,9 @@ import numpy as np
 import shelve
 import os
 
-# Setup some parameters given by paradigm_frequency_inhibition.py
-stim_delay = 100  # ms
-dt = 0.01  # ms
-stim_dtp = stim_delay / dt
-
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\net_tuned\\PreProcessed\\"
 save_path = data_path
-data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.pydd' in f]
+data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.pydd' in f and not '.npz' in f]
 
 for x in data_files:
     split_name = x.split('_')

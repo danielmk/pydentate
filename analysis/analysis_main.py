@@ -35,31 +35,31 @@ def tri_filter(signal, kernel_delta):
     return signal_conv
 
 def correlate_signals(signal1,signal2):
-    """Correlates two 2d signals. Signals must be equal in size.
-    The signals are correlated individually across the first dimension and then
-    averaged in the end to 
+    """Correlates two nxm dimensional signals.
+    Correlates sig1n with Sign2n along m and then averages all n correlation
+    coefficients.
+    Used Pearson Correlation Coefficient. Does not work for us because of NaN
+    values if one signal is silent.
     """
     corrs = []
     for idx in range(signal1.shape[0]):
         sig1 = signal1[idx] - pylab.std(signal1[idx])
         sig2 = signal2[idx] - pylab.std(signal2[idx])
-        cor = sum(signal1*signal2)/(len(signal1)*pylab.std(signal1)*pylab.std(signal2))
+        #cor = sum(sig1*sig2)/(len(sig1)*pylab.std(sig1)*pylab.std(sig2))
+        cor = sum(sig1*sig2)/(np.sqrt(sum(sig1**2))*np.sqrt(sum(sig2**2)))
         corrs.append(cor)
     
     corrs = np.array(corrs)
-    return corrs.mean()
-    
+    return np.nanmean(corrs)
 
-def sim_score(signal1, signal2, kernel_delta):
-
-    kernel = np.append(np.arange(kernel_delta),np.arange(kernel_delta,-1,-1))
-    if np.shape(signal1) == np.shape(signal2):
-        kernel=np.repeat(kernel[np.newaxis,:], repeats=np.shape(signal1)[0], axis=0)
-    else:
-        raise ValueError("signal1 and signal2 must have same shape")
-    signal1_conv = convolve2d(signal1,kernel,'same')
-    signal2_conv = convolve2d(signal2,kernel,'same')
-    return signal1_conv
+def avg_dotprod_signals(signal1,signal2):
+    """Average dot product of signal1 and signal2"""
+    non_silent_sigs = np.unique(np.concatenate((np.argwhere(signal1.any(axis=1)),np.argwhere(signal2.any(axis=1)))))
+    non_silent_sigs.sort()
+    product = signal1[non_silent_sigs]*signal2[non_silent_sigs]
+    prod_sum = product.sum(axis=1)
+    avg_dot_product = prod_sum.mean()
+    return avg_dot_product
 
 def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
     """Convert an array of timestamps to a signal where 0 is absence and 1 is

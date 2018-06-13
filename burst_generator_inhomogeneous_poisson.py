@@ -25,11 +25,16 @@ def inhom_poiss():
 
     rate_profile_as_asig = AnalogSignal(rate_profile, units = 1*pq.Hz,t_start=0*pq.s, t_stop=0.5*pq.s, sampling_period = sampling_interval)
 
-    what = []
+    spike_trains = []
     for x in range(400):
-        what.append(spike_train_generation.inhomogeneous_poisson_process(rate_profile_as_asig))
+        curr_train = spike_train_generation.inhomogeneous_poisson_process(rate_profile_as_asig)
+        # We have to make sure that there is sufficient space between spikes.
+        # If there is not, we move the next spike by 0.1ms
+        bad_idc = np.argwhere(np.diff(curr_train)==0).flatten()
+        curr_train[bad_idc+1]=curr_train[bad_idc+1] + 0.0001 * pq.s
+        spike_trains.append(curr_train)
 
-    array_like = np.array([np.around(np.array(x.times)*1000, decimals=1) for x in what])
+    array_like = np.array([np.around(np.array(x.times)*1000, decimals=1) for x in spike_trains])
 
     return array_like
 

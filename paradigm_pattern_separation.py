@@ -47,6 +47,7 @@ h.nrn_load_dll(dll_dir)
 np.random.seed(10000)
 temporal_patterns = inhom_poiss()
 
+
 # Generate the PP -> GC mapping so that each GC receives inputs from 20/400
 # randomly chosen PP inputs
 innervation_pattern_gc = np.array([np.random.choice(400,20, replace = False) for x in range(2000)])
