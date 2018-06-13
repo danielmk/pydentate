@@ -24,7 +24,7 @@ for x in data_files:
     data_list.append(np.load(data_path + x)['arr_0'])
 
 
-row_idx_start = 290
+row_idx_start = 150
 row_idx_stop = 377
 # 376
     

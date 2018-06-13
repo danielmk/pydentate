@@ -30,11 +30,18 @@ def inhom_poiss():
         curr_train = spike_train_generation.inhomogeneous_poisson_process(rate_profile_as_asig)
         # We have to make sure that there is sufficient space between spikes.
         # If there is not, we move the next spike by 0.1ms
-        bad_idc = np.argwhere(np.diff(curr_train)==0).flatten()
-        curr_train[bad_idc+1]=curr_train[bad_idc+1] + 0.0001 * pq.s
         spike_trains.append(curr_train)
 
     array_like = np.array([np.around(np.array(x.times)*1000, decimals=1) for x in spike_trains])
+    print(array_like.shape)
+    for arr_idx in range(array_like.shape[0]):
+        bad_idc = np.argwhere(np.diff(array_like[arr_idx])==0).flatten()
+        bad_idc= bad_idc+1
+        while bad_idc.any():
+            for bad_idx in bad_idc:
+                array_like[arr_idx][bad_idx]=array_like[arr_idx][bad_idx] + 0.1
+            bad_idc = np.argwhere(np.diff(array_like[arr_idx])==0).flatten()
+            bad_idc= bad_idc+1
 
     return array_like
 
