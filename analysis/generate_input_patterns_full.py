@@ -16,7 +16,7 @@ from sklearn.preprocessing import normalize
 # Generate the temporal patterns
 np.random.seed(10000)
 temporal_patterns = inhom_poiss()
-runs = range(377)
+runs = range(376)
 save_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\input_patterns\\"
 file_prefix = "input_patterns_run_"
 

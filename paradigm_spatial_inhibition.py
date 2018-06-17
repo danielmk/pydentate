@@ -66,7 +66,7 @@ stim_delay = 50
 
 for run in runs:
     # Create a standard networks and add the stimulation
-    nw = net_tuned.TunedNetwork(seed=10000+run)
+    nw = net_global.TunedNetwork(seed=10000+run)
     np.random.seed(10000 + run)
 
     # Make sure we are not stimulating a cell we measure

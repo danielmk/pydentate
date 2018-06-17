@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_global
+import net_tuned
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -47,7 +47,6 @@ h.nrn_load_dll(dll_dir)
 np.random.seed(10000)
 temporal_patterns = inhom_poiss()
 
-
 # Generate the PP -> GC mapping so that each GC receives inputs from 20/400
 # randomly chosen PP inputs
 innervation_pattern_gc = np.array([np.random.choice(400,20, replace = False) for x in range(2000)])
@@ -74,7 +73,7 @@ all_targets = np.array([y for x in PP_to_GCs for y in x])
 
 # Start the runs of the model
 for run in runs:
-    nw = net_global.TunedNetwork(10000, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run])
+    nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run])
 
     # Attach voltage recordings to all cells
     nw.populations[0].voltage_recording(range(2000))

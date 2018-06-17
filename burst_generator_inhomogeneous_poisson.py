@@ -33,10 +33,9 @@ def inhom_poiss():
         spike_trains.append(curr_train)
 
     array_like = np.array([np.around(np.array(x.times)*1000, decimals=1) for x in spike_trains])
-    print(array_like.shape)
     for arr_idx in range(array_like.shape[0]):
         bad_idc = np.argwhere(np.diff(array_like[arr_idx])==0).flatten()
-        bad_idc= bad_idc+1
+        bad_idc = bad_idc+1
         while bad_idc.any():
             for bad_idx in bad_idc:
                 array_like[arr_idx][bad_idx]=array_like[arr_idx][bad_idx] + 0.1
