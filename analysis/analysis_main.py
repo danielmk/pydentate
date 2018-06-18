@@ -61,6 +61,15 @@ def avg_dotprod_signals(signal1,signal2):
     avg_dot_product = prod_sum.mean()
     return avg_dot_product
 
+def avg_dotprod_signals_tbinned(signal1,signal2, len_bin = 100):
+    """Average dot product of signal1 and signal2"""
+    non_silent_sigs = np.unique(np.concatenate((np.argwhere(signal1.any(axis=1)),np.argwhere(signal2.any(axis=1)))))
+    non_silent_sigs.sort()
+    product = signal1[non_silent_sigs]*signal2[non_silent_sigs]
+    prod_sum = product.sum(axis=1)
+    avg_dot_product = prod_sum.mean()
+    return avg_dot_product
+
 def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
     """Convert an array of timestamps to a signal where 0 is absence and 1 is
     presence of spikes

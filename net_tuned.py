@@ -123,7 +123,8 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            400, 20, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3))
 
         # We reseed here to make sure that those connections are consistent
-        # between this and net_global
+        # between this and net_global. The only connection that differs between
+        # net_tuned and net_global will be the BC -> GC connection.
         if seed:
             self.set_numpy_seed(seed)
 
