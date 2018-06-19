@@ -12,9 +12,9 @@ import os
 import analysis_main
 
 # Setup some parameters given by paradigm_frequency_inhibition.py
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\input_patterns\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\net_tuned\\"
 save_path = data_path
-data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and 'norm' in f]
+data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and 'convolved' in f and not 'norm' in f]
 data_files.sort()
 
 corr_matrix = np.empty((len(data_files), len(data_files)))

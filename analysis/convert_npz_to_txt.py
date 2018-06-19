@@ -14,9 +14,9 @@ stim_delay = 100  # ms
 dt = 0.01  # ms
 stim_dtp = stim_delay / dt
 
-data_path = "C:\\Users\\Daniel\\pyDentateData\\frequency_inhibition_data\\30Hz\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\frequency_inhibition_data\\1Hz\\"
 save_path = data_path
-data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.pydd' in f and '.npz' in f and not '.txt' in f]
+data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and not '.txt' in f]
 
 for x in data_files:
     curr_arr = np.load(data_path + x)['arr_0']

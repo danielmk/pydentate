@@ -10,7 +10,7 @@ import numpy as np
 import shelve
 import os
 
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\net_global\\"
 save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.pydd' in f and not '.npz' in f]
 

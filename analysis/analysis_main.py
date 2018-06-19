@@ -15,6 +15,7 @@ Functions
 
 import numpy as np
 from scipy.signal import correlate2d, convolve2d, convolve
+from sklearn.preprocessing import normalize
 #from burst_generator_inhomogeneous_poisson import inhom_poiss
 import shelve
 import matplotlib.pyplot as plt
@@ -61,13 +62,35 @@ def avg_dotprod_signals(signal1,signal2):
     avg_dot_product = prod_sum.mean()
     return avg_dot_product
 
-def avg_dotprod_signals_tbinned(signal1,signal2, len_bin = 100):
+def avg_dotprod_signals_tbinned(signal1,signal2, len_bin = 1000):
     """Average dot product of signal1 and signal2"""
-    non_silent_sigs = np.unique(np.concatenate((np.argwhere(signal1.any(axis=1)),np.argwhere(signal2.any(axis=1)))))
-    non_silent_sigs.sort()
-    product = signal1[non_silent_sigs]*signal2[non_silent_sigs]
-    prod_sum = product.sum(axis=1)
-    avg_dot_product = prod_sum.mean()
+    # Normalize every time bin invididually
+    
+    signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
+                         (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
+    signal1 = signal1[:,0:5,:]
+    signal2 = np.reshape(signal2[:,0:int((signal2.shape[1]/len_bin)*len_bin)],
+                     (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
+    signal2 = signal2[:,0:5,:]
+
+    sig1 = []
+    for x in signal1:
+        sig1.append(normalize(x,axis=1))
+    signal1 = np.array(sig1)
+    
+    sig2 = []
+    for x in signal2:
+        sig2.append(normalize(x, axis=1))
+    signal2 = np.array(sig2)
+
+    product = signal1*signal2
+    prod_sum = product.sum(axis=2)
+
+    silent_sigs = np.argwhere(np.logical_and(np.invert(signal1.any(axis=2)), np.invert(signal2.any(axis=2))))
+
+    for x in silent_sigs:
+        prod_sum[x[0],x[1]] = np.NaN
+    avg_dot_product = np.nanmean(prod_sum, axis=0)
     return avg_dot_product
 
 def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
