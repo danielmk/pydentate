@@ -16,7 +16,7 @@ stim_delay = 100  # ms
 dt = 0.01  # ms
 stim_dtp = stim_delay / dt
 
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\input_patterns\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input\\input_patterns\\"
 save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f]
 data_files.sort()
@@ -28,9 +28,9 @@ for x in data_files:
     data_list.append(np.load(data_path + x)['arr_0'])
 
 row_idx_start = 0
-row_idx_stop = 376
-col_idx_start = 375
-col_idx_stop = 376
+row_idx_stop = 25
+col_idx_start = 0
+col_idx_stop = 25
 # 376
     
 for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):

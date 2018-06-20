@@ -12,7 +12,7 @@ import os
 import analysis_main
 
 # Setup some parameters given by paradigm_frequency_inhibition.py
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data\\net_global\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_global_input\\net_tuned\\75-99\\"
 save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and 'norm' in f]
 data_files.sort()
@@ -23,8 +23,8 @@ data_list = []
 for x in data_files:
     data_list.append(np.load(data_path + x)['arr_0'])
 
-row_idx_start = 300
-row_idx_stop = 376
+row_idx_start = 0
+row_idx_stop = 25
 # 376
     
 for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):

@@ -114,6 +114,22 @@ def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
 
     return sig
 
+def population_similarity_measure_ob(signal1,signal2, len_bin):
+    signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
+                         (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
+    signal1 = signal1.mean(axis=2)
+    signal2 = np.reshape(signal2[:,0:int((signal2.shape[1]/len_bin)*len_bin)],
+                     (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
+    signal2 = signal2.mean(axis=2)
+    
+    #Normalize
+    signal1 = normalize(signal1, axis=0)
+    signal2 = normalize(signal2, axis=0)
+    
+    product = signal1*signal2
+    prod_sum = product.sum(axis=0)
+    return prod_sum.mean()
+
 if __name__ == '__main__':
     temporal_patterns = inhom_poiss()
     time_sig = time_stamps_to_signal(temporal_patterns,
