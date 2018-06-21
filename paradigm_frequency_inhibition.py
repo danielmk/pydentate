@@ -12,7 +12,7 @@ import net_tuned
 import os
 import argparse
 
-parser = argparse.ArgumentParser(description='Run the frequency inhibition paradigm')
+parser = argparse.ArgumentParser(description='Frequency inhibition paradigm')
 parser.add_argument('-runs',
                     nargs=3,
                     type=int,
@@ -68,10 +68,10 @@ for run in runs:
     np.random.seed(10000 + run)
 
     # Make sure we are not stimulating a cell we measure
-    stim_cells = np.random.choice(2000,n_cells)
-    gcs_to_measure = np.random.choice(2000,20)
+    stim_cells = np.random.choice(2000, n_cells)
+    gcs_to_measure = np.random.choice(2000, 20)
     while np.intersect1d(stim_cells, gcs_to_measure).any():
-        gcs_to_measure = np.random.choice(2000,20)
+        gcs_to_measure = np.random.choice(2000, 20)
 
     for x in range(10):
         nw.populations[0].current_clamp_range(stim_cells,
@@ -79,20 +79,22 @@ for run in runs:
                                               dur=stim_dur,
                                               delay=100+interval*x)
 
-    nw.populations[0].SEClamp(gcs_to_measure, dur1 = 100+200+interval*10, rs=1)
-    nw.populations[0].voltage_recording(range(0,2000,100))
-    nw.populations[1].voltage_recording(range(0,60,2))
+    nw.populations[0].SEClamp(gcs_to_measure, dur1=100+200+interval*10, rs=1)
+    nw.populations[0].voltage_recording(range(0, 2000, 100))
+    nw.populations[1].voltage_recording(range(0, 60, 2))
     nw.populations[2].voltage_recording(range(24))
     nw.populations[3].voltage_recording(range(24))
-    mc_to_measure = np.random.choice(60,1)
-    bc_to_measure = np.random.choice(24,1)
-    hc_to_measure = np.random.choice(24,1)
-    nw.populations[1].SEClamp(mc_to_measure, dur1 = 100+200+interval*10, rs=1, amp1=-70)
-    nw.populations[2].SEClamp(bc_to_measure, dur1 = 100+200+interval*10, rs=1, amp1=-70)
-    nw.populations[3].SEClamp(hc_to_measure, dur1 = 100+200+interval*10, rs=1, amp1=-70)
+    mc_to_measure = np.random.choice(60, 1)
+    bc_to_measure = np.random.choice(24, 1)
+    hc_to_measure = np.random.choice(24, 1)
+    nw.populations[1].SEClamp(mc_to_measure, dur1=100+200+interval*10,
+                              rs=1, amp1=-70)
+    nw.populations[2].SEClamp(bc_to_measure, dur1=100+200+interval*10,
+                              rs=1, amp1=-70)
+    nw.populations[3].SEClamp(hc_to_measure, dur1=100+200+interval*10,
+                              rs=1, amp1=-70)
 
     """Initialization for -2000 to -100"""
-    #print("Running trial " + str(trial))
     h.cvode.active(0)
     dt = 0.01
     h.steps_per_ms = 1.0/dt

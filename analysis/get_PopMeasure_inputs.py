@@ -13,7 +13,7 @@ import analysis_main
 from scipy.signal import resample
 
 # Setup some parameters given by paradigm_frequency_inhibition.py
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_global_input\\input_patterns\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input\\net_nonfacilitating_scale_100\\"
 save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and not 'norm' in f]
 data_files.sort()
@@ -32,4 +32,4 @@ for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
     for col_idx, y in enumerate(data_list[row_idx+row_idx_start:len(data_list)]):
         corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.population_similarity_measure_ob(x,y, 200)
         
-np.savetxt(save_path + "dot-product-norm_matrix_idx_row-start_" + str(row_idx_start) + '-' + str(row_idx_stop) + ".txt", corr_matrix, delimiter="\t")
+np.savetxt(save_path + "1_pop-measure_matrix_" + str(row_idx_start) + '-' + str(row_idx_stop) + ".txt", corr_matrix, delimiter="\t")

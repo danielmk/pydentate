@@ -13,7 +13,7 @@ import os
 import argparse
 
 # Handle command line inputs with argparse
-parser = argparse.ArgumentParser(description='Run the pattern separation paradigm')
+parser = argparse.ArgumentParser(description='Pattern separation paradigm')
 parser.add_argument('-runs',
                     nargs=3,
                     type=int,
@@ -69,11 +69,11 @@ for x in range(0,400):
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
-
-
 # Start the runs of the model
 for run in runs:
-    nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run])
+    nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:24+run],
+                                PP_to_GCs[0+run:24+run],
+                                PP_to_BCs[0+run:24+run])
 
     # Attach voltage recordings to all cells
     nw.populations[0].voltage_recording(range(2000))
@@ -99,8 +99,8 @@ for run in runs:
     h.dt = 0.1
 
     """Setup run control for -100 to 1500"""
-    h.frecord_init() # Necessary after changing t to restart the vectors
-    
+    h.frecord_init()  # Necessary after changing t to restart the vectors
+
     while h.t < 600:
         h.fadvance()
     print("Done Running")

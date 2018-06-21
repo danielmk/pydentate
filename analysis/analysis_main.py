@@ -121,7 +121,7 @@ def population_similarity_measure_ob(signal1,signal2, len_bin):
     signal2 = np.reshape(signal2[:,0:int((signal2.shape[1]/len_bin)*len_bin)],
                      (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
     signal2 = signal2.mean(axis=2)
-    
+
     #Normalize
     signal1 = normalize(signal1, axis=0)
     signal2 = normalize(signal2, axis=0)

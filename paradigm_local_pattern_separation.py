@@ -7,14 +7,14 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_global
+import net_tuned
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
 import scipy.stats as stats
 
 # Handle command line inputs with argparse
-parser = argparse.ArgumentParser(description='Run the pattern separation paradigm')
+parser = argparse.ArgumentParser(description='Local pattern separation paradigm')
 parser.add_argument('-runs',
                     nargs=3,
                     type=int,
@@ -52,29 +52,29 @@ h.nrn_load_dll(dll_dir)
 
 np.random.seed(10000)
 # Generate a gaussian probability density function
-gauss = stats.norm(loc=1000, scale = input_scale)
+gauss = stats.norm(loc=1000, scale=input_scale)
 pdf_gc = gauss.pdf(np.arange(2000))
 pdf_gc = pdf_gc/pdf_gc.sum()
 pdf_bc = gauss.pdf(np.arange(24))
 pdf_bc = pdf_bc/pdf_bc.sum()
-# We hold the pdf constant. To randomize the centroid we reslice the GC indices.
+# We hold the pdf constant. To randomize the centroid we reslice the GC indices
 GC_indices = np.arange(2000)
-start_idc = np.random.randint(0,1999, size = 400)
+start_idc = np.random.randint(0, 1999, size=400)
 
 PP_to_GCs = []
 for x in start_idc:
     curr_idc = np.concatenate((GC_indices[x:2000], GC_indices[0:x]))
-    PP_to_GCs.append(np.random.choice(curr_idc, size = 100, replace = False, p=pdf_gc))
+    PP_to_GCs.append(np.random.choice(curr_idc, size=100, replace=False, p=pdf_gc))
 
 PP_to_GCs = np.array(PP_to_GCs)
 # Generate the PP -> BC mapping as above
 BC_indices = np.arange(24)
-start_idc = np.array(((start_idc/2000.0)*24), dtype = int)
+start_idc = np.array(((start_idc/2000.0)*24), dtype=int)
 
 PP_to_BCs = []
 for x in start_idc:
     curr_idc = np.concatenate((BC_indices[x:24], BC_indices[0:x]))
-    PP_to_BCs.append(np.random.choice(curr_idc, size=1, replace = False, p=pdf_bc))
+    PP_to_BCs.append(np.random.choice(curr_idc, size=1, replace=False, p=pdf_bc))
 
 PP_to_BCs = np.array(PP_to_BCs)
 
@@ -84,7 +84,9 @@ temporal_patterns = inhom_poiss()
 
 # Start the runs of the model
 for run in runs:
-    nw = net_global.TunedNetwork(10000, temporal_patterns[0+run:24+run], PP_to_GCs[0+run:24+run], PP_to_BCs[0+run:24+run])
+    nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:24+run],
+                                PP_to_GCs[0+run:24+run],
+                                PP_to_BCs[0+run:24+run])
 
     # Attach voltage recordings to all cells
     nw.populations[0].voltage_recording(range(2000))

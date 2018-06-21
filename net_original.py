@@ -25,7 +25,9 @@ class StandardNetworkOriginal(ouropy.gennetwork.GenNetwork):
     with some changes as in Yim et al. 2015.
     It features inhibition but omits the MC->GC connection.
     """
-    def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]),
+
+    def __init__(self, seed=None, temporal_patterns=np.array([]),
+                 spatial_patterns_gcs=np.array([]),
                  spatial_patterns_bcs=np.array([]), sprouting=0):
         # Setup cells
         self.mk_population(GranuleCell, 500)
@@ -64,21 +66,10 @@ class StandardNetworkOriginal(ouropy.gennetwork.GenNetwork):
                                                            'ddend',
                                                            2, 6.3, 0, 1*10**(-2))
 
-        # PP -> MC Not in Yim et al. 2017
-        """ouropy.gennetwork.PerforantPathStimulation(self.pp_stim, self.populations[1],
-                                         2, 'dd',
-                                         1.5, 5.5, 0, 10, 3, 0.5*10**(-2))"""
-
         # Sprouting
         ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[0],
                                   100, 'proxd', sprouting,
                                   1.5, 5.5, 0, 10, 0.8, 2*10**(-3))
-
-        """
-        Call signature of mk_Exp2SynConnection:
-        (self, pre_pop, post_pop, target_pool,
-         target_segs, divergence, tau1, tau2, e, thr, delay, weight)
-        """
         
         # GC -> MC
         ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[1],
@@ -94,11 +85,6 @@ class StandardNetworkOriginal(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.Exp2SynConnection(self.populations[0], self.populations[3],
                                   5, 'proxd',
                                   3, 0.3, 0.6, 0, 10, 1.5, 0.5*10**(-3))
-
-        # MC -> GC
-        """self.mk_Exp2SynConnection(self.populations[1], self.populations[0],
-                                     350, 'proxd',
-                                     200, 1.5, 5.5, 0, 10, 3, 0.3*10**(-3))"""
 
         # MC -> MC
         ouropy.gennetwork.Exp2SynConnection(self.populations[1], self.populations[1],
@@ -121,10 +107,6 @@ class StandardNetworkOriginal(ouropy.gennetwork.GenNetwork):
                                      140, 'soma',
                                      100, 0.26, 5.5, -70, -10, 0.85, 1.6*10**(-3))
 
-        """"ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[0],
-                                  140, 'soma',
-                                  100, 0.26, 20, -70, -10, 0.85, 1.6*10**(-3))"""
-
         # BC -> MC
         ouropy.gennetwork.Exp2SynConnection(self.populations[2], self.populations[1],
                                   7, 'proxd',
@@ -140,9 +122,6 @@ class StandardNetworkOriginal(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[0],
                                      260, 'dd',
                                      160, 0.5, 6, -70, 10, 1.6, 0.5*10**(-3))
-        """ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[0],
-                                  260, 'dd',
-                                  160, 0.5, 20, -70, 10, 1.6, 0.5*10**(-3))"""
 
         # HC -> MC
         ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[1],
@@ -153,35 +132,3 @@ class StandardNetworkOriginal(ouropy.gennetwork.GenNetwork):
         ouropy.gennetwork.Exp2SynConnection(self.populations[3], self.populations[2],
                                   5, 'ddend',
                                   4, 0.4, 5.8, -70, 10, 1.6, 0.5*10**(-3))
-
-if __name__ == '__main__':
-    """A testrun for StandardNetwork"""
-    """np.random.seed(10000)
-    temporal_patterns = np.random.poisson(10,(1,3)).cumsum(axis=1)"""
-    spatial_patterns_gcs = np.random.choice(500,200,replace=False)
-    spatial_patterns_bcs = np.random.choice(6,2,replace=False)
-    temporal_patterns = np.array([50])
-    
-    nw = StandardNetwork(seed = 10000, temporal_patterns = temporal_patterns,
-                         spatial_patterns_gcs = spatial_patterns_gcs,
-                         spatial_patterns_bcs = spatial_patterns_bcs, sprouting = 0)
-
-    h.cvode.active(0)
-    dt = 0.1
-    h.steps_per_ms = 1.0/dt
-    h.tstop = 1500
-    h.finitialize(-60)
-    h.t = -2000
-    h.secondorder = 0
-    h.dt = 10
-    while h.t < -100:
-        h.fadvance()
-        #print(h.t)
-    h.secondorder = 2
-    h.t = 0
-    h.dt = 0.1
-
-    """Setup run control for -100 to 1500"""
-    h.frecord_init() # Necessary after changing t to restart the vectors
-    while h.t < 300:
-        h.fadvance()
