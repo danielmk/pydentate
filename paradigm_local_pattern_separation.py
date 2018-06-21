@@ -53,7 +53,7 @@ h.nrn_load_dll(dll_dir)
 np.random.seed(10000)
 # Generate a gaussian probability density function
 gauss_gc = stats.norm(loc=1000, scale=input_scale)
-gauss_bc = stats.norm(loc=12, scale=24)
+gauss_bc = stats.norm(loc=12, scale=(input_scale/2000.0)*24)
 pdf_gc = gauss_gc.pdf(np.arange(2000))
 pdf_gc = pdf_gc/pdf_gc.sum()
 pdf_bc = gauss_bc.pdf(np.arange(24))
