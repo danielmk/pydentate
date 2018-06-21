@@ -52,10 +52,11 @@ h.nrn_load_dll(dll_dir)
 
 np.random.seed(10000)
 # Generate a gaussian probability density function
-gauss = stats.norm(loc=1000, scale=input_scale)
-pdf_gc = gauss.pdf(np.arange(2000))
+gauss_gc = stats.norm(loc=1000, scale=input_scale)
+gauss_bc = stats.norm(loc=12, scale=24)
+pdf_gc = gauss_gc.pdf(np.arange(2000))
 pdf_gc = pdf_gc/pdf_gc.sum()
-pdf_bc = gauss.pdf(np.arange(24))
+pdf_bc = gauss_bc.pdf(np.arange(24))
 pdf_bc = pdf_bc/pdf_bc.sum()
 # We hold the pdf constant. To randomize the centroid we reslice the GC indices
 GC_indices = np.arange(2000)
