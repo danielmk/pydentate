@@ -13,7 +13,7 @@ import analysis_main
 from scipy.signal import resample
 
 # Setup some parameters given by paradigm_frequency_inhibition.py
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input\\net_global_scale_500\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input\\seed_10000\\scale_0500\\net_disinhibited\\"
 save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and not 'norm' in f and 'convolved' in f]
 data_files.sort()
