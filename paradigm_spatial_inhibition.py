@@ -60,8 +60,8 @@ h.nrn_load_dll(dll_dir)
 # Setup specs for stimulation
 stim_pool = 500  # Size of the pool from which stimulated cells are chosen
 stim_location = int(2000 / 2.0 - stim_pool / 2.0)
-stim_amp = 1
-stim_dur = 5
+stim_amp = 1.5
+stim_dur = 10
 stim_delay = 50
 
 for run in runs:
@@ -110,23 +110,23 @@ for run in runs:
     nw.save_ap_fig(spike_plot, directory = savedir, file_name = spike_plot_file_name)
     nw.shelve_network(directory = savedir, file_name = data_file_name)
 """
-    # Calculate spatial IPSC plot
-    sampling_period = h.dt
-    bl_times = np.array([40, 50])  # in ms
-    IPSC_times = np.array([50, 90])  # in ms
-    bl_dtps = bl_times / sampling_period
-    IPSC_dtps = IPSC_times / sampling_period
-    
-    IPSCs = []
-    for cell_i in nw.populations[0].VClamps_i:
-        trace = cell_i.as_numpy()
-        bl = trace[int(bl_dtps[0]):int(bl_dtps[1])].mean()
-        peak_IPSC = trace[int(IPSC_dtps[0]):int(IPSC_dtps[1])].max()
-        IPSCs.append(peak_IPSC - bl)
-    spatial_plot = plt.figure()
-    plt.plot(cells_to_measure, IPSCs)
-    plt.xlabel("Granule Cell #")
-    plt.ylabel("Peak IPSC (nA)")
-    full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw'
-    spatial_plot.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
-    spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')"""
+# Calculate spatial IPSC plot
+sampling_period = h.dt
+bl_times = np.array([40, 50])  # in ms
+IPSC_times = np.array([50, 90])  # in ms
+bl_dtps = bl_times / sampling_period
+IPSC_dtps = IPSC_times / sampling_period
+
+IPSCs = []
+for cell_i in nw.populations[0].VClamps_i:
+    trace = np.array(cell_i)
+    bl = trace[int(bl_dtps[0]):int(bl_dtps[1])].mean()
+    peak_IPSC = trace[int(IPSC_dtps[0]):int(IPSC_dtps[1])].max()
+    IPSCs.append(peak_IPSC - bl)
+spatial_plot = plt.figure()
+plt.plot(cells_to_measure, IPSCs)
+plt.xlabel("Granule Cell #")
+plt.ylabel("Peak IPSC (nA)")
+full_file_path = save_dir + '\\' + 'run_' + str(run) + '_spatial_IPSC_plot_nw'
+spatial_plot.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
+spatial_plot.savefig(full_file_path + ".eps", dpi = 300, format ='eps')"""
