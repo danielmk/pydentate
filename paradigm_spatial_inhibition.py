@@ -8,7 +8,7 @@ Auto init and run
 
 from neuron import h
 import numpy as np
-import net_tuned
+import net_tunedrev
 import net_global
 import matplotlib.pyplot as plt
 import os
@@ -66,7 +66,7 @@ stim_delay = 50
 
 for run in runs:
     # Create a standard networks and add the stimulation
-    nw = net_global.TunedNetwork(seed=10000+run)
+    nw = net_tunedrev.TunedNetwork(seed=10000+run)
     np.random.seed(10000 + run)
 
     # Make sure we are not stimulating a cell we measure

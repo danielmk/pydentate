@@ -10,8 +10,8 @@ import numpy as np
 import shelve
 import matplotlib.pyplot as plt
 
-sim_matrix_path = 'C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input\\seed_10000\\scale_0500\\net_disinhibited\\'
-sim_matrix_fname = '1_pop-measure_matrix.txt'
+sim_matrix_path = 'C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input\\seed_10000\\input_patterns\\'
+sim_matrix_fname = '1_leutgeb-measure.txt'
 input_matrix = np.loadtxt(sim_matrix_path + sim_matrix_fname, delimiter = '\t')
 
 linear_similarity = np.array([])

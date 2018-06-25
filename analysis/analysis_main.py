@@ -15,6 +15,7 @@ Functions
 
 import numpy as np
 from scipy.signal import correlate2d, convolve2d, convolve
+from scipy.stats import pearsonr
 from sklearn.preprocessing import normalize
 #from burst_generator_inhomogeneous_poisson import inhom_poiss
 import shelve
@@ -129,6 +130,26 @@ def population_similarity_measure_ob(signal1,signal2, len_bin):
     product = signal1*signal2
     prod_sum = product.sum(axis=0)
     return prod_sum.mean()
+
+def similarity_measure_leutgeb(signal1,signal2, len_bin):
+    """Takes the binary spike data and calculates the similarity score from the
+    mean rates"""
+    signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
+                     (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
+    signal1 = signal1.sum(axis=2)
+    signal1 = signal1 / 0.0001 # 0.0001 is dt
+
+    signal2 = np.reshape(signal2[:,0:int((signal2.shape[1]/len_bin)*len_bin)],
+                     (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
+    signal2 = signal2.sum(axis=2)
+    signal2 = signal2 / 0.0001
+
+    corr_vector = []
+
+    for x in range(signal1.shape[1]):
+        corr_vector.append(pearsonr(signal1[:,x], signal2[:,x])[0])
+
+    return np.array(corr_vector)
 
 if __name__ == '__main__':
     temporal_patterns = inhom_poiss()
