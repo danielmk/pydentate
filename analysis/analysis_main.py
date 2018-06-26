@@ -14,7 +14,7 @@ Functions
 """
 
 import numpy as np
-from scipy.signal import correlate2d, convolve2d, convolve
+from scipy.signal import convolve
 from scipy.stats import pearsonr
 from sklearn.preprocessing import normalize
 #from burst_generator_inhomogeneous_poisson import inhom_poiss
@@ -126,23 +126,20 @@ def population_similarity_measure_ob(signal1,signal2, len_bin):
     #Normalize
     signal1 = normalize(signal1, axis=0)
     signal2 = normalize(signal2, axis=0)
-    
+
     product = signal1*signal2
     prod_sum = product.sum(axis=0)
     return prod_sum.mean()
 
 def similarity_measure_leutgeb(signal1,signal2, len_bin):
-    """Takes the binary spike data and calculates the similarity score from the
-    mean rates"""
+    """Oriented on the """
     signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
                      (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
     signal1 = signal1.sum(axis=2)
-    signal1 = signal1 / 0.0001 # 0.0001 is dt
 
     signal2 = np.reshape(signal2[:,0:int((signal2.shape[1]/len_bin)*len_bin)],
                      (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
     signal2 = signal2.sum(axis=2)
-    signal2 = signal2 / 0.0001
 
     corr_vector = []
 
