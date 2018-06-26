@@ -12,7 +12,7 @@ import os
 import analysis_main
 
 # Setup some parameters given by paradigm_frequency_inhibition.py
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input\\seed_10000\\scale_0100\\net_global\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\scale1000\\net_globalrev\\"
 save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and 'spike_data' in f and not 'convolved' in f]
 data_files.sort()
@@ -28,7 +28,7 @@ for x in data_files:
 row_idx_start = 0
 row_idx_stop = 25
 # 376
-len_bins = 1000    
+len_bins = 6000
 
 for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
     for col_idx, y in enumerate(data_list[row_idx+row_idx_start:len(data_list)]):
