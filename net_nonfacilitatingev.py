@@ -71,19 +71,19 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         # GC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[1],
                                   12, 'proxd',
-                                  1, 7.6, 500, 0.1, 0, 0, 10, 1.5, 0.2*10**(-2) * 10)
+                                  1, 7.6, 0, 0.1, 0, 0, 10, 1.5, 0.2*10**(-2) * 10)
 
         # GC -> BC
         #Weight x4, target_pool = 2
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[2],
                                            8, 'proxd',
-                                           1, 8.7, 500, 0.1, 0, 0, 10, 0.8, 2.5*10**(-2))
+                                           1, 8.7, 0, 0.1, 0, 0, 10, 0.8, 2.5*10**(-2))
 
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.
         ouropy.gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
                                            24, 'proxd',
-                                           1, 8.7, 500, 0.1, 0, 0, 10, 1.5, 2.5*10**(-2))
+                                           1, 8.7, 0, 0.1, 0, 0, 10, 1.5, 2.5*10**(-2))
 
         # MC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[1], self. populations[1],
@@ -103,7 +103,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         # BC -> GC
         # Nr. synapses x3; Weight *1/4; changed from 5.5 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
-                                           2000, 'soma',
+                                           560, 'soma',
                                            400, 20, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3))
 
         # We reseed here to make sure that those connections are consistent
