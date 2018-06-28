@@ -8,7 +8,7 @@ Auto init and run
 
 from neuron import h
 import numpy as np
-import net_tuned
+import net_tunedrev
 import os
 import argparse
 
@@ -27,12 +27,12 @@ parser.add_argument('-savedir',
 parser.add_argument('-interval',
                     type=int,
                     help='stimulus interval in ms',
-                    default=20,
+                    default=1000,
                     dest='interval')
 parser.add_argument('-n_cells',
                     type=int,
                     help='number of cells to stimulate',
-                    default=60,
+                    default=40,
                     dest='n_cells')
 
 args = parser.parse_args()
@@ -44,7 +44,8 @@ n_cells = args.n_cells
 # Locate and load the nrnmech.dll file. Must to be adjusted for your machine.
 dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
             "C:\\Users\\daniel\\repos\\nrnmech.dll",
-            "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
+            "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
+            "C:\\Users\\Daniel\\repos\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
 for x in dll_files:
     if os.path.isfile(x):
         dll_dir = x
@@ -64,7 +65,7 @@ cells_to_measure = np.arange(0, 2000, 100)
 
 for run in runs:
     # Create a standard networks and add the stimulation
-    nw = net_tuned.TunedNetwork(seed=10000+run)
+    nw = net_tunedrev.TunedNetwork(seed=10000+run)
     np.random.seed(10000 + run)
 
     # Make sure we are not stimulating a cell we measure

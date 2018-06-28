@@ -148,6 +148,37 @@ def similarity_measure_leutgeb(signal1,signal2, len_bin):
 
     return np.array(corr_vector)
 
+def sqrt_diff(signal1, signal2, len_bin):
+    signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
+                     (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
+
+    signal2 = np.reshape(signal2[:,0:int((signal2.shape[1]/len_bin)*len_bin)],
+                     (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
+    
+    subtr = np.sqrt((signal1 - signal2)**2)
+    subtr_sum = subtr.sum(axis = 2).sum(axis=0)
+    print(subtr_sum)
+    return subtr_sum
+
+def sqrt_diff_norm_TRESOLVED(signal1, signal2, len_bin):
+    signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
+                     (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
+
+    signal2 = np.reshape(signal2[:,0:int((signal2.shape[1]/len_bin)*len_bin)],
+                     (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
+    total_spikes = signal1.sum(axis=2).sum(axis=0) + signal1.sum(axis=2).sum(axis=0)
+    subtr = np.sqrt((signal1 - signal2)**2)
+    subtr_sum = subtr.sum(axis = 2).sum(axis=0) / total_spikes
+    print(subtr_sum)
+    return subtr_sum
+
+def sqrt_diff_norm(signal1, signal2, len_bin):
+    total_spikes = signal1.sum() + signal2.sum()
+    subtr = np.sqrt((signal1 - signal2)**2).sum()
+    return subtr/total_spikes
+    
+    
+
 if __name__ == '__main__':
     temporal_patterns = inhom_poiss()
     time_sig = time_stamps_to_signal(temporal_patterns,
