@@ -651,7 +651,6 @@ class tmgsynConnectionExponentialProb(GenConnection):
         netcons = []
 
         # Setup the Gaussian distribution
-        loc = post_pop.get_cell_number() / 2
         gauss = stats.expon(loc=0, scale=scale)
         pdf = gauss.pdf(np.arange(post_pop.get_cell_number()))
         pdf = pdf/pdf.sum()

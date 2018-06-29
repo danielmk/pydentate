@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_disinhibitedrev
+import net_delayedinhrev
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -80,11 +80,19 @@ PP_to_BCs = np.array(PP_to_BCs)
 
 # Generate temporal patterns for the 100 PP inputs
 np.random.seed(10000)
-temporal_patterns = inhom_poiss()
+patterns_temp = inhom_poiss()
+temporal_patterns = []
+for x in range(patterns_temp.shape[0]):
+    curr_patterns = np.array([])
+    for y in range(5):
+        curr_patterns = np.concatenate((curr_patterns, patterns_temp[x][patterns_temp[x]<100]+(100.0*y)))
+    temporal_patterns.append(curr_patterns)
+
+temporal_patterns = np.array(temporal_patterns)
 
 # Start the runs of the model
 for run in runs:
-    nw = net_disinhibitedrev.TunedNetwork(10000, temporal_patterns[0+run:24+run],
+    nw = net_delayedinhrev.TunedNetwork(10000, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 

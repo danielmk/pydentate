@@ -176,6 +176,18 @@ def sqrt_diff_norm(signal1, signal2, len_bin):
     total_spikes = signal1.sum() + signal2.sum()
     subtr = np.sqrt((signal1 - signal2)**2).sum()
     return subtr/total_spikes
+
+def inner_pearsonr(signal1, len_bin):
+    signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
+                 (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
+    signal1 = signal1.sum(axis=2)
+
+    corr_vector = []
+
+    for x in range(signal1.shape[1]):
+        corr_vector.append(pearsonr(signal1[:,0], signal1[:,x])[0])
+
+    return corr_vector
     
     
 
