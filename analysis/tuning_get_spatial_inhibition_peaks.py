@@ -15,11 +15,11 @@ stim_delay = 100  # ms
 dt = 0.01  # ms
 stim_dtp = stim_delay / dt
 
-data_path = "C:\\Users\\Daniel\\pyDentateData\\tuning\\revised\\spatial_inhibition_data\\tunedrev\\"
-save_path = "C:\\Users\\Daniel\\pyDentateData\\tuning\\revised\\spatial_inhibition_data\\tunedrev\\"
-data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and '2' in f[0:62] and f[60] == '2']
+data_path = "C:\\Users\\Daniel\\pyDentateData\\tuning\\revised\\spatial_inhibition_data\\tunedrevexp\\"
+save_path = "C:\\Users\\Daniel\\pyDentateData\\tuning\\revised\\spatial_inhibition_data\\tunedrevexp\\"
+data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and '100' in f[0:69]]
 #data_files=list(np.array(data_files)[[1,3,9,14,16,18,20,22,24,26]])
-data_files = data_files[1::2]
+#data_files = data_files[0::2]
 data = np.load(data_path + data_files[0])['arr_0']
 stim_delay = 50
 #intervals = np.arange(stim_delay/dt, (stim_delay/dt) + (interval/dt)*10, interval/dt)

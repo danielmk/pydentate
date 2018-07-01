@@ -28,9 +28,9 @@ for x in data_files:
 row_idx_start = 0
 row_idx_stop = 25
 # 376
-
+len_bin = 6000
 for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
     for col_idx, y in enumerate(data_list[row_idx+row_idx_start:len(data_list)]):
-        corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.similarity_measure_leutgeb(x,y,6000)
+        corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.similarity_measure_leutgeb(x,y,len_bin)
         
 np.savetxt(save_path + "1_leutgeb-measure" + ".txt", corr_matrix, delimiter="\t")

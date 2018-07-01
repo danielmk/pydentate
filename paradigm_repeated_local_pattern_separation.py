@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_delayedinhrev
+import net_nonfacilitatingrev
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -92,7 +92,7 @@ temporal_patterns = np.array(temporal_patterns)
 
 # Start the runs of the model
 for run in runs:
-    nw = net_delayedinhrev.TunedNetwork(10000, temporal_patterns[0+run:24+run],
+    nw = net_nonfacilitatingrev.TunedNetwork(10000, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 
@@ -126,9 +126,9 @@ for run in runs:
         h.fadvance()
     print("Done Running")
 
-    tuned_save_file_name = str(nw) + '_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
+    tuned_save_file_name = str(nw) + 'repeated_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
     nw.shelve_network(savedir, tuned_save_file_name)
 
     fig = nw.plot_aps(time=600)
-    tuned_fig_file_name = str(nw) + '_spike_plot_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
+    tuned_fig_file_name = str(nw) + 'repeated_spike_plot_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)

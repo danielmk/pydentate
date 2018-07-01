@@ -12,6 +12,26 @@ from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
 import scipy.stats as stats
+import math
+
+def pos(rad):
+    """
+    (x,y) position of a point on a circle with axis origin at (0,0)
+    and radius 1.
+    x = cx + r * cos(rad) -> x = cos(rad)
+    y = cy + r * sin(rad) -> y = sin(rad)
+    
+    Returns a list of tuples that give the point of each radian passed.
+    """
+    x_arr = list(np.cos(rad))
+    y_arr = list(np.sin(rad))
+    
+    return [(x_arr[idx],y_arr[idx]) for idx in range(len(x_arr))]
+
+def euclidian_dist(p1,p2):
+    """ p1 and p2 must both be of len 2 where p1 = (x1,y1); p2 = (x2,y2)"""
+    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+    
 
 # Handle command line inputs with argparse
 parser = argparse.ArgumentParser(description='Local pattern separation paradigm')
@@ -51,20 +71,33 @@ h.nrn_load_dll(dll_dir)
 
 np.random.seed(10000)
 # Generate a gaussian probability density function
-gauss_gc = stats.norm(loc=1000, scale=input_scale)
-gauss_bc = stats.norm(loc=12, scale=(input_scale/2000.0)*24)
-pdf_gc = gauss_gc.pdf(np.arange(2000))
+gc_pop_rad = (np.arange(2000,dtype=float) / 2000) * (2*np.pi)
+bc_pop_rad = (np.arange(24, dtype=float) / 24) * (2*np.pi)
+
+pre_pop_pos = pos(gc_pop_rad)
+post_pop_pos = pos(bc_pop_rad)
+
+exp_gc = stats.expon(loc=0, scale=input_scale)
+exp_bc = stats.expon(loc=0, scale=(input_scale/2000.0)*24)
+pdf_gc = exp_gc.pdf(np.arange(2000))
 pdf_gc = pdf_gc/pdf_gc.sum()
-pdf_bc = gauss_bc.pdf(np.arange(24))
+pdf_bc = exp_bc.pdf(np.arange(24))
 pdf_bc = pdf_bc/pdf_bc.sum()
 # We hold the pdf constant. To randomize the centroid we reslice the GC indices
-GC_indices = np.arange(2000)
+GC_indices = np.arange(2000,dtype=float)
 start_idc = np.random.randint(0, 1999, size=400)
+start_idc_rad = (GC_indices / 2000) * (2*np.pi)
+
 
 PP_to_GCs = []
-for x in start_idc:
-    curr_idc = np.concatenate((GC_indices[x:2000], GC_indices[0:x]))
-    PP_to_GCs.append(np.random.choice(curr_idc, size=100, replace=False, p=pdf_gc))
+for x in start_idc_rad:
+    curr_dist = []
+    for y in post_pop_pos:
+        curr_dist.append(euclidian_dist(x, y))
+    
+    sort_idc = np.argsort(curr_dist)
+    picked_cells = np.random.choice(sort_idc, size=100, replace=True, p = pdf_gc)
+    PP_to_GCs.append(picked_cells)
 
 PP_to_GCs = np.array(PP_to_GCs)
 # Generate the PP -> BC mapping as above
@@ -124,3 +157,4 @@ for run in runs:
     fig = nw.plot_aps(time=600)
     tuned_fig_file_name = str(nw) + '_spike_plot_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)
+    

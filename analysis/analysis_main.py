@@ -131,7 +131,7 @@ def population_similarity_measure_ob(signal1,signal2, len_bin):
     prod_sum = product.sum(axis=0)
     return prod_sum.mean()
 
-def similarity_measure_leutgeb(signal1,signal2, len_bin):
+def similarity_measure_leutgeb_BUGGY(signal1,signal2, len_bin):
     """Oriented on the """
     signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
                      (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
@@ -139,6 +139,21 @@ def similarity_measure_leutgeb(signal1,signal2, len_bin):
 
     signal2 = np.reshape(signal2[:,0:int((signal2.shape[1]/len_bin)*len_bin)],
                      (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
+    signal2 = signal2.sum(axis=2)
+
+    corr_vector = []
+
+    for x in range(signal1.shape[1]):
+        corr_vector.append(pearsonr(signal1[:,x], signal2[:,x])[0])
+
+    return np.array(corr_vector)
+
+def similarity_measure_leutgeb(signal1,signal2, len_bin):
+    """Oriented on the """
+    signal1 = np.reshape(signal1, (signal1.shape[0],signal1.shape[1]/len_bin,len_bin))
+    signal1 = signal1.sum(axis=2)
+    
+    signal2 = np.reshape(signal2, (signal2.shape[0],signal2.shape[1]/len_bin,len_bin))
     signal2 = signal2.sum(axis=2)
 
     corr_vector = []
@@ -177,9 +192,10 @@ def sqrt_diff_norm(signal1, signal2, len_bin):
     subtr = np.sqrt((signal1 - signal2)**2).sum()
     return subtr/total_spikes
 
-def inner_pearsonr(signal1, len_bin):
+def inner_pearsonr_BUGGY(signal1, len_bin):
     signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
                  (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
+    return signal1
     signal1 = signal1.sum(axis=2)
 
     corr_vector = []
@@ -188,7 +204,18 @@ def inner_pearsonr(signal1, len_bin):
         corr_vector.append(pearsonr(signal1[:,0], signal1[:,x])[0])
 
     return corr_vector
-    
+
+def inner_pearsonr(signal1, len_bin):
+    signal1 = np.reshape(signal1, (signal1.shape[0],signal1.shape[1]/len_bin,len_bin))
+
+    signal1 = signal1.sum(axis=2)
+
+    corr_vector = []
+
+    for x in range(signal1.shape[1]):
+        corr_vector.append(pearsonr(signal1[:,0], signal1[:,x])[0])
+
+    return corr_vector
     
 
 if __name__ == '__main__':
