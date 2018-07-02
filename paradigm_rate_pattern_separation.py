@@ -34,7 +34,7 @@ parser.add_argument('-rate',
 parser.add_argument('-seed',
                     type=int,
                     help='standard deviation of gaussian distribution',
-                    default=10000,
+                    default=0,
                     dest='seed')
 
 args = parser.parse_args()

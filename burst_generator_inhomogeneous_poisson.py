@@ -45,18 +45,7 @@ def inhom_poiss():
     return array_like
 
 def hom_poiss(rate):
-    sampling_interval = 0.0001 * pq.s
-    max_rate = 100
     rate = rate * pq.Hz
-    t = np.arange(0, 0.5, sampling_interval.magnitude)
-
-    rate_profile = (np.sin(t*10*np.pi*2-np.pi/2) + 1) * max_rate / 2
-
-    rate_profile_as_asig = AnalogSignal(rate_profile,
-                                        units=1*pq.Hz,
-                                        t_start=0*pq.s,
-                                        t_stop=0.5*pq.s,
-                                        sampling_period=sampling_interval)
 
     spike_trains = []
     for x in range(400):
@@ -67,12 +56,12 @@ def hom_poiss(rate):
 
     array_like = np.array([np.around(np.array(x.times)*1000, decimals=1) for x in spike_trains])
     for arr_idx in range(array_like.shape[0]):
-        bad_idc = np.argwhere(np.diff(array_like[arr_idx]) == 0).flatten()
+        bad_idc = np.argwhere(np.diff(array_like[arr_idx]) < 0.1).flatten()
         bad_idc = bad_idc+1
         while bad_idc.any():
             for bad_idx in bad_idc:
                 array_like[arr_idx][bad_idx] = array_like[arr_idx][bad_idx] + 0.1
-            bad_idc = np.argwhere(np.diff(array_like[arr_idx]) == 0).flatten()
+            bad_idc = np.argwhere(np.diff(array_like[arr_idx]) < 0.1).flatten()
             bad_idc = bad_idc + 1
 
     return array_like

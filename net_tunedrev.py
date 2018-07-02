@@ -47,7 +47,6 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         self.populations[3].record_aps()
 
         temporal_patterns = np.array(temporal_patterns)
-        print(np.shape(temporal_patterns))
         #temporal_patterns = np.atleast_2d(temporal_patterns)
         if type(spatial_patterns_gcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_gcs = np.atleast_2d(spatial_patterns_gcs)
