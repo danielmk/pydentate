@@ -126,9 +126,9 @@ for run in runs:
         h.fadvance()
     print("Done Running")
 
-    tuned_save_file_name = str(nw) + 'repeated_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
+    tuned_save_file_name = str(nw) + '_repeated_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
     nw.shelve_network(savedir, tuned_save_file_name)
 
     fig = nw.plot_aps(time=600)
-    tuned_fig_file_name = str(nw) + 'repeated_spike_plot_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
+    tuned_fig_file_name = str(nw) + '_repeated_spike_plot_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)

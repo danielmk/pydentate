@@ -12,7 +12,7 @@ import os
 import analysis_main
 
 # Setup some parameters given by paradigm_frequency_inhibition.py
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\input_patterns_seed_10000\\"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_rate\\input_patterns_100\\"
 save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and not 'norm' in f and not 'convolved' in f and not 'trifilt' in f]
 data_files.sort()

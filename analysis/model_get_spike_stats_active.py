@@ -59,8 +59,11 @@ for x in data_files:
     perc_active_mcs_list.append((len(active_mcs) / 60.0)*100)
     perc_active_bcs_list.append((len(active_bcs) / 24.0)*100)
     perc_active_hcs_list.append((len(active_hcs) / 24.0)*100)
-    
-n_active_gcs_array = np.array(perc_active_gcs_list)
-n_active_mcs_array = np.array(perc_active_mcs_list)
-n_active_bcs_array = np.array(perc_active_bcs_list)
-n_active_hcs_array = np.array(perc_active_hcs_list)
+
+perc_active_cells = np.array((perc_active_gcs_list, perc_active_mcs_list, perc_active_bcs_list, perc_active_hcs_list))
+n_aps_avg = np.array((n_aps_avg_gcs_list, n_aps_avg_mcs_list, n_aps_avg_bcs_list, n_aps_avg_hcs_list))
+n_aps_std = np.array((n_aps_std_gcs_list, n_aps_std_mcs_list, n_aps_std_bcs_list, n_aps_std_hcs_list))
+
+np.savetxt(data_path + "perc_active_cells.txt", perc_active_cells, delimiter = '\t')
+np.savetxt(data_path + "n_aps_avg.txt", n_aps_avg, delimiter = '\t')
+np.savetxt(data_path + "n_aps_std", n_aps_std, delimiter = '\t')
