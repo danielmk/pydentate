@@ -47,7 +47,6 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         self.populations[3].record_aps()
 
         temporal_patterns = np.array(temporal_patterns)
-        print(np.shape(temporal_patterns))
         #temporal_patterns = np.atleast_2d(temporal_patterns)
         if type(spatial_patterns_gcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_gcs = np.atleast_2d(spatial_patterns_gcs)
@@ -100,11 +99,14 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                                            20, 'midd',
                                            2, 6.2, 0, 1, 0, 0, 10, 3, 0.2*10**(-3))
 
+        # The reshuffling happens here
+        if seed:
+            self.set_numpy_seed(seed+2)
         # BC -> GC
         # Nr. synapses x3; Weight *1/4; changed from 5.5 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
-                                           2000, 'soma',
-                                           400, 20, 0, 1, 0, -70, 10, 10, 1.2*10**(-3))
+                                           560, 'soma',
+                                           400, 20, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3))
 
         # We reseed here to make sure that those connections are consistent
         # between this and net_global. The only connection that differs between
@@ -126,7 +128,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         # Weight x10; Nr synapses x4; changed from 6 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
                                            2000, 'dd',
-                                           640, 20, 0, 1, 0, -70, 15, 3.8, 0.6*10**(-2))
+                                           640, 20, 0, 1, 0, -70, 10, 3.8, 0.6*10**(-2))
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnection(self.populations[3], self.populations[1],

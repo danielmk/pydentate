@@ -15,10 +15,11 @@ stim_delay = 100  # ms
 dt = 0.01  # ms
 stim_dtp = stim_delay / dt
 
-data_path = "C:\\Users\\Daniel\\pyDentateData\\frequency_inhibition_data\\10Hz\\"
-save_path = "C:\\Users\\Daniel\\pyDentateData\\frequency_inhibition_data\\10Hz\\"
-data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and '40' in f and not '50' in f]
-interval = 100 # in kHz because ms
+data_path = "C:\\Users\\Daniel\\pyDentateData\\tuning\\revised\\frequency_inhibition_data\\"
+save_path = "C:\\Users\\Daniel\\pyDentateData\\tuning\\revised\\frequency_inhibition_data\\"
+data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and '100' in f and 'HC' in f]
+data_files = data_files[0:1]
+interval = 1000 # in kHz because ms
 data = np.load(data_path + data_files[0])['arr_0']
 stim_delay = 100
 intervals = np.arange(stim_delay/dt, (stim_delay/dt) + (interval/dt)*10, interval/dt)
@@ -32,7 +33,7 @@ for x in data:
     data_peaks = []
     for start in intervals:
         print(start)
-        data_peaks.append(x[int(start):int(start+(20/dt))].max())
+        data_peaks.append(x[int(start):int(start+(20/dt))].min())
     #plt.plot(data_peaks, marker ='o')
     peaks.append(data_peaks)
     

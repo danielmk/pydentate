@@ -14,12 +14,10 @@ import os
 #Office PC
 #directory = "Y:\\DanielM\\023_Dentate Gyrus Model\\paradigm_spatial-inhibition\\"
 #Dropbox
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_rate\\net_globalrev_030\\"
-file_name = "net_globalrev.TunedNetwork_data_paradigm_rate-pattern-separation_run_scale_seed_000_030_0.pydd"
+data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\scale500\\net_nofeedbackrev\\"
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.pydd' in f and not '.npz' in f]
 data_files.sort()
 
-data = shelve.open(data_path + file_name)
 perc_active_gcs_list = []
 perc_active_mcs_list = []
 perc_active_bcs_list = []
@@ -64,6 +62,6 @@ perc_active_cells = np.array((perc_active_gcs_list, perc_active_mcs_list, perc_a
 n_aps_avg = np.array((n_aps_avg_gcs_list, n_aps_avg_mcs_list, n_aps_avg_bcs_list, n_aps_avg_hcs_list))
 n_aps_std = np.array((n_aps_std_gcs_list, n_aps_std_mcs_list, n_aps_std_bcs_list, n_aps_std_hcs_list))
 
-np.savetxt(data_path + "perc_active_cells.txt", perc_active_cells, delimiter = '\t')
-np.savetxt(data_path + "n_aps_avg.txt", n_aps_avg, delimiter = '\t')
-np.savetxt(data_path + "n_aps_std", n_aps_std, delimiter = '\t')
+np.savetxt(data_path + "2_perc_active_cells.txt", perc_active_cells, delimiter = '\t')
+np.savetxt(data_path + "2_n_aps_avg.txt", n_aps_avg, delimiter = '\t')
+np.savetxt(data_path + "2_n_aps_std.txt", n_aps_std, delimiter = '\t')
