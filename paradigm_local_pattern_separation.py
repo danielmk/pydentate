@@ -31,6 +31,11 @@ parser.add_argument('-scale',
                     help='standard deviation of gaussian distribution',
                     default=500,
                     dest='input_scale')
+parser.add_argument('-seed',
+                    type=int,
+                    help='standard deviation of gaussian distribution',
+                    default=0,
+                    dest='seed')
 
 args = parser.parse_args()
 runs = range(args.runs[0], args.runs[1], args.runs[2])
@@ -49,7 +54,7 @@ for x in dll_files:
 print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
-np.random.seed(10000)
+np.random.seed(seed)
 # Generate a gaussian probability density function
 gauss_gc = stats.norm(loc=1000, scale=input_scale)
 gauss_bc = stats.norm(loc=12, scale=(input_scale/2000.0)*24)
@@ -79,12 +84,12 @@ for x in start_idc:
 PP_to_BCs = np.array(PP_to_BCs)
 
 # Generate temporal patterns for the 100 PP inputs
-np.random.seed(10000)
+np.random.seed(seed)
 temporal_patterns = inhom_poiss()
 
 # Start the runs of the model
 for run in runs:
-    nw = net_reshuffledrev.TunedNetwork(10000, temporal_patterns[0+run:24+run],
+    nw = net_reshuffledrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 
@@ -118,9 +123,9 @@ for run in runs:
         h.fadvance()
     print("Done Running")
 
-    tuned_save_file_name = str(nw) + '_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
+    tuned_save_file_name = str(nw) + '_data_paradigm_local-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
     nw.shelve_network(savedir, tuned_save_file_name)
 
     fig = nw.plot_aps(time=600)
-    tuned_fig_file_name = str(nw) + '_spike_plot_run_scale_' + str(run).zfill(3) + '_' + str(input_scale)
+    tuned_fig_file_name = str(nw) + '_spike-plot_paradigm_local-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)
