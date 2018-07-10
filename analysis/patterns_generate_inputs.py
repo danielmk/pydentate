@@ -13,12 +13,12 @@ import analysis_main
 from pyDentate.burst_generator_inhomogeneous_poisson import inhom_poiss
 from sklearn.preprocessing import normalize
 
-# Generate the temporal patterns
-np.random.seed(10000)
+# Generate the temporal patternss
+np.random.seed(10004)
 temporal_patterns = inhom_poiss()
 
 runs = range(25)
-save_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\input_patterns_seed_10000\\"
+save_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10004\\input_patterns\\"
 file_prefix = "input_patterns_run_"
 
 temporal_patterns = analysis_main.time_stamps_to_signal(temporal_patterns, 0.1, 0, 600)
@@ -26,11 +26,14 @@ temporal_patterns_trifilt = analysis_main.tri_filter(temporal_patterns, 200)
 temporal_patterns_norm = normalize(temporal_patterns_trifilt, axis=1)
 pattern_shape = temporal_patterns.shape
 
+patterns = []
+
 for x in runs:
     curr_pattern = np.zeros(temporal_patterns.shape)
     curr_pattern_norm = np.zeros(temporal_patterns.shape)
     curr_pattern_trifilt = np.zeros(temporal_patterns.shape)
     curr_pattern[x:x+24,:] = temporal_patterns[x:x+24,:]
+    patterns.append(curr_pattern)
     np.savez(save_path + file_prefix + str(x).zfill(3), curr_pattern)
     curr_pattern_trifilt[x:x+24,:] = temporal_patterns_trifilt[x:x+24,:]
     np.savez(save_path + file_prefix + str(x).zfill(3) + '_trifilt', curr_pattern_trifilt)

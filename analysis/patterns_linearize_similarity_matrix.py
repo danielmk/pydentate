@@ -10,7 +10,7 @@ import numpy as np
 import shelve
 import matplotlib.pyplot as plt
 
-sim_matrix_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_repeated_input_revised\\seed10000\\scale1000\\net_nonfacilitatingrev\\"
+sim_matrix_path = "Z:\\pyDentate\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10001\\input_patterns\\"
 sim_matrix_fname = '1_leutgeb-measure_matrix_len-bin_6000.txt'
 input_matrix = np.loadtxt(sim_matrix_path + sim_matrix_fname, delimiter = '\t')
 

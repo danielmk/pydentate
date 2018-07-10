@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+
 This module implements the class StandardNetwork.
 StandardNetwork creates a ring network as defined in Santhakumar et al. 2005
 with some changes as in Yim et al. 2015.
 See StandardNetwork docstring for details.
-Created on Tue Nov 28 13:01:38 2017
 
 @author: DanielM
 """

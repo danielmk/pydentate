@@ -12,7 +12,7 @@ import os
 import analysis_main
 
 # Setup some parameters given by paradigm_frequency_inhibition.py
-data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_rate\\input_patterns_100\\"
+data_path = "Z:\\pyDentate\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10001\\input_patterns\\"
 save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and not 'norm' in f and not 'convolved' in f and not 'trifilt' in f]
 data_files.sort()
@@ -33,4 +33,4 @@ for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
     for col_idx, y in enumerate(data_list[row_idx+row_idx_start:len(data_list)]):
         corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.similarity_measure_leutgeb(x,y,len_bin)
         
-np.savetxt(save_path + "1_leutgeb-measure" + ".txt", corr_matrix, delimiter="\t")
+np.savetxt(save_path + "1_leutgeb-measure_matrix_len-bin_" + str(len_bin) + ".txt", corr_matrix, delimiter="\t")
