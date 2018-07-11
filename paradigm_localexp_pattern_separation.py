@@ -7,11 +7,34 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_nofeedbackrev
+import net_tunedrevexp
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
 import scipy.stats as stats
+import math
+
+# Setup some helper functions
+def pos(rad):
+    """
+    (x,y) position of a point on a circle with axis origin at (0,0)
+    and radius 1.
+    x = cx + r * cos(rad) -> x = cos(rad)
+    y = cy + r * sin(rad) -> y = sin(rad)
+    
+    Returns a list of tuples that give the point of each radian passed.
+    """
+    x_arr = list(np.cos(rad))
+    y_arr = list(np.sin(rad))
+    
+    return [(x_arr[idx],y_arr[idx]) for idx in range(len(x_arr))]
+
+def euclidian_dist(p1,p2):
+    """ p1 and p2 must both be of len 2 where p1 = (x1,y1); p2 = (x2,y2)"""
+    return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+    
+    
+    
 
 # Handle command line inputs with argparse
 parser = argparse.ArgumentParser(description='Local pattern separation paradigm')
@@ -57,30 +80,41 @@ h.nrn_load_dll(dll_dir)
 
 np.random.seed(seed)
 # Generate a gaussian probability density function
-gauss_gc = stats.norm(loc=1000, scale=input_scale)
-gauss_bc = stats.norm(loc=12, scale=(input_scale/2000.0)*24)
+gauss_gc = stats.expon(loc=0, scale=input_scale)
+gauss_bc = stats.expon(loc=0, scale=(input_scale/2000.0)*24)
 pdf_gc = gauss_gc.pdf(np.arange(2000))
 pdf_gc = pdf_gc/pdf_gc.sum()
 pdf_bc = gauss_bc.pdf(np.arange(24))
 pdf_bc = pdf_bc/pdf_bc.sum()
 # We hold the pdf constant. To randomize the centroid we reslice the GC indices
-GC_indices = np.arange(2000)
-start_idc = np.random.randint(0, 1999, size=400)
+GC_indices = np.arange(2000, dtype=float)
+GC_pop_rads = (GC_indices / 2000.0) * (2*np.pi)
+GC_pop_pos = pos(GC_pop_rads)
+PP_rads = (np.random.randint(0, 2000, size=400) / 2000.0) * (2*np.pi)
+PP_pos =  pos(PP_rads)
 
 PP_to_GCs = []
-for x in start_idc:
-    curr_idc = np.concatenate((GC_indices[x:2000], GC_indices[0:x]))
-    PP_to_GCs.append(np.random.choice(curr_idc, size=100, replace=False, p=pdf_gc))
-
+for curr_PP_pos in PP_pos:
+    curr_dist = []
+    for post_cell_pos in GC_pop_pos:
+        curr_dist.append(euclidian_dist(curr_PP_pos, post_cell_pos))
+    sort_idc = np.argsort(curr_dist)
+    picked_cells = np.random.choice(sort_idc, 800, replace=True, p = pdf_gc)
+    PP_to_GCs.append(picked_cells)
 PP_to_GCs = np.array(PP_to_GCs)
 # Generate the PP -> BC mapping as above
 BC_indices = np.arange(24)
-start_idc = np.array(((start_idc/2000.0)*24), dtype=int)
+BC_pop_rads = (BC_indices / 24.0) * (2*np.pi)
+BC_pop_pos = pos(BC_pop_rads)
 
 PP_to_BCs = []
-for x in start_idc:
-    curr_idc = np.concatenate((BC_indices[x:24], BC_indices[0:x]))
-    PP_to_BCs.append(np.random.choice(curr_idc, size=1, replace=False, p=pdf_bc))
+for curr_PP_pos in PP_pos:
+    curr_dist = []
+    for post_cell_pos in BC_pop_pos:
+        curr_dist.append(euclidian_dist(curr_PP_pos, post_cell_pos))
+    sort_idc = np.argsort(curr_dist)
+    picked_cells = np.random.choice(sort_idc, 10, replace=True, p = pdf_bc)
+    PP_to_BCs.append(picked_cells)
 
 PP_to_BCs = np.array(PP_to_BCs)
 
@@ -90,7 +124,7 @@ temporal_patterns = inhom_poiss()
 
 # Start the runs of the model
 for run in runs:
-    nw = net_nofeedbackrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
+    nw = net_tunedrevexp.TunedNetwork(seed, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 
