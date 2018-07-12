@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar 05 13:41:23 2018
+This script simulates a network with theta modulated, spatially restricted
+perforant path input. The input is spatially restricted by a exponential decay 
+probability density function. 
+It simulates 5 theta cycles and the simulation is 600 ms long.
 
 @author: DanielM
 """
 
 from neuron import h
 import numpy as np
-import net_nofeedbackrev
+import net_tunedrev
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -28,13 +31,13 @@ parser.add_argument('-savedir',
                     dest='savedir')
 parser.add_argument('-scale',
                     type=int,
-                    help='standard deviation of gaussian distribution',
+                    help='standard deviation of gaussian distribution for PP',
                     default=500,
                     dest='input_scale')
 parser.add_argument('-seed',
                     type=int,
-                    help='standard deviation of gaussian distribution',
-                    default=0,
+                    help='seed for simulation reproducibility',
+                    default=10000,
                     dest='seed')
 
 args = parser.parse_args()
@@ -63,14 +66,14 @@ pdf_gc = gauss_gc.pdf(np.arange(2000))
 pdf_gc = pdf_gc/pdf_gc.sum()
 pdf_bc = gauss_bc.pdf(np.arange(24))
 pdf_bc = pdf_bc/pdf_bc.sum()
-# We hold the pdf constant. To randomize the centroid we reslice the GC indices
+# We hold the pdf constant. To randomize the location we reslice the GC indices
 GC_indices = np.arange(2000)
 start_idc = np.random.randint(0, 1999, size=400)
 
 PP_to_GCs = []
 for x in start_idc:
     curr_idc = np.concatenate((GC_indices[x:2000], GC_indices[0:x]))
-    PP_to_GCs.append(np.random.choice(curr_idc, size=100, replace=False, p=pdf_gc))
+    PP_to_GCs.append(np.random.choice(curr_idc, size=200, replace=False, p=pdf_gc))
 
 PP_to_GCs = np.array(PP_to_GCs)
 # Generate the PP -> BC mapping as above
@@ -80,17 +83,17 @@ start_idc = np.array(((start_idc/2000.0)*24), dtype=int)
 PP_to_BCs = []
 for x in start_idc:
     curr_idc = np.concatenate((BC_indices[x:24], BC_indices[0:x]))
-    PP_to_BCs.append(np.random.choice(curr_idc, size=1, replace=False, p=pdf_bc))
+    PP_to_BCs.append(np.random.choice(curr_idc, size=2, replace=False, p=pdf_bc))
 
 PP_to_BCs = np.array(PP_to_BCs)
 
-# Generate temporal patterns for the 100 PP inputs
+# Generate temporal patterns for the 400 PP inputs
 np.random.seed(seed)
 temporal_patterns = inhom_poiss()
 
 # Start the runs of the model
 for run in runs:
-    nw = net_nofeedbackrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
+    nw = net_tunedrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 
@@ -99,6 +102,7 @@ for run in runs:
     nw.populations[1].voltage_recording(range(60))
     nw.populations[2].voltage_recording(range(24))
     nw.populations[3].voltage_recording(range(24))
+
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
@@ -111,22 +115,20 @@ for run in runs:
     h.dt = 10
     while h.t < -100:
         h.fadvance()
-        print(h.t)
 
     h.secondorder = 2
     h.t = 0
     h.dt = 0.1
 
-    """Setup run control for -100 to 1500"""
+    """Setup run control for 0 to 600"""
     h.frecord_init() # Necessary after changing t to restart the vectors
-    
+
     while h.t < 600:
         h.fadvance()
     print("Done Running")
 
     tuned_save_file_name = str(nw) + '_data_paradigm_local-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
     nw.shelve_network(savedir, tuned_save_file_name)
-
     fig = nw.plot_aps(time=600)
     tuned_fig_file_name = str(nw) + '_spike-plot_paradigm_local-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)

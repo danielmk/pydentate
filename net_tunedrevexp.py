@@ -54,56 +54,56 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
                 # PP -> GC
                 #Original
                 ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
-                                                           temporal_patterns[pat],
-                                                           spatial_patterns_gcs[pat],
-                                                           'midd', 10, 0, 1, 0, 0, 0.5*10**(-3))
+                                                             temporal_patterns[pat],
+                                                             spatial_patterns_gcs[pat],
+                                                             'midd', 10, 0, 1, 0, 0, 0.35*10**(-3))
 
         if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
             #spatial_patterns_bcs = np.atleast_2d(spatial_patterns_bcs)
             for pat in range(len(spatial_patterns_bcs)):
                 # PP -> BC
-                ouropy.gennetwork.PerforantPathPoissonTmgsyn(self.populations[2],
+                ouropy.gennetwork.PerforantPathPoissonTmgsynNew1Syn(self.populations[2],
                                                            temporal_patterns[pat],
                                                            spatial_patterns_bcs[pat],
-                                                           'ddend', 6.3, 0, 1, 0, 0, 1*10**(-3))
+                                                           'ddend', 6.3, 0, 1, 0, 0, 0.35*10**(-3))
 
         # GC -> MC
-        ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[0], self.populations[1],
+        ouropy.gennetwork.PerforantPathPoissonTmgsynNew1Syn(self.populations[0], self.populations[1],
                                   6, 'proxd',
-                                  5, 7.6, 500, 0.1, 0, 0, 10, 1.5, 0.2*10**(-4) * 10, replace = True)
+                                  5, 7.6, 500, 0.1, 0, 0, 10, 1.5, 0.7*10**(-3) * 10, replace = True)
 
         # GC -> BC
         #Weight x4, target_pool = 2
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[0], self.populations[2],
                                            4, 'proxd',
-                                           5, 8.7, 500, 0.1, 0, 0, 10, 0.8, 2.5*10**(-4), replace = True)
+                                           5, 8.7, 500, 0.1, 0, 0, 10, 0.8, 0.9*10**(-2), replace = True)
 
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[0], self.populations[3],
                                            24, 'proxd',
-                                           5, 8.7, 500, 0.1, 0, 0, 10, 1.5, 2.5*10**(-4), replace = True)
+                                           5, 8.7, 500, 0.1, 0, 0, 10, 1.5, 0.9*10**(-6), replace = True)
 
         # MC -> MC
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[1], self. populations[1],
                                            24, 'proxd',
-                                           15, 2.2, 0, 1, 0, 0, 10, 2, 0.5*10**(-3), replace = True)
+                                           15, 2.2, 0, 1, 0, 0, 10, 2, 0.0016*10**(-3), replace = True)
 
         # MC -> BC
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[1], self.populations[2],
                                            6, 'proxd',
-                                           5, 2, 0, 1, 0, 0, 10, 3, 0.3*10**(-3), replace = True)
+                                           5, 2, 0, 1, 0, 0, 10, 3, 0.001*10**(-3), replace = True)
 
         # MC -> HC
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[1], self.populations[3],
                                            10, 'midd',
-                                           10, 6.2, 0, 1, 0, 0, 10, 3, 0.2*10**(-3), replace = True)
+                                           10, 6.2, 0, 1, 0, 0, 10, 3, 0.006*10**(-4), replace = True)
 
         # BC -> GC
         # Nr. synapses x3; Weight *1/4; changed from 5.5 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[2], self.populations[0],
                                            220, 'soma',
-                                           2000, 20, 0, 1, 0, -70, 10, 0.85, 1.2*10**(-3), replace = True)
+                                           2000, 20, 0, 1, 0, -70, 10, 0.85, 0.01*10**(-3), replace = True)
 
         # We reseed here to make sure that those connections are consistent
         # between this and net_global. The only connection that differs between
@@ -114,25 +114,25 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         # BC -> MC
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[2], self.populations[1],
                                            14, 'proxd',
-                                           15, 3.3, 0, 1, 0, -70, 10, 1.5, 1.5*10**(-3), replace = True)
+                                           15, 3.3, 0, 1, 0, -70, 10, 1.5, 0.0125*10**(-3), replace = True)
 
         # BC -> BC
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[2], self.populations[2],
                                            6,'proxd',
-                                           10, 1.8, 0,1,0,-70, 10, 0.8, 7.6*10**(-3), replace = True)
+                                           10, 1.8, 0,1,0,-70, 10, 0.8, 0.063*10**(-3), replace = True)
 
         # HC -> GC
         # Weight x10; Nr synapses x4; changed from 6 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[3], self.populations[0],
                                            2000, 'dd',
-                                           3200, 20, 0, 1, 0, -70, 10, 3.8, 0.6*10**(-2), replace = True)
+                                           3200, 20, 0, 1, 0, -70, 10, 3.8, 0.005*10**(-2), replace = True)
 
         # HC -> MC
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[3], self.populations[1],
                                            30, ['mid1d', 'mid2d'],
-                                           15, 6, 0, 1, 0, -70, 10, 1, 1.5*10**(-3), replace = True)
+                                           15, 6, 0, 1, 0, -70, 10, 1, 0.0125*10**(-3), replace = True)
 
         # HC -> BC
         ouropy.gennetwork.tmgsynConnectionExponentialProb(self.populations[3], self.populations[2],
                                            12, 'ddend',
-                                           5, 5.8, 0, 1, 0, -70, 10, 1.6, 0.5*10**(-3), replace = True)
+                                           5, 5.8, 0, 1, 0, -70, 10, 1.6, 0.00416*10**(-3), replace = True)

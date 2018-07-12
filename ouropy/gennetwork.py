@@ -571,7 +571,7 @@ class tmgsynConnection(GenConnection):
                     curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
                     curr_vector = h.Vector()
                     curr_vector.record(curr_syn._ref_g)
-                    curr_gs.append(curr_gs)
+                    curr_gs.append(curr_vector)
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
@@ -580,6 +580,7 @@ class tmgsynConnection(GenConnection):
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses
+        self.conductances = gs
         
 class tmgsynConnectionExponentialProb(GenConnection):
 
@@ -692,7 +693,7 @@ class tmgsynConnectionExponentialProb(GenConnection):
                 curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
                 curr_vector = h.Vector()
                 curr_vector.record(curr_syn._ref_g)
-                curr_gs.append(curr_gs)
+                curr_gs.append(curr_vector)
                 curr_netcons.append(curr_netcon)
                 netcons.append(curr_netcons)
                 synapses.append(curr_syns)
@@ -1110,6 +1111,49 @@ class PerforantPathPoissonStimulation(object):
         self.pre_cell_targets = np.array(target_cells)
         self.synapses = synapses
 
+class PerforantPathPoissonTmgsynNew1Syn(GenConnection):
+    """
+    Patterned Perforant Path simulation as in Yim et al. 2015.
+    uses vecevent.mod -> h.VecStim
+    """
+    def __init__(self, post_pop, t_pattern, spat_pattern, target_segs,
+                 tau_1, tau_facil, U, tau_rec, e, weight):
+
+        self.init_parameters = locals()
+        post_pop.add_connection(self)
+        synapses = []
+        netcons = []
+        t_pattern = list(t_pattern) # nrn does not like np.ndarrays?
+        target_cells = post_pop[spat_pattern]
+        self.pre_pop = 'Implicit'
+        self.post_pop = post_pop
+        self.vecstim = h.VecStim()
+        self.pattern_vec = h.Vector(t_pattern)
+        self.vecstim.play(self.pattern_vec)
+        gs = []
+
+        for curr_cell in target_cells:
+            curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
+            seg = np.random.choice(curr_seg_pool)
+            curr_syn = h.tmgsyn(seg(0.5))
+            curr_syn.tau_1 = tau_1
+            curr_syn.tau_facil = tau_facil
+            curr_syn.U = U
+            curr_syn.tau_rec = tau_rec
+            curr_syn.e = e
+            curr_netcon = h.NetCon(self.vecstim, curr_syn)
+            curr_netcon.weight[0] = weight
+            curr_vector = h.Vector()
+            curr_vector.record(curr_syn._ref_g)
+            gs.append(curr_vector)
+            netcons.append(curr_netcon)
+            synapses.append(curr_syn)
+
+        self.netcons = netcons
+        self.pre_cell_targets = np.array(spat_pattern)
+        self.synapses = synapses
+        self.conductances = gs
+        
 class PerforantPathPoissonTmgsyn(GenConnection):
     """
     Patterned Perforant Path simulation as in Yim et al. 2015.
@@ -1129,24 +1173,29 @@ class PerforantPathPoissonTmgsyn(GenConnection):
         self.vecstim = h.VecStim()
         self.pattern_vec = h.Vector(t_pattern)
         self.vecstim.play(self.pattern_vec)
+        gs = []
 
         for curr_cell in target_cells:
             curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
-            seg = np.random.choice(curr_seg_pool)
-            curr_syn = h.tmgsyn(seg(0.5))
-            curr_syn.tau_1 = tau_1
-            curr_syn.tau_facil = tau_facil
-            curr_syn.U = U
-            curr_syn.tau_rec = tau_rec
-            curr_syn.e = e
-            curr_netcon = h.NetCon(self.vecstim, curr_syn)
-            curr_netcon.weight[0] = weight
+            for seg in curr_seg_pool:
+                curr_syn = h.tmgsyn(seg(0.5))
+                curr_syn.tau_1 = tau_1
+                curr_syn.tau_facil = tau_facil
+                curr_syn.U = U
+                curr_syn.tau_rec = tau_rec
+                curr_syn.e = e
+                curr_netcon = h.NetCon(self.vecstim, curr_syn)
+                curr_netcon.weight[0] = weight
+                curr_vector = h.Vector()
+                curr_vector.record(curr_syn._ref_g)
+                gs.append(curr_vector)
             netcons.append(curr_netcon)
             synapses.append(curr_syn)
 
         self.netcons = netcons
         self.pre_cell_targets = np.array(spat_pattern)
         self.synapses = synapses
+        self.conductances = gs
 
 """HELPERS"""
 def pos(rad):

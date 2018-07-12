@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar 05 13:41:23 2018
+This script simulates a network with theta modulated, spatially restricted
+perforant path input.
+The input is spatially restricted by a gaussian probability density function. 
+It simulates 5 theta cycles and the simulation is 600 ms long.
 
 @author: DanielM
 """
@@ -13,6 +16,9 @@ import os
 import argparse
 import scipy.stats as stats
 import math
+import time
+
+t_init = time.time()
 
 # Setup some helper functions
 def pos(rad):
@@ -32,12 +38,9 @@ def pos(rad):
 def euclidian_dist(p1,p2):
     """ p1 and p2 must both be of len 2 where p1 = (x1,y1); p2 = (x2,y2)"""
     return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
-    
-    
-    
 
 # Handle command line inputs with argparse
-parser = argparse.ArgumentParser(description='Local pattern separation paradigm')
+parser = argparse.ArgumentParser(description='Local exponential pattern separation paradigm')
 parser.add_argument('-runs',
                     nargs=3,
                     type=int,
@@ -51,12 +54,12 @@ parser.add_argument('-savedir',
                     dest='savedir')
 parser.add_argument('-scale',
                     type=int,
-                    help='standard deviation of gaussian distribution',
+                    help='tau of exponential decay function',
                     default=500,
                     dest='input_scale')
 parser.add_argument('-seed',
                     type=int,
-                    help='standard deviation of gaussian distribution',
+                    help='seed for simulation reproducibility',
                     default=0,
                     dest='seed')
 
@@ -86,7 +89,7 @@ pdf_gc = gauss_gc.pdf(np.arange(2000))
 pdf_gc = pdf_gc/pdf_gc.sum()
 pdf_bc = gauss_bc.pdf(np.arange(24))
 pdf_bc = pdf_bc/pdf_bc.sum()
-# We hold the pdf constant. To randomize the centroid we reslice the GC indices
+
 GC_indices = np.arange(2000, dtype=float)
 GC_pop_rads = (GC_indices / 2000.0) * (2*np.pi)
 GC_pop_pos = pos(GC_pop_rads)
@@ -99,7 +102,7 @@ for curr_PP_pos in PP_pos:
     for post_cell_pos in GC_pop_pos:
         curr_dist.append(euclidian_dist(curr_PP_pos, post_cell_pos))
     sort_idc = np.argsort(curr_dist)
-    picked_cells = np.random.choice(sort_idc, 800, replace=True, p = pdf_gc)
+    picked_cells = np.random.choice(sort_idc, 1000, replace=True, p = pdf_gc)
     PP_to_GCs.append(picked_cells)
 PP_to_GCs = np.array(PP_to_GCs)
 # Generate the PP -> BC mapping as above
@@ -122,17 +125,24 @@ PP_to_BCs = np.array(PP_to_BCs)
 np.random.seed(seed)
 temporal_patterns = inhom_poiss()
 
+script_time = time.time()
+print("Script Setup complete in " + str(script_time-t_init) + " s")
+
 # Start the runs of the model
 for run in runs:
+    run_start_time = time.time()
+    print("Starting run " +str(run))
     nw = net_tunedrevexp.TunedNetwork(seed, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
-
     # Attach voltage recordings to all cells
     nw.populations[0].voltage_recording(range(2000))
     nw.populations[1].voltage_recording(range(60))
     nw.populations[2].voltage_recording(range(24))
     nw.populations[3].voltage_recording(range(24))
+    nw_setup_time = time.time()
+    print("Network setup finished in " + str(nw_setup_time-run_start_time) + " s")
+
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
@@ -150,17 +160,18 @@ for run in runs:
     h.secondorder = 2
     h.t = 0
     h.dt = 0.1
-
-    """Setup run control for -100 to 1500"""
+    preinit_time = time.time()
+    print("Network pre initialized in " + str(preinit_time-nw_setup_time) + " s")
+    """Setup run control for 0 to 600"""
     h.frecord_init() # Necessary after changing t to restart the vectors
     
     while h.t < 600:
         h.fadvance()
-    print("Done Running")
+    run_time = time.time()
+    print("Done running in " + str(run_time-preinit_time)+ " s")
 
-    tuned_save_file_name = str(nw) + '_data_paradigm_local-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
+    tuned_save_file_name = str(nw) + '_data_paradigm_localexp-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
     nw.shelve_network(savedir, tuned_save_file_name)
-
     fig = nw.plot_aps(time=600)
-    tuned_fig_file_name = str(nw) + '_spike-plot_paradigm_local-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
+    tuned_fig_file_name = str(nw) + '_spike-plot_paradigm_localexp-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)
