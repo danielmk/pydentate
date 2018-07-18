@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_reshuffledrev
+import net_tunedrev
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -34,13 +34,14 @@ parser.add_argument('-scale',
 parser.add_argument('-seed',
                     type=int,
                     help='standard deviation of gaussian distribution',
-                    default=0,
+                    default=10000,
                     dest='seed')
 
 args = parser.parse_args()
 runs = range(args.runs[0], args.runs[1], args.runs[2])
 savedir = args.savedir
 input_scale = args.input_scale
+seed = args.seed
 
 # Locate a nrnmech.dll file that has the mechanisms required by the network
 # On your own machine you have to add the path to your own file to the list dll_files
@@ -89,7 +90,7 @@ temporal_patterns = inhom_poiss()
 
 # Start the runs of the model
 for run in runs:
-    nw = net_reshuffledrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
+    nw = net_tunedrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 
