@@ -468,7 +468,7 @@ class tmgsynConnection(GenConnection):
 
     def __init__(self, pre_pop, post_pop,
                  target_pool, target_segs, divergence,
-                 tau_1, tau_facil, U, tau_rec, e, thr, delay, weight, replace = False):
+                 tau_1, tau_facil, U, tau_rec, e, thr, delay, weight):
         """Create a connection with tmgsyn as published by Tsodyks, Pawelzik &
         Markram, 1998.
         The tmgsyn is a dynamic three state implicit resource synapse model.
@@ -524,8 +524,8 @@ class tmgsynConnection(GenConnection):
         >>> tmgsynConnection(nw.population[0], nw.population[1],
                              3, 'prox', 1, 6.0, 0, 0.04, 0, 0, 10, 3, 0)
         A non-facilitating, non-depressing excitatory connection.
-        """
 
+        """
         self.init_parameters = locals()
         self.pre_pop = pre_pop
         self.post_pop = post_pop
@@ -539,7 +539,6 @@ class tmgsynConnection(GenConnection):
         pre_cell_target = []
         synapses = []
         netcons = []
-        gs = []
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
 
@@ -549,10 +548,8 @@ class tmgsynConnection(GenConnection):
 
             sort_idc = np.argsort(curr_dist)
             closest_cells = sort_idc[0:target_pool]
-            picked_cells = np.random.choice(closest_cells, divergence, replace=replace)
+            picked_cells = np.random.choice(closest_cells, divergence, replace=False)
             pre_cell_target.append(picked_cells)
-            curr_gs = []
-
             for target_cell in picked_cells:
 
                 curr_syns = []
@@ -569,24 +566,19 @@ class tmgsynConnection(GenConnection):
                     curr_syn.tau_rec = tau_rec
                     curr_syns.append(curr_syn)
                     curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
-                    curr_vector = h.Vector()
-                    curr_vector.record(curr_syn._ref_g)
-                    curr_gs.append(curr_vector)
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
-            gs.append(curr_gs)
 
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses
-        self.conductances = gs
         
 class tmgsynConnectionExponentialProb(GenConnection):
 
     def __init__(self, pre_pop, post_pop,
                  scale, target_segs, divergence,
-                 tau_1, tau_facil, U, tau_rec, e, thr, delay, weight, replace = False):
+                 tau_1, tau_facil, U, tau_rec, e, thr, delay, weight):
         """Create a connection with tmgsyn as published by Tsodyks, Pawelzik &
         Markram, 1998.
         The tmgsyn is a dynamic three state implicit resource synapse model.
@@ -602,7 +594,7 @@ class tmgsynConnectionExponentialProb(GenConnection):
             The presynaptic population
         post_pop - gennetwork.Population
             the postsynaptic population
-        scale - int
+        target_pool - int
             the number of cells in the target pool
         target_segs - str
             the name of the segments that are possible synaptic targets at the
@@ -659,12 +651,9 @@ class tmgsynConnectionExponentialProb(GenConnection):
         netcons = []
 
         # Setup the Gaussian distribution
-        loc = post_pop.get_cell_number() / 2
-        exp_func = stats.expon(loc=0, scale=scale)
-        pdf = exp_func.pdf(np.arange(post_pop.get_cell_number()))
+        gauss = stats.expon(loc=0, scale=scale)
+        pdf = gauss.pdf(np.arange(post_pop.get_cell_number()))
         pdf = pdf/pdf.sum()
-
-        gs = []
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
 
@@ -673,33 +662,28 @@ class tmgsynConnectionExponentialProb(GenConnection):
                 curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
 
             sort_idc = np.argsort(curr_dist)
-            picked_cells = np.random.choice(sort_idc, divergence, replace=replace, p = pdf)
+            picked_cells = np.random.choice(sort_idc, divergence, replace=True, p = pdf)
             pre_cell_target.append(picked_cells)
-            curr_gs = []
             for target_cell in picked_cells:
 
                 curr_syns = []
                 curr_netcons = []
-    
+
                 curr_seg_pool = post_pop[target_cell].get_segs_by_name(target_segs)
-                seg = np.random.choice(curr_seg_pool)
-                curr_syn = h.tmgsyn(seg(0.5))
-                curr_syn.tau_1 = tau_1
-                curr_syn.tau_facil = tau_facil
-                curr_syn.U = U
-                curr_syn.e = e
-                curr_syn.tau_rec = tau_rec
-                curr_syns.append(curr_syn)
-                curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
-                curr_vector = h.Vector()
-                curr_vector.record(curr_syn._ref_g)
-                curr_gs.append(curr_vector)
-                curr_netcons.append(curr_netcon)
-                netcons.append(curr_netcons)
-                synapses.append(curr_syns)
-            gs.append(curr_gs)
-            
-        self.conductances = gs
+                chosen_seg = np.random.choice(curr_seg_pool)
+                for seg in chosen_seg:
+                    curr_syn = h.tmgsyn(chosen_seg(0.5))
+                    curr_syn.tau_1 = tau_1
+                    curr_syn.tau_facil = tau_facil
+                    curr_syn.U = U
+                    curr_syn.e = e
+                    curr_syn.tau_rec = tau_rec
+                    curr_syns.append(curr_syn)
+                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
+                    curr_netcons.append(curr_netcon)
+                    netcons.append(curr_netcons)
+                    synapses.append(curr_syns)
+
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses
@@ -1060,15 +1044,15 @@ class PerforantPathStimulation(object):
 
         for curr_cell in target_cells:
             curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
-            seg = np.random.choice(curr_seg_pool)
-            #chosen_seg = np.random.choice(curr_seg_pool)
-            curr_syn = h.Exp2Syn(seg(0.5))
-            curr_syn.tau1 = tau1
-            curr_syn.tau2 = tau2
-            curr_syn.e = e
-            curr_netcon = h.NetCon(stim, curr_syn, thr, delay, weight)
-            netcons.append(curr_netcon)
-            synapses.append(curr_syn)
+            for seg in curr_seg_pool:
+                #chosen_seg = np.random.choice(curr_seg_pool)
+                curr_syn = h.Exp2Syn(seg(0.5))
+                curr_syn.tau1 = tau1
+                curr_syn.tau2 = tau2
+                curr_syn.e = e
+                curr_netcon = h.NetCon(stim, curr_syn, thr, delay, weight)
+                netcons.append(curr_netcon)
+                synapses.append(curr_syn)
                 
         self.netcons = netcons
         self.pre_cell_targets = np.array(target_cells)
@@ -1111,49 +1095,6 @@ class PerforantPathPoissonStimulation(object):
         self.pre_cell_targets = np.array(target_cells)
         self.synapses = synapses
 
-class PerforantPathPoissonTmgsynNew1Syn(GenConnection):
-    """
-    Patterned Perforant Path simulation as in Yim et al. 2015.
-    uses vecevent.mod -> h.VecStim
-    """
-    def __init__(self, post_pop, t_pattern, spat_pattern, target_segs,
-                 tau_1, tau_facil, U, tau_rec, e, weight):
-
-        self.init_parameters = locals()
-        post_pop.add_connection(self)
-        synapses = []
-        netcons = []
-        t_pattern = list(t_pattern) # nrn does not like np.ndarrays?
-        target_cells = post_pop[spat_pattern]
-        self.pre_pop = 'Implicit'
-        self.post_pop = post_pop
-        self.vecstim = h.VecStim()
-        self.pattern_vec = h.Vector(t_pattern)
-        self.vecstim.play(self.pattern_vec)
-        gs = []
-
-        for curr_cell in target_cells:
-            curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
-            seg = np.random.choice(curr_seg_pool)
-            curr_syn = h.tmgsyn(seg(0.5))
-            curr_syn.tau_1 = tau_1
-            curr_syn.tau_facil = tau_facil
-            curr_syn.U = U
-            curr_syn.tau_rec = tau_rec
-            curr_syn.e = e
-            curr_netcon = h.NetCon(self.vecstim, curr_syn)
-            curr_netcon.weight[0] = weight
-            curr_vector = h.Vector()
-            curr_vector.record(curr_syn._ref_g)
-            gs.append(curr_vector)
-            netcons.append(curr_netcon)
-            synapses.append(curr_syn)
-
-        self.netcons = netcons
-        self.pre_cell_targets = np.array(spat_pattern)
-        self.synapses = synapses
-        self.conductances = gs
-        
 class PerforantPathPoissonTmgsyn(GenConnection):
     """
     Patterned Perforant Path simulation as in Yim et al. 2015.
@@ -1173,7 +1114,6 @@ class PerforantPathPoissonTmgsyn(GenConnection):
         self.vecstim = h.VecStim()
         self.pattern_vec = h.Vector(t_pattern)
         self.vecstim.play(self.pattern_vec)
-        gs = []
 
         for curr_cell in target_cells:
             curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
@@ -1186,16 +1126,13 @@ class PerforantPathPoissonTmgsyn(GenConnection):
                 curr_syn.e = e
                 curr_netcon = h.NetCon(self.vecstim, curr_syn)
                 curr_netcon.weight[0] = weight
-                curr_vector = h.Vector()
-                curr_vector.record(curr_syn._ref_g)
-                gs.append(curr_vector)
-            netcons.append(curr_netcon)
-            synapses.append(curr_syn)
+                netcons.append(curr_netcon)
+                synapses.append(curr_syn)
 
         self.netcons = netcons
         self.pre_cell_targets = np.array(spat_pattern)
         self.synapses = synapses
-        self.conductances = gs
+
 
 """HELPERS"""
 def pos(rad):
