@@ -22,4 +22,5 @@ for root, dirs, files in os.walk(parent):
             print(root)
             data_path = root + '\\'
             get_inputs.similarity_measure_leutgeb_inputs_directory(data_path, 1000)
+            break
             
