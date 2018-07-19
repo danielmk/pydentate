@@ -35,3 +35,5 @@ for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
         corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.similarity_measure_leutgeb(x,y,len_bins)
         
 np.savetxt(save_path + "1_leutgeb-measure_matrix_len-bin_" + str(len_bins) +  ".txt", corr_matrix, delimiter="\t")
+
+if 
