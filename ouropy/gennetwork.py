@@ -538,6 +538,7 @@ class tmgsynConnection(GenConnection):
         pre_cell_target = []
         synapses = []
         netcons = []
+        conductances = []
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
 
@@ -553,6 +554,7 @@ class tmgsynConnection(GenConnection):
 
                 curr_syns = []
                 curr_netcons = []
+                curr_conductances = []
 
                 curr_seg_pool = post_pop[target_cell].get_segs_by_name(target_segs)
                 chosen_seg = np.random.choice(curr_seg_pool)
@@ -565,10 +567,14 @@ class tmgsynConnection(GenConnection):
                     curr_syn.tau_rec = tau_rec
                     curr_syns.append(curr_syn)
                     curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
+                    curr_gvec = h.Vector()
+                    curr_gvec.record(curr_syn._ref_g)
+                    curr_conductances.append(curr_gvec)
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
-
+            conductances.append(curr_conductances)
+        self.conductances = conductances
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses
@@ -844,6 +850,7 @@ class PerforantPathPoissonStimulation(object):
         post_pop.add_connection(self)
         synapses = []
         netcons = []
+        conductances = []
 
         target_cells = post_pop.cells[spat_pattern]
         self.pre_pop = "Implicit"
@@ -853,21 +860,27 @@ class PerforantPathPoissonStimulation(object):
 
         for curr_cell in target_cells:
             curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
+            curr_conductances = []
             for seg in curr_seg_pool:
                 curr_syn = h.Exp2Syn(seg(0.5))
                 curr_syn.tau1 = tau1
                 curr_syn.tau2 = tau2
                 curr_syn.e = e
                 curr_netcon = h.NetCon(self.vecstim, curr_syn)
+                curr_gvec = h.Vector()
+                curr_gvec.record(curr_syn._ref_g)
+                curr_conductances.append(curr_gvec)
                 curr_netcon.weight[0] = weight
                 netcons.append(curr_netcon)
                 synapses.append(curr_syn)
                 """for event in pattern:
                     curr_netcon.event(event)"""
+            conductances.append(curr_conductances)
                     
         self.netcons = netcons
         self.pre_cell_targets = np.array(target_cells)
         self.synapses = synapses
+        self.conductances = conductances
 
 class PerforantPathPoissonTmgsyn(GenConnection):
     """
@@ -888,9 +901,11 @@ class PerforantPathPoissonTmgsyn(GenConnection):
         self.vecstim = h.VecStim()
         self.pattern_vec = h.Vector(t_pattern)
         self.vecstim.play(self.pattern_vec)
+        conductances = []
 
         for curr_cell in target_cells:
             curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
+            curr_conductances = []
             for seg in curr_seg_pool:
                 curr_syn = h.tmgsyn(seg(0.5))
                 curr_syn.tau_1 = tau_1
@@ -899,10 +914,15 @@ class PerforantPathPoissonTmgsyn(GenConnection):
                 curr_syn.tau_rec = tau_rec
                 curr_syn.e = e
                 curr_netcon = h.NetCon(self.vecstim, curr_syn)
+                curr_gvec = h.Vector()
+                curr_gvec.record(curr_syn._ref_g)
+                curr_conductances.append(curr_gvec)
                 curr_netcon.weight[0] = weight
                 netcons.append(curr_netcon)
                 synapses.append(curr_syn)
+            conductances.append(curr_conductances)
 
+        self.conductances = conductances
         self.netcons = netcons
         self.pre_cell_targets = np.array(spat_pattern)
         self.synapses = synapses

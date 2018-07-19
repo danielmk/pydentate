@@ -36,4 +36,5 @@ for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
         
 np.savetxt(save_path + "1_leutgeb-measure_matrix_len-bin_" + str(len_bins) +  ".txt", corr_matrix, delimiter="\t")
 
-if 
+if __name__ == '__main__':
+    
