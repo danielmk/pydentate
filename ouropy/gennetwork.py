@@ -14,6 +14,7 @@ import math
 import time
 import os
 import shelve
+import scipy.stats as stats
 
 
 class GenNetwork(object):
