@@ -22,4 +22,8 @@ def get_binary_traces(data_path):
 
 if __name__ == '__main__':
     data_path = ""
-    get_binary_traces(data_path)
+    for root, dirs, files in os.walk(parent):
+        for name in files:
+            if name[-5:] == '.pydd':
+                get_binary_traces(root)
+                break:
