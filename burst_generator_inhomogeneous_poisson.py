@@ -44,9 +44,8 @@ def inhom_poiss_30Hz():
 
     return array_like
 
-def inhom_poiss(rate = 10):
+def inhom_poiss(rate=10, max_rate=100):
     sampling_interval = 0.0001 * pq.s
-    max_rate = 100
 
     t = np.arange(0, 0.5, sampling_interval.magnitude)
 

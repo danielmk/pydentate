@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_globalrevexp
+import net_tunedrevexpmoresyn
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -31,7 +31,7 @@ pr.add_argument('-savedir',
 pr.add_argument('-scale',
                     type=int,
                     help='standard deviation of gaussian distribution',
-                    default=500,
+                    default=1000,
                     dest='input_scale')
 pr.add_argument('-seed',
                     type=int,
@@ -99,7 +99,7 @@ temporal_patterns = inhom_poiss()
 
 # Start the runs of the model
 for run in runs:
-    nw = net_globalrevexp.TunedNetwork(seed, temporal_patterns[0+run:24+run],
+    nw = net_tunedrevexpmoresyn.TunedNetwork(seed, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 
