@@ -14,11 +14,11 @@ from pyDentate.burst_generator_inhomogeneous_poisson import inhom_poiss
 from sklearn.preprocessing import normalize
 
 # Generate the temporal patterns
-np.random.seed(10000)
-temporal_patterns = inhom_poiss()
+np.random.seed(10006)
+temporal_patterns = inhom_poiss(rate=30)
 
 runs = range(25)
-save_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\input_patterns_seed_10000\\"
+save_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_30Hz_input\\seed10006\\input_patterns\\"
 file_prefix = "input_patterns_run_"
 
 temporal_patterns = analysis_main.time_stamps_to_signal(temporal_patterns, 0.1, 0, 600)

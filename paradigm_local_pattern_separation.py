@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_tunedrevexpmoresyn
+import net_disinhibitedrev
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -95,11 +95,11 @@ PP_to_BCs = np.array(PP_to_BCs)
 
 # Generate temporal patterns for the 100 PP inputs
 np.random.seed(seed)
-temporal_patterns = inhom_poiss()
+temporal_patterns = inhom_poiss(rate=30)
 
 # Start the runs of the model
 for run in runs:
-    nw = net_tunedrevexpmoresyn.TunedNetwork(seed, temporal_patterns[0+run:24+run],
+    nw = net_disinhibitedrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 
@@ -120,7 +120,6 @@ for run in runs:
     h.dt = 10
     while h.t < -100:
         h.fadvance()
-        print(h.t)
 
     h.secondorder = 2
     h.t = 0

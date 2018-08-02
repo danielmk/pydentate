@@ -24,7 +24,7 @@ def get_binary_traces(data_path):
             print("_spike_data file already present")
 
 if __name__ == '__main__':
-    data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_30Hz_input\\"
+    data_path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_30Hz_input\\seed10003\\scale1000\\net_reshuffledrev\\"
     for root, dirs, files in os.walk(data_path):
         print(root)
         for name in files:

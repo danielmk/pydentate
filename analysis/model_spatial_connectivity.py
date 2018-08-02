@@ -31,14 +31,14 @@ def euclidian_dist(p1,p2):
 #Office PC
 #directory = "Y:\\DanielM\\023_Dentate Gyrus Model\\paradigm_spatial-inhibition\\"
 #Dropbox
-directory = "Z:\\pyDentate\\pyDentateData\\pattern_separation_data_local_input_revised_exp\\seed10000\\scale1000\\net_globalrev\\"
+directory = "C:\\Users\\Daniel\\repos\\pyDentate\\"
 
-file_name = "net_globalrevexp.TunedNetwork_data_paradigm_local-pattern-separation_run_scale_seed_000_1000_10000.pydd"
+file_name = "net_tunedrevexpmoresyn.TunedNetwork_data_paradigm_local-pattern-separation_run_scale_seed_000_1000_10000.pydd"
 
 data = shelve.open(directory + file_name)
 
 # Get to BasketCell Connection
-BC_to_GC_targets = data['net_globalrevexp.TunedNetwork']['populations'][0]['connections'][27]['BasketCellPopulation to GranuleCellPopulation']['pre_cell_targets']
+BC_to_GC_targets = data['net_tunedrevexpmoresyn.TunedNetwork']['populations'][0]['connections'][27]['BasketCellPopulation to GranuleCellPopulation']['pre_cell_targets']
 
 pre_pop_rad = (np.arange(24,dtype=float) / 24.0) * (2*np.pi)
 post_pop_rad = (BC_to_GC_targets / 2000.0) * (2*np.pi)
@@ -55,7 +55,7 @@ BC_to_GC_arc = np.array(BC_to_GC_targets, dtype = np.float)
 for row in range(BC_to_GC_arc.shape[0]):
     for col in range(BC_to_GC_arc.shape[1]):
         dist1 = abs(pre_pop_rad[row] - post_pop_rad[row,col])
-        dist2 = abs(post_pop_rad[row,col] - pre_pop_rad[row])
+        dist2 = abs(dist1 - (2*np.pi))
         if dist1 <= dist2:
             BC_to_GC_arc[row,col] = dist1
         elif dist1 > dist2:
@@ -64,7 +64,7 @@ for row in range(BC_to_GC_arc.shape[0]):
 #BC_to_GC_arc = np.absolute(BC_to_GC_arc)
 
 plt.figure()
-myhist = plt.hist((BC_to_GC_arc.flatten() / (np.pi))*2000, np.arange(-0.5,2000,1))
+myhist = plt.hist((BC_to_GC_arc.flatten() / (2*np.pi))*2000, np.arange(-0.5,2000,1))
 plt.xlabel("relative #GC")
 plt.ylabel("# Synapses")
 plt.title("net_globalrev_run_scale_seed_000_1000_10000 BC->GC connection")

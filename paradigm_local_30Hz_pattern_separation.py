@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_nonfacilitatingrev
+import net_globalrevexpmoresyn
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -90,7 +90,7 @@ temporal_patterns = inhom_poiss(rate=30)
 
 # Start the runs of the model
 for run in runs:
-    nw = net_nonfacilitatingrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
+    nw = net_globalrevexpmoresyn.TunedNetwork(seed, temporal_patterns[0+run:24+run],
                                 PP_to_GCs[0+run:24+run],
                                 PP_to_BCs[0+run:24+run])
 
