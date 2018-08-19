@@ -8,7 +8,7 @@ Auto init and run
 
 from neuron import h
 import numpy as np
-import net_tunedrev
+import net_nonfacilitatingrev
 import os
 import argparse
 
@@ -46,6 +46,7 @@ dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakum
             "C:\\Users\\daniel\\repos\\nrnmech.dll",
             "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
             "C:\\Users\\Daniel\\repos\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
+
 for x in dll_files:
     if os.path.isfile(x):
         dll_dir = x
@@ -65,7 +66,7 @@ cells_to_measure = np.arange(0, 2000, 100)
 
 for run in runs:
     # Create a standard networks and add the stimulation
-    nw = net_tunedrev.TunedNetwork(seed=10000+run)
+    nw = net_nonfacilitatingrev.TunedNetwork(seed=10000+run)
     np.random.seed(10000 + run)
 
     # Make sure we are not stimulating a cell we measure

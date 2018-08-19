@@ -150,10 +150,10 @@ def similarity_measure_leutgeb_BUGGY(signal1,signal2, len_bin):
 
 def similarity_measure_leutgeb(signal1,signal2, len_bin):
     """Oriented on the """
-    signal1 = np.reshape(signal1, (signal1.shape[0],signal1.shape[1]/len_bin,len_bin))
+    signal1 = np.reshape(signal1[:,0:int(len_bin*int(signal1.shape[1]/len_bin))], (signal1.shape[0],signal1.shape[1]/len_bin,len_bin))
     signal1 = signal1.sum(axis=2)
     
-    signal2 = np.reshape(signal2, (signal2.shape[0],signal2.shape[1]/len_bin,len_bin))
+    signal2 = np.reshape(signal2[:,0:int(len_bin*int(signal2.shape[1]/len_bin))], (signal2.shape[0],signal2.shape[1]/len_bin,len_bin))
     signal2 = signal2.sum(axis=2)
 
     corr_vector = []

@@ -16,11 +16,11 @@ dt = 0.01  # ms
 stim_dtp = stim_delay / dt
 
 data_path = "C:\\Users\\Daniel\\pyDentateData\\tuning\\revised\\frequency_inhibition_data\\"
-save_path = "C:\\Users\\Daniel\\pyDentateData\\tuning\\revised\\frequency_inhibition_data\\"
+save_path = data_path
 data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and '100' in f and 'HC' in f]
-data_files = data_files[0:1]
+data_files = "paradigm-frequency-inhibition_interval_n-cells_1000_40_GCs_net_nonfacilitatingrev.txt"
 interval = 1000 # in kHz because ms
-data = np.load(data_path + data_files[0])['arr_0']
+data = np.loadtxt(data_path + data_files)
 stim_delay = 100
 intervals = np.arange(stim_delay/dt, (stim_delay/dt) + (interval/dt)*10, interval/dt)
 

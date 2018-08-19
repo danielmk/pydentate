@@ -8,7 +8,7 @@ import patterns_get_LeutgebMeasure_inputs as get_inputs
 import patterns_get_LeutgebMeasure_outputs as get_outputs
 import os
 
-parent = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_30Hz_input\\seed10003\\scale1000\\net_reshuffledrev\\"
+parent = "Z:\\pyDentate\\pyDentateData\\pattern_separation_data_rate\\net_tunedrev_200\\"
 done = 0
 
 for root, dirs, files in os.walk(parent):
