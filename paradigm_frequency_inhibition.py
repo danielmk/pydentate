@@ -12,6 +12,7 @@ import net_nonfacilitatingrev
 import os
 import argparse
 
+# Handle command line inputs
 parser = argparse.ArgumentParser(description='Frequency inhibition paradigm')
 parser.add_argument('-runs',
                     nargs=3,
@@ -41,12 +42,17 @@ savedir = args.savedir
 interval = args.interval
 n_cells = args.n_cells
 
-# Locate and load the nrnmech.dll file. Must to be adjusted for your machine.
-dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
-            "C:\\Users\\daniel\\repos\\nrnmech.dll",
-            "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
-            "C:\\Users\\Daniel\\repos\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
-
+# Where to search for nrnmech.dll file. Must be adjusted for your machine.
+dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
+              "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
+              "dentategyrusnet2005\\nrnmech.dll"),
+             "C:\\Users\\daniel\\repos\\nrnmech.dll",
+             ("C:\\Users\\Holger\\danielm\\models_dentate\\"
+              "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
+              "dentategyrusnet2005\\nrnmech.dll"),
+             ("C:\\Users\\Daniel\\repos\\"
+              "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
+              "dentategyrusnet2005\\nrnmech.dll")]
 for x in dll_files:
     if os.path.isfile(x):
         dll_dir = x
@@ -54,9 +60,8 @@ print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
 # Setup specs for stimulation
-# Number of cells that are stimulated
 stim_pool = 150  # Size of the pool from which stimulated cells are chosen
-stim_location = int(2000 / 2.0 - stim_pool / 2.0)
+stim_location = int(2000 / 2.0 - stim_pool / 2.0)  # Global because 2000
 stim_amp = 1
 stim_dur = 5
 stim_delay = 100
@@ -65,7 +70,7 @@ stim_delay = 100
 cells_to_measure = np.arange(0, 2000, 100)
 
 for run in runs:
-    # Create a standard networks and add the stimulation
+    # Create a networks
     nw = net_nonfacilitatingrev.TunedNetwork(seed=10000+run)
     np.random.seed(10000 + run)
 
@@ -117,7 +122,11 @@ for run in runs:
         h.fadvance()
 
     spike_plot = nw.plot_aps(time=100+200+interval*10)
-    spike_plot_file_name = str(nw) + "_spikeplot_run_interval_n-cells_" + str(run) + '_' + str(interval) + '_' + str(n_cells)
-    nw.save_ap_fig(spike_plot, directory = savedir, file_name = spike_plot_file_name)
-    data_file_name = str(nw) + "_data_run_interval_n-cells_" + str(run) + '_' + str(interval) + '_' + str(n_cells)
-    nw.shelve_network(directory = savedir, file_name = data_file_name)
+    spike_plot_file_name = (str(nw) + "_spikeplot_run_interval_n-cells_" +
+                            str(run) + '_' + str(interval) + '_' +
+                            str(n_cells))
+    nw.save_ap_fig(spike_plot, directory=savedir,
+                   file_name=spike_plot_file_name)
+    data_file_name = (str(nw) + "_data_run_interval_n-cells_" + str(run) +
+                      '_' + str(interval) + '_' + str(n_cells))
+    nw.shelve_network(directory=savedir, file_name=data_file_name)

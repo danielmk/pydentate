@@ -10,13 +10,11 @@ import ouropy.parameters as params
 
 
 class HippCell(GenNeuron):
+    """Implements the HippCell class with logic inherited from
+    ouropy.GenNeuron, a generic neuron class"""
     name = "HippCell"
 
     def __init__(self, name=None):
-        self.name = name
-        self.all_secs = []
-        self.dendrites = []
-
         self.mk_soma(name='soma', diam=10, L=20)
 
         self.mk_dendrite(3, dend_name='short_1',

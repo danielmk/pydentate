@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_tuned
+import net_tunedrev
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
@@ -29,14 +29,18 @@ parser.add_argument('-savedir',
 args = parser.parse_args()
 runs = range(args.runs[0], args.runs[1], args.runs[2])
 savedir = args.savedir
-print(savedir)
 
-# Locate a nrnmech.dll file that has the mechanisms required by the network
-# On your own machine you have to add the path to your own file to the list dll_files
-dll_files = ["C:\\Users\\DanielM\\Repos\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
+# Where to search for nrnmech.dll file. Must be adjusted for your machine.
+dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
+              "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
+              "dentategyrusnet2005\\nrnmech.dll"),
             "C:\\Users\\daniel\\Repos\\nrnmech.dll",
-            "C:\\Users\\Holger\\danielm\\models_dentate\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll",
-            "C:\\Users\\Daniel\\repos\\dentate_gyrus_Santhakumar2005_and_Yim_patterns\\dentategyrusnet2005\\nrnmech.dll"]
+            ("C:\\Users\\Holger\\danielm\\models_dentate\\"
+             "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
+             "dentategyrusnet2005\\nrnmech.dll"),
+            ("C:\\Users\\Daniel\\repos\\"
+             "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
+             "dentategyrusnet2005\\nrnmech.dll")]
 for x in dll_files:
     if os.path.isfile(x):
         dll_dir = x
@@ -49,31 +53,33 @@ temporal_patterns = inhom_poiss()
 
 # Generate the PP -> GC mapping so that each GC receives inputs from 20/400
 # randomly chosen PP inputs
-innervation_pattern_gc = np.array([np.random.choice(400,20, replace = False) for x in range(2000)])
-innervation_pattern_gc = innervation_pattern_gc.swapaxes(0,1)
+innervation_pattern_gc = np.array([np.random.choice(400, 20, replace=False)
+                                   for x in range(2000)])
+innervation_pattern_gc = innervation_pattern_gc.swapaxes(0, 1)
 
 PP_to_GCs = []
-for x in range(0,400):
-    PP_to_GCs.append(np.argwhere(innervation_pattern_gc == x)[:,1])
+for x in range(0, 400):
+    PP_to_GCs.append(np.argwhere(innervation_pattern_gc == x)[:, 1])
 
 PP_to_GCs = np.array(PP_to_GCs)
 
 # Generate the PP -> BC mapping as above
-innervation_pattern_bc = np.array([np.random.choice(400,20, replace = False) for x in range(24)])
-innervation_pattern_bc = innervation_pattern_bc.swapaxes(0,1)
+innervation_pattern_bc = np.array([np.random.choice(400, 20, replace=False)
+                                   for x in range(24)])
+innervation_pattern_bc = innervation_pattern_bc.swapaxes(0, 1)
 
 PP_to_BCs = []
-for x in range(0,400):
-    PP_to_BCs.append(np.argwhere(innervation_pattern_bc == x)[:,1])
+for x in range(0, 400):
+    PP_to_BCs.append(np.argwhere(innervation_pattern_bc == x)[:, 1])
 
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
 # Start the runs of the model
 for run in runs:
-    nw = net_tuned.TunedNetwork(10000, temporal_patterns[0+run:24+run],
-                                PP_to_GCs[0+run:24+run],
-                                PP_to_BCs[0+run:24+run])
+    nw = net_tunedrev.TunedNetwork(10000, temporal_patterns[0+run:24+run],
+                                   PP_to_GCs[0+run:24+run],
+                                   PP_to_BCs[0+run:24+run])
 
     # Attach voltage recordings to all cells
     nw.populations[0].voltage_recording(range(2000))
@@ -92,7 +98,6 @@ for run in runs:
     h.dt = 10
     while h.t < -100:
         h.fadvance()
-        print(h.t)
 
     h.secondorder = 2
     h.t = 0

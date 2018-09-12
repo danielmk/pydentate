@@ -10,6 +10,9 @@ import ouropy.parameters as params
 
 
 class MossyCell(GenNeuron):
+    """Implements the HippCell class with logic inherited from
+    ouropy.GenNeuron, a generic neuron class"""
+    name = "MossyCell"
 
     def __init__(self, name=None):
         self.name = name
@@ -18,7 +21,9 @@ class MossyCell(GenNeuron):
 
         self.mk_soma(name='soma', diam=20, L=20)
         # Set up the sections with topology
-        #NOTE! There is a discrepancy here between the diameter of the third section of the dendrite. Publication: 25; Code: 2.5 The number in the code seems to be more physiological
+        """NOTE! There is a discrepancy here between the diameter of the third
+        section of the dendrite. Publication: 25; Code: 2.5 The number in
+        the code seems to be more physiological"""
         self.mk_dendrite(4, dend_name='dend_1',
                          sec_names=['proxd', 'mid1d', 'mid2d', 'dd'],
                          diam=[5.78, 4, 2.5, 1], L=[50, 50, 50, 50],
@@ -36,6 +41,6 @@ class MossyCell(GenNeuron):
                          diam=[5.78, 4, 2.5, 1], L=[50, 50, 50, 50],
                          soma_loc=0)
 
-        parameters = params.read_parameters('mossycellparams_cat.txt')
+        parameters = params.read_parameters('mossycellparams.txt')
 
         self.insert_mechs(parameters)

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Apr 12 15:38:35 2017
-
 @author: DanielM
 """
 
@@ -10,14 +8,11 @@ import ouropy.parameters as params
 
 
 class BasketCell(GenNeuron):
+    """Implements the BasketCell class with logic inherited from
+    ouropy.GenNeuron, a generic neuron class"""
     name = "BasketCell"
 
     def __init__(self, name=None):
-
-        self.name = name
-        self.all_secs = []
-        self.dendrites = []
-
         # Make soma
         self.mk_soma(name='soma', diam=15, L=20)
 

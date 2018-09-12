@@ -7,37 +7,35 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h
 import numpy as np
-import net_disinhibitedrev
+import net_tunedrev
 from burst_generator_inhomogeneous_poisson import inhom_poiss
 import os
 import argparse
 import scipy.stats as stats
 
-# Parse command line inputs
-# Command line signature:
-# python script -runs n n n -savedir str -scale n -seed n
+# Handle command line inputs
 pr = argparse.ArgumentParser(description='Local pattern separation paradigm')
 pr.add_argument('-runs',
-                    nargs=3,
-                    type=int,
-                    help='start stop range for the range of runs',
-                    default=[0, 1, 1],
-                    dest='runs')
+                nargs=3,
+                type=int,
+                help='start stop range for the range of runs',
+                default=[0, 1, 1],
+                dest='runs')
 pr.add_argument('-savedir',
-                    type=str,
-                    help='complete directory where data is saved',
-                    default=os.getcwd(),
-                    dest='savedir')
+                type=str,
+                help='complete directory where data is saved',
+                default=os.getcwd(),
+                dest='savedir')
 pr.add_argument('-scale',
-                    type=int,
-                    help='standard deviation of gaussian distribution',
-                    default=1000,
-                    dest='input_scale')
+                type=int,
+                help='standard deviation of gaussian distribution',
+                default=1000,
+                dest='input_scale')
 pr.add_argument('-seed',
-                    type=int,
-                    help='standard deviation of gaussian distribution',
-                    default=10000,
-                    dest='seed')
+                type=int,
+                help='standard deviation of gaussian distribution',
+                default=10000,
+                dest='seed')
 
 args = pr.parse_args()
 runs = range(args.runs[0], args.runs[1], args.runs[2])
@@ -45,8 +43,7 @@ savedir = args.savedir
 input_scale = args.input_scale
 seed = args.seed
 
-# Locate a nrnmech.dll file containig the mechanisms required by the network
-# adapt path for your own machine.
+# Where to search for nrnmech.dll file. Must be adjusted for your machine.
 dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
               "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
               "dentategyrusnet2005\\nrnmech.dll"),
@@ -79,7 +76,8 @@ start_idc = np.random.randint(0, 1999, size=400)
 PP_to_GCs = []
 for x in start_idc:
     curr_idc = np.concatenate((GC_indices[x:2000], GC_indices[0:x]))
-    PP_to_GCs.append(np.random.choice(curr_idc, size=100, replace=False, p=pdf_gc))
+    PP_to_GCs.append(np.random.choice(curr_idc, size=100, replace=False,
+                                      p=pdf_gc))
 
 PP_to_GCs = np.array(PP_to_GCs)
 
@@ -89,7 +87,8 @@ start_idc = np.array(((start_idc/2000.0)*24), dtype=int)
 PP_to_BCs = []
 for x in start_idc:
     curr_idc = np.concatenate((BC_indices[x:24], BC_indices[0:x]))
-    PP_to_BCs.append(np.random.choice(curr_idc, size=1, replace=False, p=pdf_bc))
+    PP_to_BCs.append(np.random.choice(curr_idc, size=1, replace=False,
+                                      p=pdf_bc))
 
 PP_to_BCs = np.array(PP_to_BCs)
 
@@ -99,9 +98,9 @@ temporal_patterns = inhom_poiss(rate=30)
 
 # Start the runs of the model
 for run in runs:
-    nw = net_disinhibitedrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
-                                PP_to_GCs[0+run:24+run],
-                                PP_to_BCs[0+run:24+run])
+    nw = net_tunedrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
+                                   PP_to_GCs[0+run:24+run],
+                                   PP_to_BCs[0+run:24+run])
 
     # Attach voltage recordings to all cells
     nw.populations[0].voltage_recording(range(2000))
@@ -126,15 +125,20 @@ for run in runs:
     h.dt = 0.1
 
     """Setup run control for -100 to 1500"""
-    h.frecord_init() # Necessary after changing t to restart the vectors
-    
+    h.frecord_init()  # Necessary after changing t to restart the vectors
     while h.t < 600:
         h.fadvance()
     print("Done Running")
 
-    tuned_save_file_name = str(nw) + '_data_paradigm_local-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
+    tuned_save_file_name = (str(nw) + "_data_paradigm_local-pattern" +
+                            "-separation_run_scale_seed_" +
+                            str(run).zfill(3) + '_' +
+                            str(input_scale).zfill(3) + '_' + str(seed)
     nw.shelve_network(savedir, tuned_save_file_name)
 
     fig = nw.plot_aps(time=600)
-    tuned_fig_file_name = str(nw) + '_spike-plot_paradigm_local-pattern-separation_run_scale_seed_' + str(run).zfill(3) + '_' + str(input_scale).zfill(3) + '_' + str(seed)
+    tuned_fig_file_name = (str(nw) + "_spike-plot_paradigm_local-pattern" + 
+                           "-separation_run_scale_seed_" +
+                           str(run).zfill(3) + '_' +
+                           str(input_scale).zfill(3) + '_' + str(seed)
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)
