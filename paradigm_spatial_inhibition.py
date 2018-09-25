@@ -91,10 +91,7 @@ for run in runs:
     nw.populations[0].voltage_recording(stim_cells)
 
     """Initialization for -2000 to -100"""
-    h.cvode.active(0)
     dt = 0.01
-    h.steps_per_ms = 1.0/dt
-    h.tstop = 1500
     h.finitialize(-60)
     h.t = -2000
     h.secondorder = 0

@@ -5,7 +5,7 @@ Created on Mon Mar 05 13:41:23 2018
 @author: DanielM
 """
 
-from neuron import h
+from neuron import h, gui
 import numpy as np
 import net_tunedrev
 from burst_generator_inhomogeneous_poisson import inhom_poiss
@@ -94,7 +94,7 @@ PP_to_BCs = np.array(PP_to_BCs)
 
 # Generate temporal patterns for the 100 PP inputs
 np.random.seed(seed)
-temporal_patterns = inhom_poiss(rate=30)
+temporal_patterns = inhom_poiss(rate=10)
 
 # Start the runs of the model
 for run in runs:
@@ -109,10 +109,7 @@ for run in runs:
     nw.populations[3].voltage_recording(range(24))
     # Run the model
     """Initialization for -2000 to -100"""
-    h.cvode.active(0)
     dt = 0.1
-    h.steps_per_ms = 1.0/dt
-    h.tstop = 1500
     h.finitialize(-60)
     h.t = -2000
     h.secondorder = 0
@@ -133,12 +130,12 @@ for run in runs:
     tuned_save_file_name = (str(nw) + "_data_paradigm_local-pattern" +
                             "-separation_run_scale_seed_" +
                             str(run).zfill(3) + '_' +
-                            str(input_scale).zfill(3) + '_' + str(seed)
+                            str(input_scale).zfill(3) + '_' + str(seed))
     nw.shelve_network(savedir, tuned_save_file_name)
 
     fig = nw.plot_aps(time=600)
     tuned_fig_file_name = (str(nw) + "_spike-plot_paradigm_local-pattern" + 
                            "-separation_run_scale_seed_" +
                            str(run).zfill(3) + '_' +
-                           str(input_scale).zfill(3) + '_' + str(seed)
+                           str(input_scale).zfill(3) + '_' + str(seed))
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)
