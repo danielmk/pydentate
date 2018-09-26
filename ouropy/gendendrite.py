@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-This module implements the GenDendrite object, a contructor for dendrites.
+This module implements the GenDendrite class, which implements generic dendrite
+logic.
 """
 from neuron import h
 
@@ -70,7 +71,8 @@ class GenDendrite(object):
             if curr_n > 0:
                 self.secs[curr_n].connect(self.secs[curr_n - 1](1))
 
-    def conn_soma(self, soma, soma_loc = 1):
+    def conn_soma(self, soma, soma_loc=1):
+        """Connect a soma to the dendrite"""
         if self.soma:
             raise StandardError("Soma already connected")
 
@@ -80,6 +82,7 @@ class GenDendrite(object):
         self.secs[0].connect(self.soma(soma_loc))
 
     def set_diam(self, diam):
+        """Change the diameter of the dendrite"""
         if not bool(self.secs):
             raise StandardError("Can't set diameter before sections are made")
             return
@@ -95,6 +98,7 @@ class GenDendrite(object):
                 curr_seg.diam = diam
 
     def set_L(self, L):
+        """Change the length of the dendrite"""
         if not bool(self.secs):
             raise Warning("Can't set L before segments are made")
             return
@@ -112,7 +116,7 @@ class GenDendrite(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if not self.secs:
             raise StandardError("No sections created yet")
         if self._i < (len(self.secs)):
@@ -122,6 +126,9 @@ class GenDendrite(object):
         else:
             self._i = 0
             raise StopIteration()
+
+    def next(self):
+        return self.__next__()
 
     def __getitem__(self, key):
         if type(key) == int:

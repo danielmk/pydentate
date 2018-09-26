@@ -40,16 +40,17 @@ class Parameter(object):
         return ("mech_name: %s, sec_name: %s, value: %d"
                 % (self.mech_name, self.sec_name, self.value))
 
+
 class ParameterSet(list):
-    
+
     def __init__(self, param_list):
         self.param_list = param_list
         self._i = 0
-    
+
     def get_mechs(self):
         mechs = {}
         for x in self.param_list:
-            if not x.sec_name in mechs.keys():
+            if x.sec_name not in mechs.keys():
                 mechs[x.sec_name] = set()
             """if x.get_mech() and (not (x.get_mech() in mechs[x.sec_name])):
                 mechs[x.sec_name].append(x.get_mech())"""
@@ -57,15 +58,15 @@ class ParameterSet(list):
                 mechs[x.sec_name].add(x.get_mech())
 
         return mechs
-    
+
     def __str__(self):
         mylist = [x.__str__() for x in self.param_list]
-        return ';'.join(map(str,mylist))
-        
+        return ';'.join(map(str, mylist))
+
     def __iter__(self):
         return self
-        
-    def next(self):
+
+    def __next__(self):
         if self._i < (len(self.param_list)):
             i = self._i
             self._i += 1
@@ -73,15 +74,16 @@ class ParameterSet(list):
         else:
             self._i = 0
             raise StopIteration()
-        
-            
-    
+
+    def next(self):
+        return self.__next__()
+
 def read_parameters(path):
-    
+
     reader = open(path, 'r')
-    
+
     data = reader.read()
-    
+
     first_split = data.split('\n')
     second_split = [x.split('\t') for x in first_split]
     second_split = [x for x in second_split if bool(x[0])]

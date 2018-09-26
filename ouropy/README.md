@@ -1,6 +1,9 @@
 # ouropy
 
-This project is a generic interface to NEURON, intended to simplify tasks such a creating neurons and networks.
+ouropy is a generic wrapper of [NEURON](https://www.neuron.yale.edu/neuron/), intended to simplify network modeling. When working in native NEURON, the logical unit is the section.
+A section is a cable with physical dimensions and biophysical mechanisms. Building a network means to create sections, connect them to form neurons, populate them with mechanism and
+finally connect them synaptically to finish the network. While NEURON makes this rather easy, we still need to keep track of all our sections. The goal of ouropy is to move from the
+logic of sections to the logic of neurons, populations and finally entire networks.
 
 # Dependencies
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Main class is GenNetwork
-Also implements Population and Connection
+This module implements the GenNetwork class, which implements generic network
+logic. Also implements Population and GenConnection classes
 
 @author: DanielM
 """
@@ -121,24 +121,26 @@ class GenNetwork(object):
         h.tstop = tstop
         h.run()
 
-    def plot_aps(self, time = 200):
-        fig = plt.figure(figsize = (8.27, 11.69))
+    def plot_aps(self, time=200):
+        fig = plt.figure(figsize=(8.27, 11.69))
         for idx, pop in enumerate(self.populations):
             cells = []
             for ap_count in pop.ap_counters:
+                # as_numpy() doesn't work on windows 10???
                 try:
-                    cells.append(ap_count[0].as_numpy()) # as_numpy() doesn't work on windows 10???
+                    cells.append(ap_count[0].as_numpy())
                 except:
                     cells.append(np.array(ap_count[0]))
-            # Workaround for matplotlib bug. plt.eventplot throws error when first
-            # element empty
+            # Workaround for matplotlib bug. plt.eventplot throws error when
+            # first element empty
             if not np.array(cells[0]).any():
                 cells[0] = np.array([0], dtype=float)
 
-            plt.subplot(4,1,idx+1)
+            plt.subplot(4, 1, idx+1)
             plt.eventplot(cells)
-            plt.ylabel(str(pop)+ '\n' + str(pop.perc_active_cells())[0:4] + '% active')
-            plt.xlim((0,time))
+            plt.ylabel(str(pop) + '\n' + str(pop.perc_active_cells())[0:4] +
+                       '% active')
+            plt.xlim((0, time))
         plt.xlabel("time (ms)")
         return fig
 
@@ -146,8 +148,8 @@ class GenNetwork(object):
         if not directory:
             directory = os.getcwd()
         if not file_name:
-            local_time_as_string = '_'.join(time.asctime(time.localtime()).split(' '))
-            file_name = str(self) + '_' + local_time_as_string
+            loc_time_str = '_'.join(time.asctime(time.localtime()).split(' '))
+            file_name = str(self) + '_' + loc_time_str
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
@@ -155,12 +157,13 @@ class GenNetwork(object):
         if os.path.isfile(full_file_path):
             raise ValueError("The file already exists.\n" +
                              "shelve_network does not overwrite files.")
-        
-        fig.savefig(full_file_path + ".pdf", dpi = 300, format ='pdf')
-        fig.savefig(full_file_path + ".eps", dpi = 300, format ='eps')
+
+        fig.savefig(full_file_path + ".pdf", dpi=300, format='pdf')
+        fig.savefig(full_file_path + ".eps", dpi=300, format='eps')
 
     def get_properties(self):
-        properties = {'populations': [x.get_properties() for x in self.populations],
+        properties = {'populations': [x.get_properties()
+                                      for x in self.populations],
                       'init_params': self.init_params}
         return properties
 
@@ -172,8 +175,8 @@ class GenNetwork(object):
         if not directory:
             directory = os.getcwd()
         if not file_name:
-            local_time_as_string = '_'.join(time.asctime(time.localtime()).split(' '))
-            file_name = str(self) + '_' + local_time_as_string
+            loc_time_str = '_'.join(time.asctime(time.localtime()).split(' '))
+            file_name = str(self) + '_' + loc_time_str
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
@@ -183,9 +186,9 @@ class GenNetwork(object):
                              "shelve_network does not overwrite files.")
 
         curr_shelve = shelve.open(full_file_path, flag='n')
-        curr_shelve[str(self)] = self.get_properties() # BUG with paradigm_frequency_inhibition
+        # BUG with paradigm_frequency_inhibition at 1Hz, possibly too long sim?
+        curr_shelve[str(self)] = self.get_properties()
         curr_shelve.close()
-        return 1
 
     def __str__(self):
         return str(self.__class__).split("'")[1]
@@ -250,7 +253,6 @@ class Population(object):
             curr_vec = h.Vector()
             curr_vec.record(clamp._ref_i)
             self.VClamps_i.append(curr_vec)
-            
 
     def voltage_recording(self, cells):
         for x in cells:
@@ -307,8 +309,9 @@ class Population(object):
     def plot_aps(self, color='k'):
         cells = []
         for x in self.ap_counters:
+            # as_numpy() doesn't work on windows 10 ???
             try:
-                cells.append(x[0].as_numpy()) # as_numpy() doesn't work on windows 10
+                cells.append(x[0].as_numpy())
             except:
                 cells.append(np.array(x[0]))
 
@@ -341,7 +344,8 @@ class Population(object):
 
     def perc_active_cells(self):
         try:
-            timing_arrays = [x[0].as_numpy() for x in self.ap_counters] # as_numpy doesn't work on windows 10
+            # as_numpy doesn't work on windows 10 ???
+            timing_arrays = [x[0].as_numpy() for x in self.ap_counters]
         except:
             timing_arrays = [np.array(x[0]) for x in self.ap_counters]
         active_counter = 0
@@ -406,7 +410,8 @@ class Population(object):
         properties = {'parent_network': str(self.parent_network),
                       'cell_type': self.cell_type.name,
                       'cell_number': self.get_cell_number(),
-                      'connections': [conn.get_properties() for conn in self.connections],
+                      'connections': [conn.get_properties()
+                                      for conn in self.connections],
                       'ap_time_stamps': ap_time_stamps,
                       'ap_number': ap_numbers,
                       'v_records': v_rec,
@@ -424,7 +429,7 @@ class Population(object):
     def __getitem__(self, item):
         return self.cells[item]
 
-    def next(self):
+    def __next__(self):
         if self.i < (len(self.cells)):
             i = self.i
             self.i += 1
@@ -432,6 +437,9 @@ class Population(object):
         else:
             self.i = 0
             raise StopIteration()
+    
+    def next(self):
+        return self.__next__()
 
 
 class GenConnection(object):
@@ -531,8 +539,10 @@ class tmgsynConnection(GenConnection):
         self.post_pop = post_pop
         pre_pop.add_connection(self)
         post_pop.add_connection(self)
-        pre_pop_rad = (np.arange(pre_pop.get_cell_number(),dtype=float) / pre_pop.get_cell_number()) * (2*np.pi)
-        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) / post_pop.get_cell_number()) * (2*np.pi)
+        pre_pop_rad = (np.arange(pre_pop.get_cell_number(), dtype=float) /
+                       pre_pop.get_cell_number()) * (2*np.pi)
+        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) /
+                        post_pop.get_cell_number()) * (2*np.pi)
 
         pre_pop_pos = pos(pre_pop_rad)
         post_pop_pos = pos(post_pop_rad)
@@ -549,15 +559,17 @@ class tmgsynConnection(GenConnection):
 
             sort_idc = np.argsort(curr_dist)
             closest_cells = sort_idc[0:target_pool]
-            picked_cells = np.random.choice(closest_cells, divergence, replace=False)
+            picked_cells = np.random.choice(closest_cells,
+                                            divergence,
+                                            replace=False)
             pre_cell_target.append(picked_cells)
-            for target_cell in picked_cells:
+            for tar_c in picked_cells:
 
                 curr_syns = []
                 curr_netcons = []
                 curr_conductances = []
 
-                curr_seg_pool = post_pop[target_cell].get_segs_by_name(target_segs)
+                curr_seg_pool = post_pop[tar_c].get_segs_by_name(target_segs)
                 chosen_seg = np.random.choice(curr_seg_pool)
                 for seg in chosen_seg:
                     curr_syn = h.tmgsyn(chosen_seg(0.5))
@@ -567,7 +579,9 @@ class tmgsynConnection(GenConnection):
                     curr_syn.e = e
                     curr_syn.tau_rec = tau_rec
                     curr_syns.append(curr_syn)
-                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
+                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
+                                           curr_syn, thr, delay,
+                                           weight, sec=pre_pop[idx].soma)
                     curr_gvec = h.Vector()
                     curr_gvec.record(curr_syn._ref_g)
                     curr_conductances.append(curr_gvec)
@@ -579,7 +593,8 @@ class tmgsynConnection(GenConnection):
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses
-        
+
+
 class tmgsynConnectionExponentialProb(GenConnection):
 
     def __init__(self, pre_pop, post_pop,
@@ -647,8 +662,10 @@ class tmgsynConnectionExponentialProb(GenConnection):
         self.post_pop = post_pop
         pre_pop.add_connection(self)
         post_pop.add_connection(self)
-        pre_pop_rad = (np.arange(pre_pop.get_cell_number(),dtype=float) / pre_pop.get_cell_number()) * (2*np.pi)
-        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) / post_pop.get_cell_number()) * (2*np.pi)
+        pre_pop_rad = (np.arange(pre_pop.get_cell_number(), dtype=float) /
+                       pre_pop.get_cell_number()) * (2*np.pi)
+        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) /
+                        post_pop.get_cell_number()) * (2*np.pi)
 
         pre_pop_pos = pos(pre_pop_rad)
         post_pop_pos = pos(post_pop_rad)
@@ -669,7 +686,8 @@ class tmgsynConnectionExponentialProb(GenConnection):
                 curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
 
             sort_idc = np.argsort(curr_dist)
-            picked_cells = np.random.choice(sort_idc, divergence, replace=True, p = pdf)
+            picked_cells = np.random.choice(sort_idc, divergence,
+                                            replace=True, p=pdf)
             pre_cell_target.append(picked_cells)
             for target_cell in picked_cells:
 
@@ -686,7 +704,9 @@ class tmgsynConnectionExponentialProb(GenConnection):
                     curr_syn.e = e
                     curr_syn.tau_rec = tau_rec
                     curr_syns.append(curr_syn)
-                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
+                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
+                                           curr_syn, thr, delay, weight,
+                                           sec=pre_pop[idx].soma)
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
@@ -694,7 +714,8 @@ class tmgsynConnectionExponentialProb(GenConnection):
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses
-        
+
+
 class tmgsynConnection_old(GenConnection):
 
     def __init__(self, pre_pop, post_pop,
@@ -762,8 +783,10 @@ class tmgsynConnection_old(GenConnection):
         self.post_pop = post_pop
         pre_pop.add_connection(self)
         post_pop.add_connection(self)
-        pre_pop_rad = (np.arange(pre_pop.get_cell_number(),dtype=float) / pre_pop.get_cell_number()) * (2*np.pi)
-        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) / post_pop.get_cell_number()) * (2*np.pi)
+        pre_pop_rad = (np.arange(pre_pop.get_cell_number(), dtype=float) /
+                       pre_pop.get_cell_number()) * (2*np.pi)
+        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) /
+                        post_pop.get_cell_number()) * (2*np.pi)
 
         pre_pop_pos = pos(pre_pop_rad)
         post_pop_pos = pos(post_pop_rad)
@@ -772,21 +795,22 @@ class tmgsynConnection_old(GenConnection):
         netcons = []
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
-
             curr_dist = []
             for post_cell_pos in post_pop_pos:
                 curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
 
             sort_idc = np.argsort(curr_dist)
             closest_cells = sort_idc[0:target_pool]
-            picked_cells = np.random.choice(closest_cells, divergence, replace=False)
+            picked_cells = np.random.choice(closest_cells,
+                                            divergence,
+                                            replace=False)
             pre_cell_target.append(picked_cells)
-            for target_cell in picked_cells:
+            for tar_c in picked_cells:
 
                 curr_syns = []
                 curr_netcons = []
 
-                curr_seg_pool = post_pop[target_cell].get_segs_by_name(target_segs)
+                curr_seg_pool = post_pop[tar_c].get_segs_by_name(target_segs)
                 chosen_seg = np.random.choice(curr_seg_pool)
                 for seg in chosen_seg:
                     curr_syn = h.tmgsyn(chosen_seg(0.5))
@@ -796,7 +820,9 @@ class tmgsynConnection_old(GenConnection):
                     curr_syn.e = e
                     curr_syn.tau_rec = tau_rec
                     curr_syns.append(curr_syn)
-                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
+                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
+                                           curr_syn, thr, delay, weight,
+                                           sec=pre_pop[idx].soma)
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
@@ -823,8 +849,10 @@ class Exp2SynConnection(GenConnection):
         self.post_pop = post_pop
         pre_pop.add_connection(self)
         post_pop.add_connection(self)
-        pre_pop_rad = (np.arange(pre_pop.get_cell_number(),dtype=float) / pre_pop.get_cell_number()) * (2*np.pi)
-        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) / post_pop.get_cell_number()) * (2*np.pi)
+        pre_pop_rad = (np.arange(pre_pop.get_cell_number(), dtype=float) /
+                       pre_pop.get_cell_number()) * (2*np.pi)
+        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) /
+                        post_pop.get_cell_number()) * (2*np.pi)
         self.pre_pop_rad = pre_pop_rad
         self.post_pop_rad = post_pop_rad
 
@@ -838,17 +866,19 @@ class Exp2SynConnection(GenConnection):
 
             curr_dist = []
             for post_cell_pos in post_pop_pos:
-                curr_dist.append(euclidian_dist(curr_cell_pos,post_cell_pos))
+                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
 
             sort_idc = np.argsort(curr_dist)
             closest_cells = sort_idc[0:target_pool]
-            picked_cells = np.random.choice(closest_cells, divergence, replace = False)
+            picked_cells = np.random.choice(closest_cells,
+                                            divergence,
+                                            replace=False)
             pre_cell_target.append(picked_cells)
-            for target_cell in picked_cells:
+            for tar_c in picked_cells:
                 curr_syns = []
                 curr_netcons = []
 
-                curr_seg_pool = post_pop[target_cell].get_segs_by_name(target_segs)
+                curr_seg_pool = post_pop[tar_c].get_segs_by_name(target_segs)
                 chosen_seg = np.random.choice(curr_seg_pool)
                 for seg in chosen_seg:
                     curr_syn = h.Exp2Syn(chosen_seg(0.5))
@@ -856,7 +886,9 @@ class Exp2SynConnection(GenConnection):
                     curr_syn.tau2 = tau2
                     curr_syn.e = e
                     curr_syns.append(curr_syn)
-                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v, curr_syn, thr, delay, weight, sec = pre_pop[idx].soma)
+                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
+                                           curr_syn, thr, delay, weight,
+                                           sec=pre_pop[idx].soma)
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
@@ -865,53 +897,6 @@ class Exp2SynConnection(GenConnection):
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses
 
-#Possibly Depracate
-"""class PerforantPathStimulation(object):
-
-    This class connects a pre and a post synaptic population with a Exp2Syn
-    synapse.
-
-
-    def __init__(self, post_pop, n_targets, target_segs,
-                 tau1, tau2, e, thr, delay, weight):
-
-        divergence,
-                 tau1, tau2, e, g_max, thr, delay, weight, name = "GC->MC"
-
-
-        synapses = []
-        netcons = []
-        netstims = []
-
-
-        if type(n_targets) == int:
-            # Select n_targets from post_pop
-            target_cells = np.random.choice(post_pop.cells, n_targets, replace = False)
-        else:
-            target_cells = post_pop.cells[n_targets]
-
-        for curr_cell in target_cells:
-            curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
-            for seg in curr_seg_pool:
-                chosen_seg = np.random.choice(curr_seg_pool)
-                curr_syn = h.Exp2Syn(seg(0.5))
-                curr_syn.tau1 = tau1
-                curr_syn.tau2 = tau2
-                curr_syn.e = e
-                curr_netstim = h.NetStim()
-                curr_netstim.number = 1
-                curr_netstim.start = 3
-                curr_netcon = h.NetCon(curr_netstim, curr_syn, thr, delay, weight)
-                netstims.append(curr_netstim)
-                netcons.append(curr_netcon)
-                synapses.append(curr_syn)
-            
-                
-        self.netcons = netcons
-        self.pre_cell_targets = np.array(target_cells)
-        self.synapses = synapses
-        self.netstims = netstims
-        # Make the synapse"""
 
 class PerforantPathStimulation(object):
     """
@@ -934,14 +919,14 @@ class PerforantPathStimulation(object):
 
         if type(n_targets) == int:
             # Select n_targets from post_pop
-            target_cells = np.random.choice(post_pop.cells, n_targets, replace = False)
+            target_cells = np.random.choice(post_pop.cells, n_targets,
+                                            replace=False)
         else:
             target_cells = post_pop.cells[n_targets]
 
         for curr_cell in target_cells:
             curr_seg_pool = curr_cell.get_segs_by_name(target_segs)
             for seg in curr_seg_pool:
-                #chosen_seg = np.random.choice(curr_seg_pool)
                 curr_syn = h.Exp2Syn(seg(0.5))
                 curr_syn.tau1 = tau1
                 curr_syn.tau2 = tau2
@@ -949,19 +934,19 @@ class PerforantPathStimulation(object):
                 curr_netcon = h.NetCon(stim, curr_syn, thr, delay, weight)
                 netcons.append(curr_netcon)
                 synapses.append(curr_syn)
-                
+
         self.netcons = netcons
         self.pre_cell_targets = np.array(target_cells)
         self.synapses = synapses
-        # Make the synapse
-        
+
+
 class PerforantPathPoissonStimulation(object):
     """
     Patterned Perforant Path stimulation as in Yim et al. 2015.
     uses vecevent.mod -> h.VecStim
     """
     def __init__(self, post_pop, t_pattern, spat_pattern, target_segs,
-                tau1, tau2, e, weight):
+                 tau1, tau2, e, weight):
 
         post_pop.add_connection(self)
         synapses = []
@@ -992,11 +977,12 @@ class PerforantPathPoissonStimulation(object):
                 """for event in pattern:
                     curr_netcon.event(event)"""
             conductances.append(curr_conductances)
-                    
+
         self.netcons = netcons
         self.pre_cell_targets = np.array(target_cells)
         self.synapses = synapses
         self.conductances = conductances
+
 
 class PerforantPathPoissonTmgsyn(GenConnection):
     """
@@ -1010,7 +996,7 @@ class PerforantPathPoissonTmgsyn(GenConnection):
         post_pop.add_connection(self)
         synapses = []
         netcons = []
-        t_pattern = list(t_pattern) # nrn does not like np.ndarrays?
+        t_pattern = list(t_pattern)  # nrn does not like np.ndarrays?
         target_cells = post_pop[spat_pattern]
         self.pre_pop = 'Implicit'
         self.post_pop = post_pop
@@ -1044,27 +1030,22 @@ class PerforantPathPoissonTmgsyn(GenConnection):
         self.synapses = synapses
 
 
-"""HELPERS"""
+# Helpers
 def pos(rad):
     """
     (x,y) position of a point on a circle with axis origin at (0,0)
     and radius 1.
     x = cx + r * cos(rad) -> x = cos(rad)
     y = cy + r * sin(rad) -> y = sin(rad)
-    
+
     Returns a list of tuples that give the point of each radian passed.
     """
     x_arr = list(np.cos(rad))
     y_arr = list(np.sin(rad))
-    
-    return [(x_arr[idx],y_arr[idx]) for idx in range(len(x_arr))]
 
-def euclidian_dist(p1,p2):
+    return [(x_arr[idx], y_arr[idx]) for idx in range(len(x_arr))]
+
+
+def euclidian_dist(p1, p2):
     """ p1 and p2 must both be of len 2 where p1 = (x1,y1); p2 = (x2,y2)"""
     return math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
-    
-    
-    
-    
-    
-    

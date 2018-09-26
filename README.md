@@ -10,8 +10,13 @@ changes based on new literature and our own in-vitro findings.
 
 To use pyDentate for yourself or reproduce our findings, you will need to install [NEURON](https://www.neuron.yale.edu/neuron/) and your python environment needs to be aware
 of the \nrn\lib\python\neuron package that is installed with NEURON and the NEURON .dlls need to be available to python. Finally, you will need to compile the NEURON meachnisms
-that come with pyDentate in pyDenate/mechs on your machine with NEURONs mknrndll tool which will give you a nrnmech.dll file. The paradigm scripts run networks and in these
+that come with pyDentate in pyDenate/mechs on your machine with NEURONs mknrndll tool (nrnivmodl on linux) which will give you a nrnmech.dll file. The paradigm scripts run networks and in these
 scripts you need to give the path to that nrnmech.dll file.
+
+All published results were produced with NEURON7.4 and Python 2.7
+The Model also runs in Python 3 and Neuron 7.5 and 7.6 but for unknown reasons the exact spike times do not replicate.
+Refer to pyDentate\output_examples to see outputs generated with different versions.
+
 If you experience problems with running pydentate contact danielmuellermsc@gmail.com.
 
 # Author
