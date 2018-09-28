@@ -36,7 +36,7 @@ class GenNeuron(object):
     Ball-and-stick neuron with default geometry
     """
 
-    def mk_soma(self, diam, L, name=None):
+    def mk_soma(self, diam=None, L=None, name=None):
         """Assignes self.soma a hoc section with dimensions diam and L.
         Uses nrn defaults when None. Name defaults to 'soma'.
         Before mk_soma is called, self.soma = None.
