@@ -6,7 +6,7 @@ Auto init and run
 @author: DanielM
 """
 
-from neuron import h
+from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_tunedrev
 import os
@@ -91,7 +91,9 @@ for run in runs:
     nw.populations[0].voltage_recording(stim_cells)
 
     """Initialization for -2000 to -100"""
+    h.cvode.active(0)
     dt = 0.01
+    h.steps_per_ms = 1.0/dt
     h.finitialize(-60)
     h.t = -2000
     h.secondorder = 0

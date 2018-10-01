@@ -6,7 +6,7 @@ Auto init and run
 @author: DanielM
 """
 
-from neuron import h
+from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_nonfacilitatingrev
 import os
@@ -112,6 +112,7 @@ for run in runs:
     h.dt = 10
     while h.t < -100:
         h.fadvance()
+
     h.secondorder = 2
     h.t = 0
     h.dt = 0.01
