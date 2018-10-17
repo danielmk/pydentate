@@ -17,186 +17,6 @@ import shelve
 import scipy.stats as stats
 
 
-class GenNetwork(object):
-    """The GenNetwork class organizes populations and connections to a network.
-    It uses methods to create gennetwork.Population and Connection classes.
-    The GenNetwork provides the logic common in creating a network model and
-    keeping track of all the cells, synapses, netcons involved. It also sets up
-    measuring vectors for entire populations.
-
-    Attributes
-    ----------
-    populations - list
-        A list of the populations currently present in the network
-    connections - list
-        A list of connections currently present in the network
-
-    Methods
-    -------
-    __init__
-    mk_Exp2SynConnection
-    mk_PerforantPathStimulation
-    mk_Sprouting
-    current_clamp
-    voltage_recording
-    set_numpy_seed
-    run_network
-
-    Use cases
-    ---------
-    >>> GenNetwork([GranuleCell, MossyCell], [500,15])
-    Create an unconnected network of 500 Granule and 15 Mossy cells.
-    """
-
-    def __init__(self, celltypes=None, cellnums=None):
-        """Initialize instance empty or with cell populations.
-        See gennetwork.Population for detailed implementation of Population.
-
-        Parameters
-        ----------
-        celltypes - sequence of GenNeuron instances or subclasses thereof
-            the threshold value for action potential detection
-        cellnums - numeric sequence
-            specifies number of neurons per population. same len as celltypes
-
-        Returns
-        -------
-        self
-
-        Use Cases
-        ---------
-        >>> GenNetwork([GranuleCell, MossyCell], [500,15])
-        Create a network with 500 granule cells and 15 mossy cells.
-        """
-
-        self.populations = []
-        self.connections = []
-        if celltypes is None:
-            return
-
-        if cellnums is None:
-            return
-
-        for idx, cell_type in enumerate(celltypes):
-            self.populations.append(Population(cell_type, cellnums[idx], self))
-
-    def mk_population(self, cell_type, n_cells):
-        """Initialize instance empty or with cell populations.
-        See gennetwork.Population for detailed implementation of Population.
-
-        Parameters
-        ----------
-        celltypes - sequence of GenNeuron instances or subclasses thereof
-            the threshold value for action potential detection
-        cellnums - numeric sequence
-            specifies number of neurons per population. same len as celltypes
-
-        Returns
-        -------
-        self
-
-        """
-
-        if not hasattr(self, 'populations'):
-            self.populations = []
-
-        self.populations.append(Population(cell_type, n_cells, self))
-
-    def voltage_recording(self, cell_type):
-        rnd_int = random.randint(0, len(self.cells[cell_type]) - 1)
-        soma_v_vec, t_vec = self.cells[cell_type][rnd_int]._voltage_recording()
-        return soma_v_vec, t_vec
-
-    def set_numpy_seed(self, seed):
-        """
-        Allows you to set the seed of the numpy.random generator that
-        GenNetwork and other classes in gennetwork are using.
-        You can also access the random number.
-        """
-        np.random.seed(seed)
-        return np.random.seed
-
-    def run_network(self, tstop=1000, dt=1):
-        raise NotImplemented("run_network is not implemented yet")
-        h.tstop = tstop
-        h.run()
-
-    def plot_aps(self, time=200):
-        fig = plt.figure(figsize=(8.27, 11.69))
-        for idx, pop in enumerate(self.populations):
-            cells = []
-            for ap_count in pop.ap_counters:
-                # as_numpy() doesn't work on windows 10???
-                try:
-                    cells.append(ap_count[0].as_numpy())
-                except:
-                    cells.append(np.array(ap_count[0]))
-            # Workaround for matplotlib bug. plt.eventplot throws error when
-            # first element empty
-            if not np.array(cells[0]).any():
-                cells[0] = np.array([0], dtype=float)
-
-            plt.subplot(4, 1, idx+1)
-            plt.eventplot(cells)
-            plt.ylabel(str(pop) + '\n' + str(pop.perc_active_cells())[0:4] +
-                       '% active')
-            plt.xlim((0, time))
-        plt.xlabel("time (ms)")
-        return fig
-
-    def save_ap_fig(self, fig, directory=None, file_name=None):
-        if not directory:
-            directory = os.getcwd()
-        if not file_name:
-            loc_time_str = '_'.join(time.asctime(time.localtime()).split(' '))
-            file_name = str(self) + '_' + loc_time_str
-        if not os.path.isdir(directory):
-            os.mkdir(directory)
-
-        full_file_path = directory + "\\" + file_name
-        if os.path.isfile(full_file_path):
-            raise ValueError("The file already exists.\n" +
-                             "shelve_network does not overwrite files.")
-
-        fig.savefig(full_file_path + ".pdf", dpi=300, format='pdf')
-        fig.savefig(full_file_path + ".eps", dpi=300, format='eps')
-
-    def get_properties(self):
-        properties = {'populations': [x.get_properties()
-                                      for x in self.populations],
-                      'init_params': self.init_params}
-        return properties
-
-    def shelve_network(self, directory=None, file_name=None):
-        """Saves the complete network information to a python shelve file.
-        Goes down from the network to populations to connections and uses their
-        get_properties() methods to extract all the information.
-        """
-        if not directory:
-            directory = os.getcwd()
-        if not file_name:
-            loc_time_str = '_'.join(time.asctime(time.localtime()).split(' '))
-            file_name = str(self) + '_' + loc_time_str
-        if not os.path.isdir(directory):
-            os.mkdir(directory)
-
-        full_file_path = directory + "\\" + file_name + '.pydd'
-        if os.path.isfile(full_file_path):
-            raise ValueError("The file already exists.\n" +
-                             "shelve_network does not overwrite files.")
-
-        curr_shelve = shelve.open(full_file_path, flag='n')
-        # BUG with paradigm_frequency_inhibition at 1Hz, possibly too long sim?
-        curr_shelve[str(self)] = self.get_properties()
-        curr_shelve.close()
-
-    def __str__(self):
-        return str(self.__class__).split("'")[1]
-
-
-
-
-
 class GenConnection(object):
     def __init__(self):
         pass
@@ -343,6 +163,285 @@ class tmgsynConnection(GenConnection):
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
+            conductances.append(curr_conductances)
+        self.conductances = conductances
+        self.netcons = netcons
+        self.pre_cell_targets = np.array(pre_cell_target)
+        self.synapses = synapses
+
+
+class pyr2pyrConnCA3(GenConnection):
+
+    def __init__(self, pre_pop, post_pop,
+                 target_pool, target_segs, divergence, thr, weight,
+                 initW, Max, Min, Delay, Ratio, ConPattern, Lambda1, Lambda2,
+                 threshold1, threshold2, tauD1, d1, tauD2, d2, tauF, f, erev,
+                 bACH, aDA, bDA, wACH, Alpha_ampa, Beta_ampa, Cdur_ampa,
+                 gbar_ampa, Alpha_nmda, Beta_nmda, Cdur_nmda, gbar_nmda,
+                 GaussA):
+        """TODO DOC
+
+        Parameters
+        ----------
+        pre_pop - gennetwork.Population
+            The presynaptic population
+        post_pop - gennetwork.Population
+            the postsynaptic population
+        target_pool - int
+            the number of cells in the target pool
+        target_segs - str
+            the name of the segments that are possible synaptic targets at the
+            postsynaptic population
+        divergence - int
+            divergence in absolute terms, that is the number of synapses each
+            presynaptic cell forms
+        tau_1 - numeric
+            the time constant of synaptic decay. conforms to the transition
+            from the active to the inactive resource state. units of time as in
+            neuron standard units
+        tau_facil - numeric
+            the time constant of facilitation decay. this essentially creates
+            the frequency dependence. set to 0 for no facilitation.
+        U - numeric
+            maximum of postsynaptic response. has to be considered together
+            with the weight from the netcon.
+        tau_rec - numeric
+            time constant of recovery from inactive for recovered state.
+            gives depression since inactive resources do not contribute to
+            postsynaptic signal. set to 0 for no depression.
+        e - numeric
+            equilibrium potential of the postsynaptic conductance
+        thr - numeric
+            threshold for synaptic event at the presynaptic source
+        delay - numeric
+            delay between presynaptic signal and onset of postsynaptic signal
+        weight - numeric
+            weight for the netcon object connecting source and target
+
+        Returns
+        -------
+        None
+
+        Use Cases
+        ---------
+        >>> tmgsynConnection(nw.population[0], nw.population[1],
+                             3, 'prox', 1, 6.0, 0, 0.04, 0, 0, 10, 3, 0)
+        A non-facilitating, non-depressing excitatory connection.
+
+        """
+        self.init_parameters = locals()
+        self.pre_pop = pre_pop
+        self.post_pop = post_pop
+        pre_pop.add_connection(self)
+        post_pop.add_connection(self)
+        pre_pop_rad = (np.arange(pre_pop.get_cell_number(), dtype=float) /
+                       pre_pop.get_cell_number()) * (2*np.pi)
+        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) /
+                        post_pop.get_cell_number()) * (2*np.pi)
+
+        pre_pop_pos = pos(pre_pop_rad)
+        post_pop_pos = pos(post_pop_rad)
+        pre_cell_target = []
+        synapses = []
+        netcons = []
+        conductances = []
+
+        for idx, curr_cell_pos in enumerate(pre_pop_pos):
+
+            curr_dist = []
+            for post_cell_pos in post_pop_pos:
+                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
+
+            sort_idc = np.argsort(curr_dist)
+            closest_cells = sort_idc[0:target_pool]
+            picked_cells = np.random.choice(closest_cells,
+                                            divergence,
+                                            replace=False)
+            pre_cell_target.append(picked_cells)
+            for tar_c in picked_cells:
+
+                curr_syns = []
+                curr_netcons = []
+                curr_conductances = []
+
+                curr_syn = h.pyr2pyr(post_pop[tar_c].soma(0.5))
+                curr_syn.initW = initW
+                curr_syn.Wmax = Max
+                curr_syn.Wmin = Min
+                curr_syn.lambda1 = Lambda1
+                curr_syn.lambda2 = Lambda2
+                curr_syn.threshold1 = threshold1
+                curr_syn.threshold2 = threshold2
+                curr_syn.tauD1 = tauD1
+                curr_syn.d1 = d1
+                curr_syn.tauD2 = tauD2
+                curr_syn.d2 = d2
+                curr_syn.tauF = tauF
+                curr_syn.f = f
+                curr_syn.Erev_ampa = erev
+                curr_syn.Erev_nmda = erev
+                curr_syn.bACH = bACH
+                curr_syn.aDA = aDA
+                curr_syn.bDA = bDA
+                curr_syn.wACH = wACH
+                curr_syn.AlphaTmax_ampa = Alpha_ampa
+                curr_syn.Beta_ampa = Beta_ampa
+                curr_syn.Cdur_ampa = Cdur_ampa
+                curr_syn.gbar_ampa = gbar_ampa
+                curr_syn.AlphaTmax_nmda = Alpha_nmda
+                curr_syn.Beta_nmda = Beta_nmda
+                curr_syn.Cdur_nmda = Cdur_nmda
+                curr_syn.gbar_nmda = gbar_nmda
+
+                curr_syns.append(curr_syn)
+                curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
+                                       curr_syn, thr, Delay,
+                                       weight, sec=pre_pop[idx].soma)
+                #curr_gvec = h.Vector()
+                #curr_gvec.record(curr_syn._ref_g)
+                #curr_conductances.append(curr_gvec)
+                curr_netcons.append(curr_netcon)
+                netcons.append(curr_netcons)
+                synapses.append(curr_syns)
+            conductances.append(curr_conductances)
+        self.conductances = conductances
+        self.netcons = netcons
+        self.pre_cell_targets = np.array(pre_cell_target)
+        self.synapses = synapses
+        
+class inter2pyrConnCA3(GenConnection):
+
+    def __init__(self, pre_pop, post_pop,
+                 target_pool, target_segs, divergence, thr, weight,
+                 initW, Max, Min, Delay, Ratio, ConPattern, Lambda1, Lambda2,
+                 threshold1, threshold2, tauD1, d1, tauD2, d2, tauF, f, erev,
+                 bACH, aDA, bDA, wACH, Alpha_gabaa, Beta_gabaa, Cdur_gabaa,
+                 gbar_gabaa, Alpha_gabab, Beta_gabab, Cdur_gabab, gbar_gabab,
+                 GaussA):
+        """TODO DOC
+
+        Parameters
+        ----------
+        pre_pop - gennetwork.Population
+            The presynaptic population
+        post_pop - gennetwork.Population
+            the postsynaptic population
+        target_pool - int
+            the number of cells in the target pool
+        target_segs - str
+            the name of the segments that are possible synaptic targets at the
+            postsynaptic population
+        divergence - int
+            divergence in absolute terms, that is the number of synapses each
+            presynaptic cell forms
+        tau_1 - numeric
+            the time constant of synaptic decay. conforms to the transition
+            from the active to the inactive resource state. units of time as in
+            neuron standard units
+        tau_facil - numeric
+            the time constant of facilitation decay. this essentially creates
+            the frequency dependence. set to 0 for no facilitation.
+        U - numeric
+            maximum of postsynaptic response. has to be considered together
+            with the weight from the netcon.
+        tau_rec - numeric
+            time constant of recovery from inactive for recovered state.
+            gives depression since inactive resources do not contribute to
+            postsynaptic signal. set to 0 for no depression.
+        e - numeric
+            equilibrium potential of the postsynaptic conductance
+        thr - numeric
+            threshold for synaptic event at the presynaptic source
+        delay - numeric
+            delay between presynaptic signal and onset of postsynaptic signal
+        weight - numeric
+            weight for the netcon object connecting source and target
+
+        Returns
+        -------
+        None
+
+        Use Cases
+        ---------
+        >>> tmgsynConnection(nw.population[0], nw.population[1],
+                             3, 'prox', 1, 6.0, 0, 0.04, 0, 0, 10, 3, 0)
+        A non-facilitating, non-depressing excitatory connection.
+
+        """
+        self.init_parameters = locals()
+        self.pre_pop = pre_pop
+        self.post_pop = post_pop
+        pre_pop.add_connection(self)
+        post_pop.add_connection(self)
+        pre_pop_rad = (np.arange(pre_pop.get_cell_number(), dtype=float) /
+                       pre_pop.get_cell_number()) * (2*np.pi)
+        post_pop_rad = (np.arange(post_pop.get_cell_number(), dtype=float) /
+                        post_pop.get_cell_number()) * (2*np.pi)
+
+        pre_pop_pos = pos(pre_pop_rad)
+        post_pop_pos = pos(post_pop_rad)
+        pre_cell_target = []
+        synapses = []
+        netcons = []
+        conductances = []
+
+        for idx, curr_cell_pos in enumerate(pre_pop_pos):
+
+            curr_dist = []
+            for post_cell_pos in post_pop_pos:
+                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
+
+            sort_idc = np.argsort(curr_dist)
+            closest_cells = sort_idc[0:target_pool]
+            picked_cells = np.random.choice(closest_cells,
+                                            divergence,
+                                            replace=False)
+            pre_cell_target.append(picked_cells)
+            for tar_c in picked_cells:
+
+                curr_syns = []
+                curr_netcons = []
+                curr_conductances = []
+
+                curr_syn = h.inter2pyr(post_pop[tar_c].soma(0.5))
+                curr_syn.initW = initW
+                curr_syn.Wmax = Max
+                curr_syn.Wmin = Min
+                curr_syn.lambda1 = Lambda1
+                curr_syn.lambda2 = Lambda2
+                curr_syn.threshold1 = threshold1
+                curr_syn.threshold2 = threshold2
+                curr_syn.tauD1 = tauD1
+                curr_syn.d1 = d1
+                curr_syn.tauD2 = tauD2
+                curr_syn.d2 = d2
+                curr_syn.tauF = tauF
+                curr_syn.f = f
+                curr_syn.Erev_gabaa = erev
+                curr_syn.Erev_gabab = erev
+                curr_syn.bACH = bACH
+                curr_syn.aDA = aDA
+                curr_syn.bDA = bDA
+                curr_syn.wACH = wACH
+                curr_syn.AlphaTmax_gabaa = Alpha_gabaa
+                curr_syn.Beta_gabaa = Beta_gabaa
+                curr_syn.Cdur_gabaa = Cdur_gabaa
+                curr_syn.gbar_gabaa = gbar_gabaa
+                curr_syn.AlphaTmax_gabab = Alpha_gabab
+                curr_syn.Beta_gabab = Beta_gabab
+                curr_syn.Cdur_gabab = Cdur_gabab
+                curr_syn.gbar_gabab = gbar_gabab
+
+                curr_syns.append(curr_syn)
+                curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
+                                       curr_syn, thr, Delay,
+                                       weight, sec=pre_pop[idx].soma)
+                #curr_gvec = h.Vector()
+                #curr_gvec.record(curr_syn._ref_g)
+                #curr_conductances.append(curr_gvec)
+                curr_netcons.append(curr_netcon)
+                netcons.append(curr_netcons)
+                synapses.append(curr_syns)
             conductances.append(curr_conductances)
         self.conductances = conductances
         self.netcons = netcons
@@ -885,14 +984,6 @@ class Population(object):
             self.cells.append(cell_type())
 
         self.cells = np.array(self.cells, dtype=object)
-
-    def mk_2dtopology(self, width, height):
-        loc_matrix = np.ndarray(self.get_cell_number(), 2)
-        aspect = width/height
-        n_cells = self.get_cell_number()
-        n_height = n_cells / aspect
-        n_width
-        
 
     def get_cell_number(self):
         """Return the number of cells"""
