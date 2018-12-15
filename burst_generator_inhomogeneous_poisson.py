@@ -111,3 +111,7 @@ def hom_poiss(rate):
             bad_idc = bad_idc + 1
 
     return array_like
+
+if __name__ =='__main__':
+    np.random.seed(10000)
+    temporal_patterns = inhom_poiss(rate=10)

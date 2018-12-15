@@ -40,9 +40,9 @@ def get_perc_active_n_aps(file_name):
 
 
 if __name__ == '__main__':
-    data_path = "Z:\\pyDentate\\pyDentateData\\pattern_separation_data_local_30Hz_input\\seed10006\\scale1000\\net_disinhibitedrev\\"
+    data_path = "Z:\\pyDentate\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\input_patterns_seed_10000\\"
     # file_name = "net_tunedrev.TunedNetwork_run_scale_000_1000.pydd"
-    data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.pydd' in f and not '.npz' in f]
+    data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and not 'norm' in f and not 'trifilt' in f]
     perc_active_list = []
     avg_n_aps_list = []
     for x in data_files:

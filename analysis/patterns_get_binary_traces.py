@@ -21,7 +21,7 @@ def get_binary_traces(data_path):
             print(x)
             data = shelve.open(data_path + '\\' + x)
             curr_spike_data = analysis_main.time_stamps_to_signal(data[data.keys()[0]]['populations'][0]['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600)
-            np.savez(save_path + '\\' + x + '_spike_data', curr_spike_data)
+            np.savez(save_path + '\\' + x + '_spike_data', np.array(curr_spike_data, dtype = np.bool))
         else:
             print("_spike_data file already present")
 
