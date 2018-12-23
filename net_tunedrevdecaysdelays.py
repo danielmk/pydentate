@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-This module implements the class TunedNetwork.
-TunedNetwork creates a ring network as defined in Santhakumar et al. 2005
+This module implements the class StandardNetwork.
+StandardNetwork creates a ring network as defined in Santhakumar et al. 2005
 with some changes as in Yim et al. 2015.
 See StandardNetwork docstring for details.
 Created on Tue Nov 28 13:01:38 2017
@@ -26,7 +26,9 @@ class TunedNetwork(gennetwork.GenNetwork):
 
     def __init__(self, seed=None, temporal_patterns=np.array([]),
                  spatial_patterns_gcs=np.array([]),
-                 spatial_patterns_bcs=np.array([])):
+                 spatial_patterns_bcs=np.array([]), BC_decay=20, HC_decay=20,
+                 BC_delay=0.85, HC_delay=3.8, BC_weight=1.2*10**(-3),
+                 HC_weight=0.6*10**(-2)):
         self.init_params = locals()
         self.init_params['self'] = str(self.init_params['self'])
         # Setup cells
@@ -101,8 +103,8 @@ class TunedNetwork(gennetwork.GenNetwork):
         # BC -> GC
         # # synapses x3; Weight *1/4; tau from 5.5 to 20 (Hefft & Jonas, 2005)
         gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
-                                    560, 'soma', 400, 20, 0, 1, 0, -70, 10,
-                                    0.85, 1.2*10**(-3))
+                                    560, 'soma', 400, BC_decay, 0, 1, 0, -70, 10,
+                                    BC_delay, BC_weight)
 
         # We reseed here to make sure that those connections are consistent
         # between this and net_global which has a global target pool for
@@ -123,8 +125,8 @@ class TunedNetwork(gennetwork.GenNetwork):
         # HC -> GC
         # Weight x10; Nr synapses x4; tau from 6 to 20 (Hefft & Jonas, 2005)
         gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
-                                    2000, 'dd', 640, 20, 0, 1, 0, -70, 10,
-                                    3.8, 0.6*10**(-2))
+                                    2000, 'dd', 640, HC_decay, 0, 1, 0, -70, 10,
+                                    HC_delay, HC_weight)
 
         # HC -> MC
         gennetwork.tmgsynConnection(self.populations[3], self.populations[1],
