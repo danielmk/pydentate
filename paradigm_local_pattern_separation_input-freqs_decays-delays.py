@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar 05 13:41:23 2018
+The output files have the following structure
+nw-name_run_seed_input-freq_input-scale_bc-decay_hc-decay_bc-delay_hc-delay_gc-weight_bc-weight_hc-weight
 
 @author: DanielM
 """
@@ -62,14 +63,19 @@ pr.add_argument('-hc_delay',
                 help='decay time constant of HC to GC synapse in ms',
                 default=3.8,
                 dest='hc_delay')
+pr.add_argument('-gc_weight',
+                type=float,
+                help='weight of GC to BC and HC synapses',
+                default=2.5*10**(-2),
+                dest='gc_weight')
 pr.add_argument('-bc_weight',
                 type=float,
-                help='decay time constant of BC to GC synapse in ms',
+                help='weight of BC to GC synapses',
                 default=1.2*10**(-3),
                 dest='bc_weight')
 pr.add_argument('-hc_weight',
                 type=float,
-                help='decay time constant of HC to GC synapse in ms',
+                help='weight of HC to GC synapses',
                 default=0.6*10**(-2),
                 dest='hc_weight')
 
@@ -83,6 +89,7 @@ bc_decay = args.bc_decay
 hc_decay = args.hc_decay
 bc_delay = args.bc_delay
 hc_delay = args.hc_delay
+gc_weight = args.gc_weight
 bc_weight = args.bc_weight
 hc_weight = args.hc_weight
 
@@ -152,9 +159,10 @@ for seed in seeds:
                                                    hc_decay,
                                                    bc_delay,
                                                    hc_delay,
+                                                   gc_weight,
                                                    bc_weight,
                                                    hc_weight)
-
+        break
         # Attach voltage recordings to all cells
         nw.populations[0].voltage_recording(range(2000))
         nw.populations[1].voltage_recording(range(60))
@@ -182,18 +190,18 @@ for seed in seeds:
             h.fadvance()
         print("Done Running")
 
-        save_file_name = (str(nw) + "delaydecay_run_seed_input-frequency_scale_" +
-                                "bcdc_hcdc_bcdl_hcdl_bcw_hcw_" +
-                                str(run).zfill(3) + '_' +
-                                str(seed).zfill(5) + '_' +
-                                str(input_freq) + '_' +
-                                str(input_scale).zfill(3) + '_' +
-                                str(bc_decay).zfill(3) + '_' + 
-                                str(hc_decay).zfill(3) + '_' +
-                                str(bc_delay).zfill(6) + '_' + 
-                                str(hc_delay).zfill(6) + '_' +
-                                str(bc_weight).zfill(6) + '_' + 
-                                str(hc_weight).zfill(6))
+        save_file_name = (str(nw) + '_' +
+                          str(run).zfill(3) + '_' +
+                          str(seed).zfill(5) + '_' +
+                          str(input_freq) + '_' +
+                          str(input_scale).zfill(3) + '_' +
+                          str(bc_decay).zfill(3) + '_' + 
+                          str(hc_decay).zfill(3) + '_' +
+                          str(bc_delay).zfill(6) + '_' + 
+                          str(hc_delay).zfill(6) + '_' +
+                          str(gc_weight).zfill(6) + '_' + 
+                          str(bc_weight).zfill(6) + '_' + 
+                          str(hc_weight).zfill(6))
     
         ap_time_stamps = [np.array(x[0]) for x in nw.populations[0].ap_counters]
         ap_binary_array = np.zeros((2000,int(600/dt)), dtype=np.uint8)

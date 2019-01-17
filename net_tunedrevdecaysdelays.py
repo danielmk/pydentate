@@ -27,7 +27,7 @@ class TunedNetwork(gennetwork.GenNetwork):
     def __init__(self, seed=None, temporal_patterns=np.array([]),
                  spatial_patterns_gcs=np.array([]),
                  spatial_patterns_bcs=np.array([]), BC_decay=20, HC_decay=20,
-                 BC_delay=0.85, HC_delay=3.8, BC_weight=1.2*10**(-3),
+                 BC_delay=0.85, HC_delay=3.8, GC_weight = 2.5*10**(-2), BC_weight=1.2*10**(-3),
                  HC_weight=0.6*10**(-2)):
         self.init_params = locals()
         self.init_params['self'] = str(self.init_params['self'])
@@ -77,13 +77,13 @@ class TunedNetwork(gennetwork.GenNetwork):
         # Weight x4, target_pool = 2
         gennetwork.tmgsynConnection(self.populations[0], self.populations[2],
                                     8, 'proxd', 1, 8.7, 500, 0.1, 0, 0, 10,
-                                    0.8, 2.5*10**(-2))
+                                    0.8, GC_weight)
 
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.
         gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
                                     24, 'proxd', 1, 8.7, 500, 0.1, 0, 0, 10,
-                                    1.5, 2.5*10**(-2))
+                                    1.5, GC_weight)
 
         # MC -> MC
         gennetwork.tmgsynConnection(self.populations[1], self. populations[1],
