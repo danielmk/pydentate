@@ -154,8 +154,8 @@ for seed in seeds:
     np.random.seed(input_seed)
     temporal_patterns = inhom_poiss(rate=10)
 
-    seed_input_patterns = []
-    seed_output_patterns = []
+    seed_input_vectors = []
+    seed_output_vectors = []
     # Start the runs of the model
     for run in runs:
         print("Run: " + str(run))
@@ -170,7 +170,7 @@ for seed in seeds:
                                                    gc_weight,
                                                    bc_weight,
                                                    hc_weight)
-        break
+
         # Attach voltage recordings to all cells
         nw.populations[0].voltage_recording(range(2000))
         nw.populations[1].voltage_recording(range(60))
@@ -198,24 +198,56 @@ for seed in seeds:
             h.fadvance()
         print("Done Running")
 
+        output_pop_vector = np.array([x[1].n for x in nw.populations[0].ap_counters])
+        seed_output_vectors.append(output_pop_vector)
+        input_pop_vector = np.zeros(temporal_patterns.shape[0])
+        input_pop_vector[0+run:24+run] = [x.shape[0] for x in temporal_patterns[0+run:24+run]]
+        seed_output_vectors.append(input_pop_vector)
+
         save_file_name = (str(nw) + '_' +
                           str(run).zfill(3) + '_' +
                           str(seed).zfill(5) + '_' +
                           str(input_seed).zfill(5) + '_' +
                           str(input_freq) + '_' +
                           str(input_scale).zfill(3) + '_' +
-                          str(bc_decay).zfill(3) + '_' + 
+                          str(bc_decay).zfill(3) + '_' +
                           str(hc_decay).zfill(3) + '_' +
                           str(bc_delay).zfill(6) + '_' + 
                           str(hc_delay).zfill(6) + '_' +
-                          str(gc_weight).zfill(6) + '_' + 
-                          str(bc_weight).zfill(6) + '_' + 
+                          str(gc_weight).zfill(6) + '_' +
+                          str(bc_weight).zfill(6) + '_' +
                           str(hc_weight).zfill(6))
 
         fig = nw.plot_aps(time=600)
         nw.save_ap_fig(fig, savedir, 'figure_' + save_file_name)
-        
+
         if run==0:
             nw.shelve_network(savedir, 'nw-specs_' + save_file_name)
-        break
-    break
+
+    # Calculate the correlation matrices
+    n_runs = len(seed_input_vectors)
+    input_corrs = []
+    output_corrs = []
+    for row_idx in range(n_runs):
+        for col_idx in range(1+row_idx,n_runs):
+            curr_input_corr = stats.pearsonr(seed_input_vectors[row_idx], seed_input_vectors[col_idx])
+            curr_output_corr = stats.pearsonr(seed_output_vectors[row_idx], seed_output_vectors[col_idx])
+            input_corrs.append(curr_input_corr)
+            output_corrs.append(curr_output_corr)
+
+    save_file_name = (str(nw) + '_' +
+                      str(seed).zfill(5) + '_' +
+                      str(input_seed).zfill(5) + '_' +
+                      str(input_freq) + '_' +
+                      str(input_scale).zfill(3) + '_' +
+                      str(bc_decay).zfill(3) + '_' +
+                      str(hc_decay).zfill(3) + '_' +
+                      str(bc_delay).zfill(6) + '_' + 
+                      str(hc_delay).zfill(6) + '_' +
+                      str(gc_weight).zfill(6) + '_' +
+                      str(bc_weight).zfill(6) + '_' +
+                      str(hc_weight).zfill(6))
+
+    np.save("input-corrs_" + save_file_name, np.array(input_corrs))
+    np.save("output-corrs_" + save_file_name, np.array(output_corrs))
+
