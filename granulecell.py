@@ -27,6 +27,6 @@ class GranuleCell(GenNeuron):
                          diam=[3.0, 3.0, 3.0, 3.0],
                          L=[50.0, 150.0, 150.0, 150.0], soma_loc=1.0)
 
-        parameters = params.read_parameters('granulecellparams.txt')
+        parameters = params.read_parameters('C:\\Users\\Daniel\\repos\\pyDentate\\granulecellparams.txt')
 
         self.insert_mechs(parameters)

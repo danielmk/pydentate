@@ -170,7 +170,7 @@ for seed in seeds:
                                                    gc_weight,
                                                    bc_weight,
                                                    hc_weight)
-        break
+
         # Attach voltage recordings to all cells
         nw.populations[0].voltage_recording(range(2000))
         nw.populations[1].voltage_recording(range(60))

@@ -43,6 +43,6 @@ class MossyCell(GenNeuron):
 
         # Difference between mossycell and mossycell_cat.
         # mossycell_cat imports mossycellparams_cat.txt
-        parameters = params.read_parameters('mossycellparams_cat.txt')
+        parameters = params.read_parameters('C:\\Users\\Daniel\\repos\\pyDentate\\mossycellparams_cat.txt')
 
         self.insert_mechs(parameters)
