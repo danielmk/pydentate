@@ -8,12 +8,15 @@ This is a temporary script file.
 import os
 import numpy as np
 
-parent = "C:\\Users\\Daniel\\pyDentateData\\robustness\\frequencies\\"
+parent = "C:\\Users\\Daniel\\pyDentateData\\robustness\\delays\\corrs\\"
 all_files = [x for x in os.listdir(parent) if not "figure" in x if '.npz' in x]
 all_input_data = [np.load(parent + x)['input_corrs'] for x in all_files]
 all_output_data = [np.load(parent + x)['output_corrs'] for x in all_files]
 
 parsed_files = np.array([x.split('_')[3:14] for x in all_files], dtype = np.float)
+
+tuned_idc = np.argwhere(parsed_files[:,8] > 0)[:,0]
+nofeedback_idc = np.argwhere(parsed_files[:,8] == 0)[:,0]
 
 subtracted_Rs = np.array([(all_input_data[x] - all_output_data[x]) for x in range(len(all_input_data))])
 subtracted_Rs_mean = subtracted_Rs.mean(axis=1)
@@ -32,7 +35,7 @@ binned_mean_Rs = binned_Rs / binned_ns
 binned_mean_Rs = np.nanmean(binned_mean_Rs, axis=1)
 
 full_data = np.append(parsed_files, binned_mean_Rs[:,np.newaxis], axis=1)
-np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\aggregate_data.txt", full_data, delimiter = '\t')
+#np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\delays\\corrs\\aggregate_data.txt", full_data, delimiter = '\t')
 
 # Maps parameters to their index in parsed_files
 idx_map = {'nw-seed': 0,
@@ -68,7 +71,31 @@ freqs_dict = {}
 for x in freqs:
     freqs_dict[str(x)] = subtracted_Rs_mean[np.argwhere(parsed_files[:,2] ==x)]
     
+tuned_idc = np.argwhere(parsed_files[:,8] > 0)[:,0]
+nofeedback_idc = np.argwhere(parsed_files[:,8] == 0)[:,0]
+tuned_outputs = np.array(all_output_data)[tuned_idc,:]
+nofeedback_outputs = np.array(all_output_data)[nofeedback_idc,:]
+#
+subtracted_outputs = nofeedback_outputs - tuned_outputs
+parsed_files_tuned = parsed_files[tuned_idc]
+tuned_input_data = [all_input_data[x] for x in tuned_idc]
 
+# Bin the subtracted outputs
+bins = np.arange(0,1.1,0.1)
+digitized_inputs = np.digitize(tuned_input_data, bins) - 1  # minus 1 to convert to indices
+binned_subtracted_Rs = np.zeros((digitized_inputs.shape[0], bins.shape[0]-1))
+binned_subtracted_ns = np.zeros((digitized_inputs.shape[0], bins.shape[0]-1))
+
+for row_idx, row in enumerate(digitized_inputs):
+    for col_idx, col in enumerate(row):
+        binned_subtracted_Rs[row_idx, col] += subtracted_outputs[row_idx, col_idx]
+        binned_subtracted_ns[row_idx, col] += 1
+
+binned_subtracted_mean_Rs_w_nans = binned_subtracted_Rs / binned_subtracted_ns
+binned_subtracted_mean_Rs = np.nanmean(binned_subtracted_mean_Rs_w_nans, axis=1)
+
+subtracted_data = full_data = np.append(parsed_files_tuned, binned_subtracted_mean_Rs[:,np.newaxis], axis=1)
+np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\delays\\corrs\\aggregate_data_full-minus-nofeedback.txt", subtracted_data, delimiter = '\t')
 
 
 """

@@ -10,6 +10,7 @@ import numpy as np
 import shelve
 import os
 import analysis_main
+import pdb
 
 def similarity_measure_leutgeb_output_tresolved_directory(data_path, len_bins):
     # Setup some parameters given by paradigm_frequency_inhibition.py
@@ -18,8 +19,6 @@ def similarity_measure_leutgeb_output_tresolved_directory(data_path, len_bins):
     data_files.sort()
 
     data_files = data_files[0:25]
-
-    corr_matrix = np.empty((len(data_files), len(data_files)))
 
     data_list = []
     for x in data_files:
@@ -38,5 +37,5 @@ def similarity_measure_leutgeb_output_tresolved_directory(data_path, len_bins):
 
 if __name__ == '__main__':
     path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\scale1000\\net_reshuffledrev\\"
-    len_bins = 1000
+    len_bins = 333
     similarity_measure_leutgeb_output_tresolved_directory(path, len_bins)

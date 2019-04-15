@@ -13,10 +13,10 @@ import analysis_main
 import pdb
 
 
-def similarity_measure_leutgeb_inputs_directory(data_path, len_bins):
+def similarity_measure_NDP_directory(data_path):
     # Setup some parameters given by paradigm_frequency_inhibition.py
     save_path = data_path
-    data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and not 'norm' in f and not 'convolved' in f and not 'trifilt' in f]
+    data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and 'spike_data' in f and not 'norm' in f and not 'convolved' in f and not 'trifilt' in f]
     data_files.sort()
     
     data_files = data_files[0:25]
@@ -32,12 +32,10 @@ def similarity_measure_leutgeb_inputs_directory(data_path, len_bins):
     # 376
     for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
         for col_idx, y in enumerate(data_list[row_idx+row_idx_start:len(data_list)]):
-            pdb.set_trace()
-            corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.similarity_measure_leutgeb(x,y,len_bins)
+            corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.ndp_signals(x,y)
             
-    np.savetxt(save_path + "1_leutgeb-measure_matrix_len-bin_" + str(len_bins) +  ".txt", corr_matrix, delimiter="\t")
+    np.savetxt(save_path + "1_NDP_matrix" + ".txt", corr_matrix, delimiter="\t")
 
 if __name__ == '__main__':
-    path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\input_patterns_seed_10000\\"
-    len_bins = 6000
-    similarity_measure_leutgeb_inputs_directory(path, len_bins)
+    path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\scale1000\\net_disinhibitedrev\\"
+    similarity_measure_NDP_directory(path)

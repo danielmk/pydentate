@@ -21,6 +21,7 @@ from sklearn.preprocessing import normalize
 import shelve
 import matplotlib.pyplot as plt
 import pylab
+import pdb
 
 def tri_filter(signal, kernel_delta):
     """
@@ -55,13 +56,30 @@ def correlate_signals(signal1,signal2):
     return np.nanmean(corrs)
 
 def avg_dotprod_signals(signal1,signal2):
-    """Average dot product of signal1 and signal2"""
+    """Average dot product of signal1 and signal2 excluding silent cells"""
     non_silent_sigs = np.unique(np.concatenate((np.argwhere(signal1.any(axis=1)),np.argwhere(signal2.any(axis=1)))))
     non_silent_sigs.sort()
     product = signal1[non_silent_sigs]*signal2[non_silent_sigs]
     prod_sum = product.sum(axis=1)
     avg_dot_product = prod_sum.mean()
     return avg_dot_product
+
+def ndp_signals(signal1, signal2):
+    dotproduct = (signal1 * signal2).sum()
+    normalization = np.sqrt((signal1*signal1).sum())*np.sqrt((signal2*signal2).sum())
+    return dotproduct/normalization
+
+def ndp_signals_tresolved(signal1, signal2, len_bin):
+    signal1 = np.reshape(signal1[:,0:int(len_bin*int(signal1.shape[1]/len_bin))], (signal1.shape[0],int(signal1.shape[1]/len_bin),len_bin))
+    signal1 = signal1.sum(axis=2)
+    
+    signal2 = np.reshape(signal2[:,0:int(len_bin*int(signal2.shape[1]/len_bin))], (signal2.shape[0],int(signal2.shape[1]/len_bin),len_bin))
+    signal2 = signal2.sum(axis=2)
+    
+    dotproduct = (signal1 * signal2).sum(axis=0)
+    normalization = np.sqrt((signal1*signal1).sum(axis=0))*np.sqrt((signal2*signal2).sum(axis=0))
+    
+    return dotproduct/normalization
 
 def avg_dotprod_signals_tbinned(signal1,signal2, len_bin = 1000):
     """Average dot product of signal1 and signal2"""
@@ -149,11 +167,10 @@ def similarity_measure_leutgeb_BUGGY(signal1,signal2, len_bin):
     return np.array(corr_vector)
 
 def similarity_measure_leutgeb(signal1,signal2, len_bin):
-    """Oriented on the """
-    signal1 = np.reshape(signal1[:,0:int(len_bin*int(signal1.shape[1]/len_bin))], (signal1.shape[0],signal1.shape[1]/len_bin,len_bin))
+    signal1 = np.reshape(signal1[:,0:int(len_bin*int(signal1.shape[1]/len_bin))], (signal1.shape[0],int(signal1.shape[1]/len_bin),len_bin))
     signal1 = signal1.sum(axis=2)
     
-    signal2 = np.reshape(signal2[:,0:int(len_bin*int(signal2.shape[1]/len_bin))], (signal2.shape[0],signal2.shape[1]/len_bin,len_bin))
+    signal2 = np.reshape(signal2[:,0:int(len_bin*int(signal2.shape[1]/len_bin))], (signal2.shape[0],int(signal2.shape[1]/len_bin),len_bin))
     signal2 = signal2.sum(axis=2)
 
     corr_vector = []

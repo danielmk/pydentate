@@ -59,7 +59,7 @@ for x in current_steps:
     mc_rec = mc._voltage_recording()
     bc_rec = bc._voltage_recording()
     hc_rec = hc._voltage_recording()
-    
+
     gc_apc_curr = h.APCount(gc.soma(0.5))
     mc_apc_curr = h.APCount(mc.soma(0.5))
     bc_apc_curr = h.APCount(bc.soma(0.5))

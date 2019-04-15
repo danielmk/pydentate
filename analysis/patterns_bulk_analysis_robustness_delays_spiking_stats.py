@@ -8,13 +8,32 @@ This is a temporary script file.
 import os
 import numpy as np
 
-parent = "C:\\Users\\Daniel\\pyDentateData\\robustness\\frequencies\\"
+parent = "C:\\Users\\Daniel\\pyDentateData\\robustness\\delays\\time-stamps\\"
 all_files = [x for x in os.listdir(parent) if not "figure" in x if '.npz' in x]
-all_input_data = [np.load(parent + x)['input_corrs'] for x in all_files]
-all_output_data = [np.load(parent + x)['output_corrs'] for x in all_files]
+all_input_data = np.array([np.load(parent + x)['input_time_stamps'] for x in all_files])
+all_output_data = np.array([np.load(parent + x)['output_time_stamps'] for x in all_files])
+
+all_input_ns = np.zeros(all_input_data.shape)
+all_output_ns = np.zeros(all_output_data.shape)
+
+for nw_idx, nw in enumerate(all_input_data):
+    for run_idx, run in enumerate(nw):
+        for cell_idx, cell in enumerate(run):
+            all_input_ns[nw_idx,run_idx,cell_idx] = cell.shape[0]
+
+for nw_idx, nw in enumerate(all_output_data):
+    for run_idx, run in enumerate(nw):
+        for cell_idx, cell in enumerate(run):
+            all_output_ns[nw_idx,run_idx,cell_idx] = cell.shape[0]
+
+avg_spikes_input = all_input_ns.mean(axis=2).mean(axis=1)
+avg_spikes_output = all_output_ns.mean(axis=2).mean(axis=1)
 
 parsed_files = np.array([x.split('_')[3:14] for x in all_files], dtype = np.float)
 
+tuned_idc = np.argwhere(parsed_files[:,8] > 0)[:,0]
+nofeedback_idc = np.argwhere(parsed_files[:,8] == 0)[:,0]
+"""
 subtracted_Rs = np.array([(all_input_data[x] - all_output_data[x]) for x in range(len(all_input_data))])
 subtracted_Rs_mean = subtracted_Rs.mean(axis=1)
 
@@ -32,7 +51,7 @@ binned_mean_Rs = binned_Rs / binned_ns
 binned_mean_Rs = np.nanmean(binned_mean_Rs, axis=1)
 
 full_data = np.append(parsed_files, binned_mean_Rs[:,np.newaxis], axis=1)
-np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\aggregate_data.txt", full_data, delimiter = '\t')
+np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\delays\\corrs\\aggregate_data.txt", full_data, delimiter = '\t')
 
 # Maps parameters to their index in parsed_files
 idx_map = {'nw-seed': 0,
@@ -67,7 +86,7 @@ freqs = np.array([5,10,15,20,25,30,35,40,45,50,55,60,70,80,90,100])
 freqs_dict = {}
 for x in freqs:
     freqs_dict[str(x)] = subtracted_Rs_mean[np.argwhere(parsed_files[:,2] ==x)]
-    
+"""
 
 
 

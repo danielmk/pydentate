@@ -28,11 +28,11 @@ for row_idx, row in enumerate(digitized_inputs):
         binned_Rs[row_idx, col] += subtracted_Rs[row_idx, col_idx]
         binned_ns[row_idx, col] += 1
 
-binned_mean_Rs = binned_Rs / binned_ns
-binned_mean_Rs = np.nanmean(binned_mean_Rs, axis=1)
+binned_mean_Rs_w_nans = binned_Rs / binned_ns
+binned_mean_Rs = np.nanmean(binned_mean_Rs_w_nans, axis=1)
 
 full_data = np.append(parsed_files, binned_mean_Rs[:,np.newaxis], axis=1)
-np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\aggregate_data.txt", full_data, delimiter = '\t')
+#np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\frequencies\\aggregate_data.txt", full_data, delimiter = '\t')
 
 # Maps parameters to their index in parsed_files
 idx_map = {'nw-seed': 0,
@@ -60,15 +60,31 @@ idx_map = {'nw-seed': 10000,
            'bc_weight': 0.0012,
            'hc_weight': 0.006}
 
+tuned_idc = np.argwhere(parsed_files[:,8] > 0)[:,0]
+nofeedback_idc = np.argwhere(parsed_files[:,8] == 0)[:,0]
+tuned_outputs = np.array(all_output_data)[tuned_idc,:]
+nofeedback_outputs = np.array(all_output_data)[nofeedback_idc,:]
+#
+subtracted_outputs = nofeedback_outputs - tuned_outputs
+parsed_files_tuned = parsed_files[tuned_idc]
+tuned_input_data = [all_input_data[x] for x in tuned_idc]
 
+# Bin the subtracted outputs
+bins = np.arange(0,1.1,0.1)
+digitized_inputs = np.digitize(tuned_input_data, bins) - 1  # minus 1 to convert to indices
+binned_subtracted_Rs = np.zeros((digitized_inputs.shape[0], bins.shape[0]-1))
+binned_subtracted_ns = np.zeros((digitized_inputs.shape[0], bins.shape[0]-1))
 
-# Split the files by frequency
-freqs = np.array([5,10,15,20,25,30,35,40,45,50,55,60,70,80,90,100])
-freqs_dict = {}
-for x in freqs:
-    freqs_dict[str(x)] = subtracted_Rs_mean[np.argwhere(parsed_files[:,2] ==x)]
-    
+for row_idx, row in enumerate(digitized_inputs):
+    for col_idx, col in enumerate(row):
+        binned_subtracted_Rs[row_idx, col] += subtracted_outputs[row_idx, col_idx]
+        binned_subtracted_ns[row_idx, col] += 1
 
+binned_subtracted_mean_Rs_w_nans = binned_subtracted_Rs / binned_subtracted_ns
+binned_subtracted_mean_Rs = np.nanmean(binned_subtracted_mean_Rs_w_nans, axis=1)
+
+subtracted_data = full_data = np.append(parsed_files_tuned, binned_subtracted_mean_Rs[:,np.newaxis], axis=1)
+np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\frequencies\\aggregate_data_full-minus-nofeedback.txt", subtracted_data, delimiter = '\t')
 
 
 """
