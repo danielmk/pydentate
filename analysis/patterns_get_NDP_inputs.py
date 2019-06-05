@@ -32,7 +32,7 @@ def similarity_measure_NDP_directory(data_path):
     # 376
     for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
         for col_idx, y in enumerate(data_list[row_idx+row_idx_start:len(data_list)]):
-            corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.ndp_signals(x,y)
+            corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.ndp_signals(x.sum(axis=1),y.sum(axis=1))
 
     np.savetxt(save_path + "1_NDP_matrix" + ".txt", corr_matrix, delimiter="\t")
 

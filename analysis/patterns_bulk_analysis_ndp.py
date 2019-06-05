@@ -8,7 +8,7 @@ import patterns_get_NDP_inputs as get_inputs
 import patterns_get_NDP_outputs as get_outputs
 import os
 
-parent = "Z:\\pyDentate\\pyDentateData\\pattern_separation_data_local_input_revised\\"
+parent = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\"
 done = 0
 
 for root, dirs, files in os.walk(parent):

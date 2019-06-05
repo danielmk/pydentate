@@ -1,0 +1,1 @@
+python paradigm_large_scale_robustness_decays_2-0.py -runs 0 25 1 -savedir "C:\\Users\\Daniel\\pyDentateData\\robustness\\decays_2-0\\py3-6-6_win10\\" -scale 1000 -seeds 10 18 1 -input_freq 10 -bc_decay 1 -hc_decay 1 -bc_delay 0.85 -hc_delay 3.8 -gc_weight 0.025 -bc_weight 0.0012 -hc_weight 0.006

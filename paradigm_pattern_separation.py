@@ -31,7 +31,8 @@ runs = range(args.runs[0], args.runs[1], args.runs[2])
 savedir = args.savedir
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
-dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
+dll_files = [("C:\\Users\\Daniel\\repos\\pyDentate\\mechs_7-5\\nrnmech.dll"),
+             ("C:\\Users\\DanielM\\Repos\\models_dentate\\"
               "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
               "dentategyrusnet2005\\nrnmech.dll"),
             "C:\\Users\\daniel\\Repos\\nrnmech.dll",

@@ -21,10 +21,10 @@ basePath = Path(r"Z:\pyDentate\pyDentateData")
 model_input = r"pattern_separation_data_local_input_revised"
 seed = "seed10000"
 scale = "scale1000"
-filename = r"1_leutgeb-measure_matrix_len-bin_6000.txt"
+filename = r"1_NDP_matrix.txt"
 
 
-case = r"input_patterns_seed_10000"
+case = r"input_patterns"
 file_to_open = basePath / model_input / seed / case / filename
 data = np.loadtxt(str(file_to_open))
 linear_data= np.array([])

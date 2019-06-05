@@ -160,6 +160,7 @@ class GenNetwork(object):
 
         fig.savefig(full_file_path + ".pdf", dpi=300, format='pdf')
         fig.savefig(full_file_path + ".eps", dpi=300, format='eps')
+        plt.close()
 
     def get_properties(self):
         properties = {'populations': [x.get_properties()

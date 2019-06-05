@@ -65,18 +65,23 @@ def avg_dotprod_signals(signal1,signal2):
     return avg_dot_product
 
 def ndp_signals(signal1, signal2):
+    #pdb.set_trace()
     dotproduct = (signal1 * signal2).sum()
+    #pdb.set_trace()
     normalization = np.sqrt((signal1*signal1).sum())*np.sqrt((signal2*signal2).sum())
+    #pdb.set_trace()
     return dotproduct/normalization
 
 def ndp_signals_tresolved(signal1, signal2, len_bin):
+    pdb.set_trace()
     signal1 = np.reshape(signal1[:,0:int(len_bin*int(signal1.shape[1]/len_bin))], (signal1.shape[0],int(signal1.shape[1]/len_bin),len_bin))
     signal1 = signal1.sum(axis=2)
-    
+    pdb.set_trace()
     signal2 = np.reshape(signal2[:,0:int(len_bin*int(signal2.shape[1]/len_bin))], (signal2.shape[0],int(signal2.shape[1]/len_bin),len_bin))
     signal2 = signal2.sum(axis=2)
-    
+    pdb.set_trace()
     dotproduct = (signal1 * signal2).sum(axis=0)
+    pdb.set_trace()
     normalization = np.sqrt((signal1*signal1).sum(axis=0))*np.sqrt((signal2*signal2).sum(axis=0))
     
     return dotproduct/normalization
@@ -118,13 +123,13 @@ def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
     """
     # Construct a zero array with size corresponding to desired output signal
     sig = np.zeros((np.shape(time_stamps)[0],int((t_stop-t_start)/dt_signal)))
-    
     # Find the indices where spikes occured according to time_stamps
     time_idc = []
     for x in time_stamps:
         curr_idc = []
-        for y in x:
-            curr_idc.append((y-t_start)/ dt_signal)
+        if np.any(x):
+            for y in x:
+                curr_idc.append((y-t_start)/ dt_signal)
         time_idc.append(curr_idc)
     
     # Set the spike indices to 1
@@ -167,17 +172,18 @@ def similarity_measure_leutgeb_BUGGY(signal1,signal2, len_bin):
     return np.array(corr_vector)
 
 def similarity_measure_leutgeb(signal1,signal2, len_bin):
+    pdb.set_trace()
     signal1 = np.reshape(signal1[:,0:int(len_bin*int(signal1.shape[1]/len_bin))], (signal1.shape[0],int(signal1.shape[1]/len_bin),len_bin))
     signal1 = signal1.sum(axis=2)
-    
+    pdb.set_trace()
     signal2 = np.reshape(signal2[:,0:int(len_bin*int(signal2.shape[1]/len_bin))], (signal2.shape[0],int(signal2.shape[1]/len_bin),len_bin))
     signal2 = signal2.sum(axis=2)
-
+    pdb.set_trace()
     corr_vector = []
 
     for x in range(signal1.shape[1]):
         corr_vector.append(pearsonr(signal1[:,x], signal2[:,x])[0])
-
+    pdb.set_trace()
     return np.array(corr_vector)
 
 def sqrt_diff(signal1, signal2, len_bin):
@@ -203,6 +209,15 @@ def sqrt_diff_norm_TRESOLVED(signal1, signal2, len_bin):
     subtr_sum = subtr.sum(axis = 2).sum(axis=0) / total_spikes
     print(subtr_sum)
     return subtr_sum
+
+def coactivity(signal1, signal2):
+    coactive = (np.array(signal1 >0) * np.array(signal2 > 0)).sum()
+    total_active = np.logical_or(np.array(signal1 >0), np.array(signal2 > 0)).sum()
+    return coactive/float(total_active)
+
+def overlap(signal1, signal2):
+    total_overlap = ((signal1 > 0) == (signal2 >0)).sum()
+    return total_overlap / float(len(signal1))
 
 def sqrt_diff_norm(signal1, signal2, len_bin):
     total_spikes = signal1.sum() + signal2.sum()

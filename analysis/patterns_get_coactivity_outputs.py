@@ -13,7 +13,7 @@ import analysis_main
 import pdb
 
 
-def similarity_measure_NDP_directory(data_path):
+def similarity_measure_coactivity_directory(data_path):
     # Setup some parameters given by paradigm_frequency_inhibition.py
     save_path = data_path
     data_files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f)) and '.npz' in f and 'spike_data' in f and not 'norm' in f and not 'convolved' in f and not 'trifilt' in f]
@@ -32,10 +32,10 @@ def similarity_measure_NDP_directory(data_path):
     # 376
     for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
         for col_idx, y in enumerate(data_list[row_idx+row_idx_start:len(data_list)]):
-            corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.ndp_signals(x.sum(axis=1),y.sum(axis=1))
+            corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.coactivity(x.sum(axis=1),y.sum(axis=1))
             
-    np.savetxt(save_path + "1_NDP_matrix" + ".txt", corr_matrix, delimiter="\t")
+    np.savetxt(save_path + "1_coactivity_matrix.txt", corr_matrix, delimiter="\t")
 
 if __name__ == '__main__':
     path = "C:\\Users\\Daniel\\pyDentateData\\pattern_separation_data_local_input_revised\\seed10000\\scale1000\\net_disinhibitedrev\\"
-    similarity_measure_NDP_directory(path)
+    similarity_measure_coactivity_directory(path)

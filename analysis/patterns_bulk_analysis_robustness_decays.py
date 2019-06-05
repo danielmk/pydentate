@@ -8,8 +8,8 @@ This is a temporary script file.
 import os
 import numpy as np
 
-parent = "C:\\Users\\Daniel\\pyDentateData\\robustness\\delays\\corrs\\"
-all_files = [x for x in os.listdir(parent) if not "figure" in x if '.npz' in x]
+parent = "C:\\Users\\Daniel\\pyDentateData\\robustness\\decays_2-0\\"
+all_files = [x for x in os.listdir(parent) if not "figure" in x if '.npz' in x if 'corrs' in x]
 all_input_data = [np.load(parent + x)['input_corrs'] for x in all_files]
 all_output_data = [np.load(parent + x)['output_corrs'] for x in all_files]
 
@@ -35,7 +35,7 @@ binned_mean_Rs = binned_Rs / binned_ns
 binned_mean_Rs = np.nanmean(binned_mean_Rs, axis=1)
 
 full_data = np.append(parsed_files, binned_mean_Rs[:,np.newaxis], axis=1)
-#np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\delays\\corrs\\aggregate_data.txt", full_data, delimiter = '\t')
+np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\decays_2-0\\aggregate_data.txt", full_data, delimiter = '\t')
 
 # Maps parameters to their index in parsed_files
 idx_map = {'nw-seed': 0,
@@ -75,7 +75,8 @@ tuned_idc = np.argwhere(parsed_files[:,8] > 0)[:,0]
 nofeedback_idc = np.argwhere(parsed_files[:,8] == 0)[:,0]
 tuned_outputs = np.array(all_output_data)[tuned_idc,:]
 nofeedback_outputs = np.array(all_output_data)[nofeedback_idc,:]
-#
+
+"""
 subtracted_outputs = nofeedback_outputs - tuned_outputs
 parsed_files_tuned = parsed_files[tuned_idc]
 tuned_input_data = [all_input_data[x] for x in tuned_idc]
@@ -96,7 +97,7 @@ binned_subtracted_mean_Rs = np.nanmean(binned_subtracted_mean_Rs_w_nans, axis=1)
 
 subtracted_data = full_data = np.append(parsed_files_tuned, binned_subtracted_mean_Rs[:,np.newaxis], axis=1)
 np.savetxt("C:\\Users\\Daniel\\pyDentateData\\robustness\\delays\\corrs\\aggregate_data_full-minus-nofeedback.txt", subtracted_data, delimiter = '\t')
-
+"""
 
 """
 for root, dirs, files in os.walk(parent):
