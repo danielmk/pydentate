@@ -30,6 +30,6 @@ class BasketCell(GenNeuron):
                          sec_names=['proxd', 'mid1', 'mid2', 'ddend'],
                          diam=[4, 3, 2, 1], L=[75, 75, 75, 75], soma_loc=1.0)
 
-        parameters = params.read_parameters('C:\\Users\\Daniel\\repos\\pyDentate\\basketcellparams.txt')
+        parameters = params.read_parameters('basketcellparams.txt')
 
         self.insert_mechs(parameters)

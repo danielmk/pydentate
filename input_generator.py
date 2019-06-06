@@ -55,6 +55,7 @@ def inhom_poiss(rate=10, max_rate=100):
     frequency is given by the max_rate parameter in Hz.
     min frequency is always 0Hz
     """
+
     sampling_interval = 0.0001 * pq.s
 
     t = np.arange(0, 0.5, sampling_interval.magnitude)
