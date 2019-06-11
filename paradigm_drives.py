@@ -51,42 +51,42 @@ parser.add_argument('-n_cells_gcs_mcs_bcs_hcs_pps',
                     dest='n_cells')
 parser.add_argument('-W_pp_gc',
                     type=float,
-                    help='the seed making the network reproducible',
+                    help='the weight of the pp to gc connection',
                     default=1e-3,
                     dest='W_pp_gc')
 parser.add_argument('-W_pp_bc',
                     type=float,
-                    help='the seed making the network reproducible',
+                    help='the weight of the pp to bc connection',
                     default=1e-3*0,
                     dest='W_pp_bc')
 parser.add_argument('-n_pp_gc',
                     type=int,
-                    help='the seed making the network reproducible',
-                    default=20,
+                    help='number of pp to gc synapses ',
+                    default=6,
                     dest='n_pp_gc')
 parser.add_argument('-n_pp_bc',
                     type=int,
-                    help='the seed making the network reproducible',
+                    help='number of pp to bc synapses',
                     default=20,
                     dest='n_pp_bc')
 parser.add_argument('-W_gc_bc',
                     type=float,
-                    help='the seed making the network reproducible',
+                    help='weight of gc to bc synapses',
                     default=2.5e-2,
                     dest='W_gc_bc')
 parser.add_argument('-W_gc_hc',
                     type=float,
-                    help='the seed making the network reproducible',
+                    help='number of gc to hc synapses',
                     default=2.5e-2,
                     dest='W_gc_hc')
 parser.add_argument('-W_bc_gc',
                     type=float,
-                    help='the seed making the network reproducible',
+                    help='number of bc to gc synapses',
                     default=1.2e-3,
                     dest='W_bc_gc')
 parser.add_argument('-W_hc_gc',
                     type=float,
-                    help='the seed making the network reproducible',
+                    help='number of hc to gc synapses',
                     default=6e-3,
                     dest='W_hc_gc')
 
