@@ -154,7 +154,7 @@ class GenNetwork(object):
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
-        full_file_path = directory + "\\" + file_name
+        full_file_path = directory + os.path.sep + file_name
         if os.path.isfile(full_file_path):
             raise ValueError("The file already exists.\n" +
                              "shelve_network does not overwrite files.")
@@ -373,8 +373,7 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
             the name of the segments that are possible synaptic targets at the
             postsynaptic population
         divergence - numeric
-            divergence in relative terms, fraction of cells in post pop being
-            targeted
+            divergence as the number of connections a pre synaptic cell makes
         tau_1 - numeric
             the time constant of synaptic decay. conforms to the transition
             from the active to the inactive resource state. units of time as in
@@ -424,6 +423,7 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
         pre_cell_target = []
         synapses = []
         netcons = []
+        conductances = []
         conn_matrix = np.zeros((len(pre_pop_pos),len(post_pop_pos)))
 
         # Setup the Gaussian distribution
@@ -431,7 +431,6 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
         gauss = stats.expon(loc=0, scale=scale*post_pop.get_cell_number())
         pdf = gauss.pdf(np.arange(post_pop.get_cell_number()))
         pdf = pdf/pdf.sum()
-        divergence = int(divergence*len(post_pop_pos))
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
             curr_dist = []
@@ -445,6 +444,7 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
             for target_cell in picked_cells:
                 curr_syns = []
                 curr_netcons = []
+                curr_conductances = []
                 curr_seg_pool = post_pop[target_cell].get_segs_by_name(target_segs)
                 chosen_seg = np.random.choice(curr_seg_pool)
                 for seg in chosen_seg:
@@ -458,9 +458,16 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
                     curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
                                            curr_syn, thr, delay, weight,
                                            sec=pre_pop[idx].soma)
+
+                    curr_gvec = h.Vector()
+                    curr_gvec.record(curr_syn._ref_g)
+                    curr_conductances.append(curr_gvec)
+
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
+            conductances.append(curr_conductances)
+        self.conductances = conductances
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses

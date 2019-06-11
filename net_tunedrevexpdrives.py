@@ -27,8 +27,9 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
     name = "TunedNetworkExpDrives"
 
     def __init__(self, seed=None, n_gcs=2000, n_mcs=60, n_bcs=24, n_hcs=24,
-                 
-                 temporal_patterns=np.array([])):
+                 W_pp_gc=1e-3, W_pp_bc=1e-3, n_pp_gc = 20, n_pp_bc = 20, W_gc_bc=2.5e-2, W_gc_hc=2.5e-2,
+                 W_bc_gc=1.2e-3, W_hc_gc=6e-3, temporal_patterns=np.array([])):
+        self.seed=seed
         # Set seed for reproducibility
         if seed:
             self.set_numpy_seed(seed)
@@ -50,73 +51,73 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         t_patterns = np.array(temporal_patterns)
 
         # PP -> GC
-        ouropy.gennetwork.ImplicitConvergentTmgsynConnectionExpProb(self.populations[0], t_patterns, 'midd', 20,
-                     10, 0, 1, 0, 0, 1e-3)
+        ouropy.gennetwork.ImplicitConvergentTmgsynConnectionExpProb(self.populations[0], t_patterns, 'midd', n_pp_gc,
+                     10, 0, 1, 0, 0, W_pp_gc)
 
         # PP -> BC
-        ouropy.gennetwork.ImplicitConvergentTmgsynConnectionExpProb(self.populations[2], t_patterns, 'ddend', 20,
-                     6.3, 0, 1, 0, 0, 1e-3)
+        ouropy.gennetwork.ImplicitConvergentTmgsynConnectionExpProb(self.populations[2], t_patterns, 'ddend', n_pp_bc,
+                     6.3, 0, 1, 0, 0, W_pp_bc)
 
         # GC -> MC
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[0], self.populations[1],
                                   6/60, 'proxd',
-                                  1/60, 7.6, 500, 0.1, 0, 0, 10, 1.5, 2e-2)
+                                  1, 7.6, 500, 0.1, 0, 0, 10, 1.5, 2e-2)
 
         # GC -> BC
         #Weight x4, target_pool = 2
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[0], self.populations[2],
                                            4/24, 'proxd',
-                                           1/24, 8.7, 500, 0.1, 0, 0, 10, 0.8, 2.5e-2)
+                                           1, 8.7, 500, 0.1, 0, 0, 10, 0.8, W_gc_bc)
 
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[0], self.populations[3],
                                            24/24, 'proxd',
-                                           1/24, 8.7, 500, 0.1, 0, 0, 10, 1.5, 2.5e-2)
+                                           1, 8.7, 500, 0.1, 0, 0, 10, 1.5, W_gc_hc)
 
         # MC -> MC
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[1], self. populations[1],
                                            24/60, 'proxd',
-                                           1/20, 2.2, 0, 1, 0, 0, 10, 2, 0.5e-3)
+                                           3, 2.2, 0, 1, 0, 0, 10, 2, 0.5e-3)
 
         # MC -> BC
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[1], self.populations[2],
                                            6/24, 'proxd',
-                                           1/24, 2, 0, 1, 0, 0, 10, 3, 0.3e-3)
+                                           1, 2, 0, 1, 0, 0, 10, 3, 0.3e-3)
 
         # MC -> HC
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[1], self.populations[3],
                                            10/24, 'midd',
-                                           1/12, 6.2, 0, 1, 0, 0, 10, 3, 0.2e-3)
+                                           2, 6.2, 0, 1, 0, 0, 10, 3, 0.2e-3)
 
         # BC -> GC
         # Nr. synapses x3; Weight *1/4; changed from 5.5 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[2], self.populations[0],
                                            280/2000, 'soma',
-                                           1/5, 20, 0, 1, 0, -70, 10, 0.85, 1.2e-3)
+                                           400, 20, 0, 1, 0, -70, 10, 0.85, W_bc_gc)
 
         # BC -> MC
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[2], self.populations[1],
                                            14/60, 'proxd',
-                                           1/20, 3.3, 0, 1, 0, -70, 10, 1.5, 1.5e-3)
+                                           3, 3.3, 0, 1, 0, -70, 10, 1.5, 1.5e-3)
 
         # BC -> BC
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[2], self.populations[2],
                                            6/24,'proxd',
-                                           1/12, 1.8, 0,1,0,-70, 10, 0.8, 7.6e-3)
+                                           2, 1.8, 0,1,0,-70, 10, 0.8, 7.6e-3)
 
         # HC -> GC
         # Weight x10; Nr synapses x4; changed from 6 to 20 (Hefft & Jonas, 2005)
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[3], self.populations[0],
                                            2000/2000, 'dd',
-                                           8/25, 20, 0, 1, 0, -70, 10, 3.8, 0.6e-2)
+                                           640, 20, 0, 1, 0, -70, 10, 3.8, W_hc_gc)
 
         # HC -> MC
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[3], self.populations[1],
                                            30/60, ['mid1d', 'mid2d'],
-                                           1/15, 6, 0, 1, 0, -70, 10, 1, 1.5e-3)
+                                           4, 6, 0, 1, 0, -70, 10, 1, 1.5e-3)
 
         # HC -> BC
         ouropy.gennetwork.DivergentTmgsynConnectionExpProb(self.populations[3], self.populations[2],
                                            12/24, 'ddend',
-                                           1/6, 5.8, 0, 1, 0, -70, 10, 1.6, 0.5e-3)
+                                           4, 5.8, 0, 1, 0, -70, 10, 1.6, 0.5e-3)

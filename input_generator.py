@@ -49,7 +49,7 @@ def inhom_poiss_30Hz():
     return array_like
 
 
-def inhom_poiss(rate=10, max_rate=100):
+def inhom_poiss(mod_rate=10, max_rate=100, n_inputs=400):
     """Generate an inhomogeneous poisson spike train with a rate profile that
     is a sine wave whose rate is given by the rate parameter and that maximum
     frequency is given by the max_rate parameter in Hz.
@@ -60,7 +60,7 @@ def inhom_poiss(rate=10, max_rate=100):
 
     t = np.arange(0, 0.5, sampling_interval.magnitude)
 
-    rate_profile = (np.sin(t*rate*np.pi*2-np.pi/2) + 1) * max_rate / 2
+    rate_profile = (np.sin(t*mod_rate*np.pi*2-np.pi/2) + 1) * max_rate / 2
 
     rate_profile_as_asig = AnalogSignal(rate_profile,
                                         units=1*pq.Hz,
@@ -69,7 +69,7 @@ def inhom_poiss(rate=10, max_rate=100):
                                         sampling_period=sampling_interval)
 
     spike_trains = []
-    for x in range(400):
+    for x in range(n_inputs):
         curr_train = stg.inhomogeneous_poisson_process(rate_profile_as_asig)
         # We have to make sure that there is sufficient space between spikes.
         # If there is not, we move the next spike by 0.1ms
