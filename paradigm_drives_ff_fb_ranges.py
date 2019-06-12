@@ -13,6 +13,7 @@ import os
 import argparse
 import time
 from analysis_main import time_stamps_to_signal
+import pdb
 tsts = time_stamps_to_signal
 
 # Handle command line inputs with argparse
@@ -92,7 +93,6 @@ parser.add_argument('-W_hc_gc',
                     help='number of hc to gc synapses',
                     default=6e-3,
                     dest='W_hc_gc')
-
 args = parser.parse_args()
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
@@ -110,21 +110,10 @@ temporal_patterns_full = inhom_poiss(mod_rate=args.pp_mod_rate,
                                 max_rate=args.pp_max_rate,
                                 n_inputs=400)
 
-pp_ts = []
-gc_ts = []
-mc_ts = []
-bc_ts = []
-hc_ts = []
 
-pp_to_gc_list = []
-gc_to_hc_list = []
-gc_to_bc_list = []
-hc_to_gc_list = []
-bc_to_gc_list = []
 
 # Start the runs of the model
 runs = range(args.runs[0], args.runs[1], args.runs[2])
-initial_run = runs[0]
 ff_weights = np.arange(args.W_pp_bc[0], args.W_pp_bc[1], args.W_pp_bc[2])
 fb_weights = np.arange(args.W_gc_bc[0], args.W_gc_bc[1], args.W_gc_bc[2])
 print(ff_weights)
@@ -178,15 +167,32 @@ for ff_weight in ff_weights:
                 h.fadvance()
             end_proc_t = time.perf_counter()
             print("Done Running at " + str(end_proc_t) + " after " + str((end_proc_t - start_proc_t)/60) + " minutes")
-        
-            save_data_name =  f"""{run}_{nw.seed}_{nw.populations[0].get_cell_number()}_{nw.populations[1].get_cell_number()}_{nw.populations[2].get_cell_number()}_{nw.populations[3].get_cell_number()}_{args.n_cells[4]}__{args.n_pp_gc}_{args.n_pp_bc}_{args.W_pp_gc}_{ff_weight}_{args.pp_max_rate}_{fb_weight}_{fb_weight}_{args.W_bc_gc}_{args.W_hc_gc}"""
-            
-            fig = nw.plot_aps(time=600)
-            tuned_fig_file_name = str(nw) + "_" + save_data_name
-            nw.save_ap_fig(fig, args.savedir, tuned_fig_file_name)
+
+            save_data_name = (f"{str(nw)}_"
+                              f"{nw.seed:06d}_"
+                              f"{run:03d}_"
+                              f"{nw.populations[0].get_cell_number():05d}_"
+                              f"{nw.populations[1].get_cell_number():05d}_"
+                              f"{nw.populations[2].get_cell_number():05d}_"
+                              f"{nw.populations[3].get_cell_number():05d}_"
+                              f"{args.n_cells[4]:05d}_"
+                              f"{args.n_pp_gc:04d}_"
+                              f"{args.n_pp_bc:04d}_"
+                              f"{args.W_pp_gc:08.5f}_"
+                              f"{ff_weight:08.5f}_"
+                              f"{args.pp_mod_rate:04d}_"
+                              f"{args.pp_max_rate:04d}_"
+                              f"{fb_weight:08.5f}_"
+                              f"{fb_weight:08.5f}_"
+                              f"{args.W_bc_gc:08.5f}_"
+                              f"{args.W_hc_gc:08.5f}")
+            if run == 0:
+                fig = nw.plot_aps(time=600)
+                tuned_fig_file_name =save_data_name
+                nw.save_ap_fig(fig, args.savedir, tuned_fig_file_name)
             
             pp_lines = np.empty(400, dtype = np.object)
-            pp_lines[0+run:24+run] = temporal_patterns[0+run:24+run]
+            pp_lines[0+run:args.n_cells[4]+run] = temporal_patterns[0+run:args.n_cells[4]+run]
             
             curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
@@ -194,34 +200,25 @@ for ff_weight in ff_weights:
             curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             
-            pp_ts.append(curr_pp_ts)
-            gc_ts.append(curr_gc_ts)
-            mc_ts.append(curr_mc_ts)
-            bc_ts.append(curr_bc_ts)
-            hc_ts.append(curr_hc_ts)
-            
             pp_lines = nw.populations[0].connections[0:24]
             summed_pp_lines = [np.array(x.conductances).sum(axis=0).sum(axis=0) for x in pp_lines]
             pp_to_gc = np.array(summed_pp_lines).sum(axis=0)
-            pp_to_gc_list.append(pp_to_gc)
             
-            gc_to_hc_list.append(np.array(nw.populations[0].connections[2].conductances).sum(axis=0).sum(axis=0))
-            gc_to_bc_list.append(np.array(nw.populations[0].connections[1].conductances).sum(axis=0).sum(axis=0))
-            bc_to_gc_list.append(np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0))
-            hc_to_gc_list.append(np.array(nw.populations[0].connections[4].conductances).sum(axis=0).sum(axis=0))
-            
-            save_data_name =  f"""{str(nw)}_runs-{initial_run}-to-{run}_{nw.seed}_{nw.populations[0].get_cell_number()}_{nw.populations[1].get_cell_number()}_{nw.populations[2].get_cell_number()}_{nw.populations[3].get_cell_number()}_{args.n_cells[4]}_{args.n_pp_gc}_{args.n_pp_bc}_{args.pp_max_rate}_{args.W_pp_gc}_{ff_weight}_{fb_weight}_{fb_weight}_{args.W_bc_gc}_{args.W_hc_gc}"""
-            
+            gc_to_hc = np.array(nw.populations[0].connections[2].conductances).sum(axis=0).sum(axis=0)
+            gc_to_bc =np.array(nw.populations[0].connections[1].conductances).sum(axis=0).sum(axis=0)
+            bc_to_gc = np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0)
+            hc_to_gc = np.array(nw.populations[0].connections[4].conductances).sum(axis=0).sum(axis=0)
+        
             np.savez(args.savedir + os.path.sep + "time-stamps_" + save_data_name,
-                     pp_ts = np.array(pp_ts),
-                     gc_ts = np.array(gc_ts),
-                     mc_ts = np.array(mc_ts),
-                     bc_ts = np.array(bc_ts),
-                     hc_ts = np.array(hc_ts))
+                     pp_ts = np.array(curr_pp_ts),
+                     gc_ts = np.array(curr_gc_ts),
+                     mc_ts = np.array(curr_mc_ts),
+                     bc_ts = np.array(curr_bc_ts),
+                     hc_ts = np.array(curr_hc_ts))
             
             np.savez(args.savedir + os.path.sep + "conductances_" + save_data_name,
-                     pp_to_gc = np.array(pp_to_gc_list),
-                     gc_to_hc = np.array(gc_to_hc_list),
-                     gc_to_bc = np.array(gc_to_bc_list),
-                     bc_to_gc = np.array(bc_to_gc_list),
-                     hc_to_gc = np.array(hc_to_gc_list))
+                     pp_to_gc = np.array(pp_to_gc),
+                     gc_to_hc = np.array(gc_to_hc),
+                     gc_to_bc = np.array(gc_to_bc),
+                     bc_to_gc = np.array(bc_to_gc),
+                     hc_to_gc = np.array(hc_to_gc))
