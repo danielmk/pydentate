@@ -116,8 +116,6 @@ temporal_patterns_full = inhom_poiss(mod_rate=args.pp_mod_rate,
 runs = range(args.runs[0], args.runs[1], args.runs[2])
 ff_weights = np.arange(args.W_pp_bc[0], args.W_pp_bc[1], args.W_pp_bc[2])
 fb_weights = np.arange(args.W_gc_bc[0], args.W_gc_bc[1], args.W_gc_bc[2])
-print(ff_weights)
-print(fb_weights)
 for ff_weight in ff_weights:
     for fb_weight in fb_weights:
         for run in runs:
