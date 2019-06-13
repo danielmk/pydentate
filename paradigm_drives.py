@@ -214,3 +214,7 @@ for run in runs:
              gc_to_bc = np.array(gc_to_bc),
              bc_to_gc = np.array(bc_to_gc),
              hc_to_gc = np.array(hc_to_gc))
+
+    del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
+    del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
+    del nw

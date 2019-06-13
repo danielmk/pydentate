@@ -116,6 +116,8 @@ temporal_patterns_full = inhom_poiss(mod_rate=args.pp_mod_rate,
 runs = range(args.runs[0], args.runs[1], args.runs[2])
 ff_weights = np.arange(args.W_pp_bc[0], args.W_pp_bc[1], args.W_pp_bc[2])
 fb_weights = np.arange(args.W_gc_bc[0], args.W_gc_bc[1], args.W_gc_bc[2])
+print(ff_weights)
+print(fb_weights)
 for ff_weight in ff_weights:
     for fb_weight in fb_weights:
         for run in runs:
@@ -206,7 +208,7 @@ for ff_weight in ff_weights:
             gc_to_bc =np.array(nw.populations[0].connections[1].conductances).sum(axis=0).sum(axis=0)
             bc_to_gc = np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0)
             hc_to_gc = np.array(nw.populations[0].connections[4].conductances).sum(axis=0).sum(axis=0)
-        
+            
             np.savez(args.savedir + os.path.sep + "time-stamps_" + save_data_name,
                      pp_ts = np.array(curr_pp_ts),
                      gc_ts = np.array(curr_gc_ts),
@@ -220,3 +222,7 @@ for ff_weight in ff_weights:
                      gc_to_bc = np.array(gc_to_bc),
                      bc_to_gc = np.array(bc_to_gc),
                      hc_to_gc = np.array(hc_to_gc))
+            
+            del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
+            del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
+            del nw
