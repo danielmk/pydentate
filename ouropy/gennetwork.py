@@ -351,7 +351,8 @@ class tmgsynConnection(GenConnection):
 class DivergentTmgsynConnectionExpProb(GenConnection):
     def __init__(self, pre_pop, post_pop,
                  scale, target_segs, divergence,
-                 tau_1, tau_facil, U, tau_rec, e, thr, delay, weight):
+                 tau_1, tau_facil, U, tau_rec, e, thr, delay, weight,
+                 rec_cond=True):
         """Create a connection with tmgsyn as published by Tsodyks, Pawelzik &
         Markram, 1998.
         The tmgsyn is a dynamic three state implicit resource synapse model.
@@ -423,8 +424,10 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
         pre_cell_target = []
         synapses = []
         netcons = []
-        conductances = []
         conn_matrix = np.zeros((len(pre_pop_pos),len(post_pop_pos)))
+
+
+        conductances = []
 
         # Setup the Gaussian distribution
         # loc = post_pop.get_cell_number() / 2
@@ -458,15 +461,16 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
                     curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
                                            curr_syn, thr, delay, weight,
                                            sec=pre_pop[idx].soma)
-
-                    curr_gvec = h.Vector()
-                    curr_gvec.record(curr_syn._ref_g)
-                    curr_conductances.append(curr_gvec)
+                    if rec_cond:
+                        curr_gvec = h.Vector()
+                        curr_gvec.record(curr_syn._ref_g)
+                        curr_conductances.append(curr_gvec)
 
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
-            conductances.append(curr_conductances)
+            if rec_cond:
+                conductances.append(curr_conductances)
         self.conductances = conductances
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
@@ -475,7 +479,8 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
         
 class ImplicitConvergentTmgsynConnectionExpProb(GenConnection):
     def __init__(self, post_pop, t_patterns, target_segs, convergence,
-                     tau_1, tau_facil, U, tau_rec, e, weight):
+                     tau_1, tau_facil, U, tau_rec, e, weight,
+                     rec_cond=True):
         """Create a connection with tmgsyn as published by Tsodyks, Pawelzik &
         Markram, 1998.
         The tmgsyn is a dynamic three state implicit resource synapse model.
@@ -572,13 +577,15 @@ class ImplicitConvergentTmgsynConnectionExpProb(GenConnection):
                     curr_syn.tau_rec = tau_rec
                     curr_syn.e = e
                     curr_netcon = h.NetCon(curr_vecstim, curr_syn)
-                    curr_gvec = h.Vector()
-                    curr_gvec.record(curr_syn._ref_g)
-                    curr_conductances.append(curr_gvec)
+                    if rec_cond:
+                        curr_gvec = h.Vector()
+                        curr_gvec.record(curr_syn._ref_g)
+                        curr_conductances.append(curr_gvec)
                     curr_netcon.weight[0] = weight
                     netcons.append(curr_netcon)
                     synapses.append(curr_syn)
-                conductances.append(curr_conductances)
+                if rec_cond:
+                    conductances.append(curr_conductances)
 
         self.pre_pop = 'Implicit'
         self.post_pop = post_pop

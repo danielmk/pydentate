@@ -64,7 +64,7 @@ parser.add_argument('-W_pp_bc',
 parser.add_argument('-n_pp_gc',
                     type=int,
                     help='number of pp to gc synapses ',
-                    default=6,
+                    default=20,
                     dest='n_pp_gc')
 parser.add_argument('-n_pp_bc',
                     type=int,
@@ -93,6 +93,11 @@ parser.add_argument('-W_hc_gc',
                     help='number of hc to gc synapses',
                     default=6e-3,
                     dest='W_hc_gc')
+parser.add_argument('-rec_cond',
+                    type=int,
+                    help='number of hc to gc synapses',
+                    default=1,
+                    dest='rec_cond')
 args = parser.parse_args()
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
@@ -118,6 +123,8 @@ ff_weights = np.arange(args.W_pp_bc[0], args.W_pp_bc[1], args.W_pp_bc[2])
 fb_weights = np.arange(args.W_gc_bc[0], args.W_gc_bc[1], args.W_gc_bc[2])
 print(ff_weights)
 print(fb_weights)
+print(bool(args.rec_cond))
+print(args.rec_cond)
 for ff_weight in ff_weights:
     for fb_weight in fb_weights:
         for run in runs:
@@ -142,7 +149,8 @@ for ff_weight in ff_weights:
                                                     W_gc_hc=fb_weight,
                                                     W_bc_gc=args.W_bc_gc,
                                                     W_hc_gc=args.W_hc_gc,
-                                                    temporal_patterns=temporal_patterns)
+                                                    temporal_patterns=temporal_patterns,
+                                                    rec_cond=bool(args.rec_cond))
         
             # Run the model
             """Initialization for -2000 to -100"""
@@ -186,6 +194,7 @@ for ff_weight in ff_weights:
                               f"{fb_weight:08.5f}_"
                               f"{args.W_bc_gc:08.5f}_"
                               f"{args.W_hc_gc:08.5f}")
+
             if run == 0:
                 fig = nw.plot_aps(time=600)
                 tuned_fig_file_name =save_data_name
@@ -200,15 +209,6 @@ for ff_weight in ff_weights:
             curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             
-            pp_lines = nw.populations[0].connections[0:24]
-            summed_pp_lines = [np.array(x.conductances).sum(axis=0).sum(axis=0) for x in pp_lines]
-            pp_to_gc = np.array(summed_pp_lines).sum(axis=0)
-            
-            gc_to_hc = np.array(nw.populations[0].connections[2].conductances).sum(axis=0).sum(axis=0)
-            gc_to_bc =np.array(nw.populations[0].connections[1].conductances).sum(axis=0).sum(axis=0)
-            bc_to_gc = np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0)
-            hc_to_gc = np.array(nw.populations[0].connections[4].conductances).sum(axis=0).sum(axis=0)
-            
             np.savez(args.savedir + os.path.sep + "time-stamps_" + save_data_name,
                      pp_ts = np.array(curr_pp_ts),
                      gc_ts = np.array(curr_gc_ts),
@@ -216,13 +216,5 @@ for ff_weight in ff_weights:
                      bc_ts = np.array(curr_bc_ts),
                      hc_ts = np.array(curr_hc_ts))
             
-            np.savez(args.savedir + os.path.sep + "conductances_" + save_data_name,
-                     pp_to_gc = np.array(pp_to_gc),
-                     gc_to_hc = np.array(gc_to_hc),
-                     gc_to_bc = np.array(gc_to_bc),
-                     bc_to_gc = np.array(bc_to_gc),
-                     hc_to_gc = np.array(hc_to_gc))
-            
             del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
-            del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
             del nw
