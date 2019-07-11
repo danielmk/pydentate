@@ -133,8 +133,13 @@ def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
         time_idc.append(curr_idc)
     
     # Set the spike indices to 1
-    for sig_idx, idc in enumerate(time_idc):
-        sig[sig_idx,np.array(idc,dtype=np.int)] = 1
+    try:
+        for sig_idx, idc in enumerate(time_idc):
+            sig[sig_idx,np.array(idc,dtype=np.int)] = 1
+    except:
+        
+        for sig_idx, idc in enumerate(time_idc):
+            sig[sig_idx,np.array(idc,dtype=np.int)-1] = 1
 
     return sig
 
