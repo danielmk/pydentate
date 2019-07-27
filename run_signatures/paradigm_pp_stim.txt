@@ -1,0 +1,1 @@
+python paradigm_pp_stim.py -runs 0 25 1 -savedir "/home/daniel/repos/output/pp_stim_paradigm/gi_measures" -seed 10000 -pp_mod_rate 10 -pp_max_rate 100 -n_cells_gcs_mcs_bcs_hcs_pps 2000 60 24 24 24 -W_pp_gc 1.0e-3 -W_pp_bc 1.0e-3 3.6e-3 3.6e-3 -n_pp_gc 20 -n_pp_bc 20 -W_gc_bc 2.5e-2 2.6e-2 2.5e-2 -W_gc_hc 2.5e-2 -W_bc_gc 1.2e-3 -W_hc_gc 6e-3 -rec_cond 1

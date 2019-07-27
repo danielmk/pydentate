@@ -78,10 +78,9 @@ parser.add_argument('-W_gc_bc',
                     default=[1.5e-2,3.5e-2,1e-3],
                     dest='W_gc_bc')
 parser.add_argument('-W_gc_hc',
-                    nargs=3,
                     type=float,
                     help='number of gc to hc synapses',
-                    default=[1.5e-2,3.5e-2,1e-3],
+                    default=2.5e-2,
                     dest='W_gc_hc')
 parser.add_argument('-W_bc_gc',
                     type=float,
@@ -115,18 +114,14 @@ temporal_patterns_full = inhom_poiss(mod_rate=args.pp_mod_rate,
                                 max_rate=args.pp_max_rate,
                                 n_inputs=400)
 
-
-
 # Start the runs of the model
 runs = range(args.runs[0], args.runs[1], args.runs[2])
-ff_weights = np.arange(args.W_pp_bc[0], args.W_pp_bc[1], args.W_pp_bc[2])
-fb_weights = np.arange(args.W_gc_bc[0], args.W_gc_bc[1], args.W_gc_bc[2])
-print(ff_weights)
-print(fb_weights)
-print(bool(args.rec_cond))
-print(args.rec_cond)
-for ff_weight in ff_weights:
-    for fb_weight in fb_weights:
+pp_bc_weights = np.arange(args.W_pp_bc[0], args.W_pp_bc[1], args.W_pp_bc[2])
+gc_bc_weights = np.arange(args.W_gc_bc[0], args.W_gc_bc[1], args.W_gc_bc[2])
+print(pp_bc_weights)
+print(gc_bc_weights)
+for ff_weight in pp_bc_weights:
+    for fb_weight in gc_bc_weights:
         for run in runs:
             start_proc_t = time.perf_counter()
             print("Run: " + str(run) + ". Total time: " + str(start_proc_t))
@@ -135,7 +130,7 @@ for ff_weight in ff_weights:
                 temporal_patterns[idx] = np.array([])
             for idx in range(0,run):
                 temporal_patterns[idx] = np.array([])
-        
+
             nw = net_tunedrevexpdrives.TunedNetwork(seed=args.seed+run,
                                                     n_gcs=args.n_cells[0],
                                                     n_mcs=args.n_cells[1],
@@ -146,12 +141,12 @@ for ff_weight in ff_weights:
                                                     n_pp_gc=args.n_pp_gc,
                                                     n_pp_bc=args.n_pp_bc,
                                                     W_gc_bc=fb_weight,
-                                                    W_gc_hc=fb_weight,
+                                                    W_gc_hc=args.W_gc_hc,
                                                     W_bc_gc=args.W_bc_gc,
                                                     W_hc_gc=args.W_hc_gc,
                                                     temporal_patterns=temporal_patterns,
                                                     rec_cond=bool(args.rec_cond))
-            pdb.set_trace()
+
             # Run the model
             """Initialization for -2000 to -100"""
             h.cvode.active(0)
@@ -163,7 +158,7 @@ for ff_weight in ff_weights:
             h.dt = 10
             while h.t < -100:
                 h.fadvance()
-
+        
             h.secondorder = 2
             h.t = 0
             h.dt = 0.1
@@ -199,26 +194,40 @@ for ff_weight in ff_weights:
                 fig = nw.plot_aps(time=600)
                 tuned_fig_file_name =save_data_name
                 nw.save_ap_fig(fig, args.savedir, tuned_fig_file_name)
-
+            
             pp_lines = np.empty(400, dtype = np.object)
             pp_lines[0+run:args.n_cells[4]+run] = temporal_patterns[0+run:args.n_cells[4]+run]
             
             curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_mc_ts = np.array(tsts(nw.populations[1].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-            # MAJOR BUG
-            # curr_hc_ts and curr_bc_ts are switched. nw.populations[2] are actually
-            # the bcs and nw.populations[2] are the hcs. See net_tunedrevexpdrives.
-            # All downstream analysis has to respect this switch!
             curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-            
+
             np.savez(args.savedir + os.path.sep + "time-stamps_" + save_data_name,
                      pp_ts = np.array(curr_pp_ts),
                      gc_ts = np.array(curr_gc_ts),
                      mc_ts = np.array(curr_mc_ts),
                      bc_ts = np.array(curr_bc_ts),
                      hc_ts = np.array(curr_hc_ts))
+
+            if args.rec_cond:
+                pp_lines = nw.populations[0].connections[0:24]
+                summed_pp_lines = [np.array(x.conductances).sum(axis=0).sum(axis=0) for x in pp_lines]
+                pp_to_gc = np.array(summed_pp_lines).sum(axis=0)
+                
+                gc_to_hc = np.array(nw.populations[0].connections[2].conductances).sum(axis=0).sum(axis=0)
+                gc_to_bc =np.array(nw.populations[0].connections[1].conductances).sum(axis=0).sum(axis=0)
+                bc_to_gc = np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0)
+                hc_to_gc = np.array(nw.populations[0].connections[4].conductances).sum(axis=0).sum(axis=0)
+    
+                np.savez(args.savedir + os.path.sep + "conductances_" + save_data_name,
+                         pp_to_gc = np.array(pp_to_gc),
+                         gc_to_hc = np.array(gc_to_hc),
+                         gc_to_bc = np.array(gc_to_bc),
+                         bc_to_gc = np.array(bc_to_gc),
+                         hc_to_gc = np.array(hc_to_gc))
+                del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
             
             del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
             del nw
