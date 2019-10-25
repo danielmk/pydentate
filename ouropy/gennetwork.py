@@ -556,8 +556,8 @@ class ImplicitConvergentTmgsynConnectionExpProb(GenConnection):
         patternvecs = []
         t_patterns = np.array(t_patterns)  # nrn does not like np.ndarrays?
         conductances = []
-        conn_matrix = np.zeros((spat_patterns.shape[0],post_pop.get_cell_number()))
-    
+        conn_matrix = np.zeros((spat_patterns.shape[0], post_pop.get_cell_number()))
+
         for spat_idx, spat_pattern in enumerate(spat_patterns):
             target_cells = post_pop[spat_pattern]
             conn_matrix[spat_idx, spat_pattern] = 1
