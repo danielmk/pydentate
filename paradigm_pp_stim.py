@@ -92,6 +92,11 @@ parser.add_argument('-W_hc_gc',
                     help='number of hc to gc synapses',
                     default=6e-3,
                     dest='W_hc_gc')
+parser.add_argument('-t_pp_to_bc_offset',
+                    type=float,
+                    help="temporal offset between pp innervation of gcs and bcs",
+                    default=0.0,
+                    dest="t_pp_to_bc_offset")
 parser.add_argument('-rec_cond',
                     type=int,
                     help='number of hc to gc synapses',
@@ -115,8 +120,8 @@ temporal_patterns_full = inhom_poiss(mod_rate=args.pp_mod_rate,
                                 max_rate=args.pp_max_rate,
                                 n_inputs=400)
 """
-temporal_patterns_full_list = [[50.0] for x in range(399)]
-temporal_patterns_full_list.append([50.0, 600.0])
+temporal_patterns_full_list = [np.array([50.0+np.random.normal(0,2)])for x in range(399)]
+temporal_patterns_full_list.append(np.array([50.0+np.random.normal(0,2), 600.0]))
 temporal_patterns_full = np.array(temporal_patterns_full_list, dtype=np.object)
 
 # Start the runs of the model
@@ -149,6 +154,7 @@ for ff_weight in pp_bc_weights:
                                                     W_gc_hc=args.W_gc_hc,
                                                     W_bc_gc=args.W_bc_gc,
                                                     W_hc_gc=args.W_hc_gc,
+                                                    ff_t_offset=args.t_pp_to_bc_offset,
                                                     temporal_patterns=temporal_patterns,
                                                     rec_cond=bool(args.rec_cond))
 
@@ -169,7 +175,7 @@ for ff_weight in pp_bc_weights:
             h.secondorder = 2
             h.t = 0
             h.dt = 0.1
-        
+
             """Setup run control for -100 to 1500"""
             h.frecord_init()  # Necessary after changing t to restart the vectors
         
@@ -195,16 +201,17 @@ for ff_weight in pp_bc_weights:
                               f"{fb_weight:08.5f}_"
                               f"{fb_weight:08.5f}_"
                               f"{args.W_bc_gc:08.5f}_"
-                              f"{args.W_hc_gc:08.5f}")
+                              f"{args.W_hc_gc:08.5f}_"
+                              f"{args.t_pp_to_bc_offset}")
 
             if run == 0:
                 fig = nw.plot_aps(time=400)
                 tuned_fig_file_name =save_data_name
                 nw.save_ap_fig(fig, args.savedir, tuned_fig_file_name)
-            
+
             pp_lines = np.empty(400, dtype = np.object)
             pp_lines[0+run:args.n_cells[4]+run] = temporal_patterns[0+run:args.n_cells[4]+run]
-            
+
             curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_mc_ts = np.array(tsts(nw.populations[1].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
@@ -217,20 +224,14 @@ for ff_weight in pp_bc_weights:
                      mc_ts = np.array(curr_mc_ts),
                      bc_ts = np.array(curr_bc_ts),
                      hc_ts = np.array(curr_hc_ts))
-            
-            np.savez(args.savedir + os.path.sep + "vclamps_" + save_data_name,
-                     vclamp_gc_i = np.array(nw.populations[0].VClamps_i))
 
             if args.rec_cond:
-                pp_lines = nw.populations[0].connections[0:24]
-                summed_pp_lines = [np.array(x.conductances).sum(axis=0).sum(axis=0) for x in pp_lines]
-                pp_to_gc = np.array(summed_pp_lines).sum(axis=0)
-                
-                gc_to_hc = np.array(nw.populations[0].connections[2].conductances).sum(axis=0).sum(axis=0)
-                gc_to_bc =np.array(nw.populations[0].connections[1].conductances).sum(axis=0).sum(axis=0)
-                bc_to_gc = np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0)
-                hc_to_gc = np.array(nw.populations[0].connections[4].conductances).sum(axis=0).sum(axis=0)
-    
+                pp_to_gc = np.array(nw.populations[0].connections[0].conductances).sum(axis=0).sum(axis=0)
+                gc_to_hc = np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0)
+                gc_to_bc = np.array(nw.populations[0].connections[2].conductances).sum(axis=0).sum(axis=0)
+                bc_to_gc = np.array(nw.populations[0].connections[4].conductances).sum(axis=0).sum(axis=0)
+                hc_to_gc = np.array(nw.populations[0].connections[5].conductances).sum(axis=0).sum(axis=0)
+
                 np.savez(args.savedir + os.path.sep + "conductances_" + save_data_name,
                          pp_to_gc = np.array(pp_to_gc),
                          gc_to_hc = np.array(gc_to_hc),
@@ -238,6 +239,6 @@ for ff_weight in pp_bc_weights:
                          bc_to_gc = np.array(bc_to_gc),
                          hc_to_gc = np.array(hc_to_gc))
                 del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
-            
+
             del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
             del nw

@@ -28,7 +28,7 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
 
     def __init__(self, seed=None, n_gcs=2000, n_mcs=60, n_bcs=24, n_hcs=24,
                  W_pp_gc=1e-3, W_pp_bc=1e-3, n_pp_gc = 20, n_pp_bc = 20, W_gc_bc=2.5e-2, W_gc_hc=2.5e-2,
-                 W_bc_gc=1.2e-3, W_hc_gc=6e-3, temporal_patterns=np.array([]), rec_cond=True):
+                 W_bc_gc=1.2e-3, W_hc_gc=6e-3, ff_t_offset = 0, temporal_patterns=np.array([]), rec_cond=True):
         self.seed=seed
         # Set seed for reproducibility
         if seed:
@@ -53,9 +53,9 @@ class TunedNetwork(ouropy.gennetwork.GenNetwork):
         # PP -> GC
         ouropy.gennetwork.ImplicitConvergentTmgsynConnectionExpProb(self.populations[0], t_patterns, 'midd', n_pp_gc,
                      10, 0, 1, 0, 0, W_pp_gc, rec_cond=rec_cond)
-
+        bc_t_patterns = np.array([x+ff_t_offset for x in t_patterns])
         # PP -> BC
-        ouropy.gennetwork.ImplicitConvergentTmgsynConnectionExpProb(self.populations[2], t_patterns, 'ddend', n_pp_bc,
+        ouropy.gennetwork.ImplicitConvergentTmgsynConnectionExpProb(self.populations[2], bc_t_patterns, 'ddend', n_pp_bc,
                      6.3, 0, 1, 0, 0, W_pp_bc, rec_cond=rec_cond)
 
         # GC -> MC

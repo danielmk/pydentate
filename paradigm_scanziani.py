@@ -14,6 +14,8 @@ import argparse
 import time
 from analysis_main import time_stamps_to_signal
 import pdb
+import sys
+import matplotlib.pyplot as plt
 tsts = time_stamps_to_signal
 
 # Handle command line inputs with argparse
@@ -22,7 +24,7 @@ parser.add_argument('-runs',
                     nargs=3,
                     type=int,
                     help='start stop range for the range of runs',
-                    default=[0, 25, 1],
+                    default=[0, 1, 1],
                     dest='runs')
 parser.add_argument('-savedir',
                     type=str,
@@ -48,7 +50,7 @@ parser.add_argument('-n_cells_gcs_mcs_bcs_hcs_pps',
                     nargs=5,
                     type=int,
                     help='the cell numbers of the network',
-                    default=[2000, 60, 24, 24, 24],
+                    default=[2000, 60, 24, 24, 40],
                     dest='n_cells')
 parser.add_argument('-W_pp_gc',
                     type=float,
@@ -59,7 +61,7 @@ parser.add_argument('-W_pp_bc',
                     nargs=3,
                     type=float,
                     help='the weight of the pp to bc connection',
-                    default=[0,2e-3,1e-3],
+                    default=[0.0e-3,2e-3,3e-3],
                     dest='W_pp_bc')
 parser.add_argument('-n_pp_gc',
                     type=int,
@@ -75,7 +77,7 @@ parser.add_argument('-W_gc_bc',
                     nargs=3,
                     type=float,
                     help='weight of gc to bc synapses',
-                    default=[1.5e-2,3.5e-2,1e-3],
+                    default=[2.5e-2,3.5e-2,1e-3],
                     dest='W_gc_bc')
 parser.add_argument('-W_gc_hc',
                     type=float,
@@ -85,13 +87,23 @@ parser.add_argument('-W_gc_hc',
 parser.add_argument('-W_bc_gc',
                     type=float,
                     help='number of bc to gc synapses',
-                    default=1.2e-3,
+                    default=4.8e-3,
                     dest='W_bc_gc')
 parser.add_argument('-W_hc_gc',
                     type=float,
                     help='number of hc to gc synapses',
                     default=6e-3,
                     dest='W_hc_gc')
+parser.add_argument('-delta_t',
+                    type=float,
+                    help='number of hc to gc synapses',
+                    default=0.0,
+                    dest='delta_t')
+parser.add_argument('-t_pp_to_bc_offset',
+                    type=float,
+                    help="temporal offset between pp innervation of gcs and bcs",
+                    default=-4.5,
+                    dest="t_pp_to_bc_offset")
 parser.add_argument('-rec_cond',
                     type=int,
                     help='number of hc to gc synapses',
@@ -110,9 +122,18 @@ h.nrn_load_dll(dll_dir)
 
 # Generate temporal patterns for the 100 PP inputs
 np.random.seed(args.seed)
+
+"""
 temporal_patterns_full = inhom_poiss(mod_rate=args.pp_mod_rate,
                                 max_rate=args.pp_max_rate,
                                 n_inputs=400)
+"""
+
+temporal_patterns_full_list_1 = [np.array([100.0+np.random.normal(0,2)]) for x in range(args.n_cells[4]-1)]
+temporal_patterns_full_list_2 = [np.array([100+np.random.normal(0,2)]), 600.0]
+temporal_patterns_full_list_3 = [np.array([100.0+np.random.normal(0,2)+args.delta_t]) for x in range(args.n_cells[4])]
+temporal_patterns_full_list_4 = [np.array([]) for x in range(400-2*args.n_cells[4])]
+temporal_patterns_full = np.array(temporal_patterns_full_list_1+temporal_patterns_full_list_2+temporal_patterns_full_list_3+temporal_patterns_full_list_4, dtype=np.object)
 
 # Start the runs of the model
 runs = range(args.runs[0], args.runs[1], args.runs[2])
@@ -126,10 +147,6 @@ for ff_weight in pp_bc_weights:
             start_proc_t = time.perf_counter()
             print("Run: " + str(run) + ". Total time: " + str(start_proc_t))
             temporal_patterns = temporal_patterns_full.copy()
-            for idx in range(run+args.n_cells[4],temporal_patterns.shape[0]):
-                temporal_patterns[idx] = np.array([])
-            for idx in range(0,run):
-                temporal_patterns[idx] = np.array([])
 
             nw = net_tunedrevexpdrives.TunedNetwork(seed=args.seed+run,
                                                     n_gcs=args.n_cells[0],
@@ -144,9 +161,15 @@ for ff_weight in pp_bc_weights:
                                                     W_gc_hc=args.W_gc_hc,
                                                     W_bc_gc=args.W_bc_gc,
                                                     W_hc_gc=args.W_hc_gc,
+                                                    ff_t_offset=args.t_pp_to_bc_offset,
                                                     temporal_patterns=temporal_patterns,
                                                     rec_cond=bool(args.rec_cond))
-            print("nw setup done")
+            print("Done setting up nw")
+            nw.populations[0].voltage_recording(range(2000))
+            nw.populations[1].voltage_recording(range(60))
+            nw.populations[2].voltage_recording(range(24))
+            nw.populations[3].voltage_recording(range(24))
+
             # Run the model
             """Initialization for -2000 to -100"""
             h.cvode.active(0)
@@ -158,15 +181,15 @@ for ff_weight in pp_bc_weights:
             h.dt = 10
             while h.t < -100:
                 h.fadvance()
-        
+
             h.secondorder = 2
             h.t = 0
             h.dt = 0.1
-        
+
             """Setup run control for -100 to 1500"""
             h.frecord_init()  # Necessary after changing t to restart the vectors
         
-            while h.t < 600:
+            while h.t < 300:
                 h.fadvance()
             end_proc_t = time.perf_counter()
             print("Done Running at " + str(end_proc_t) + " after " + str((end_proc_t - start_proc_t)/60) + " minutes")
@@ -186,23 +209,25 @@ for ff_weight in pp_bc_weights:
                               f"{args.pp_mod_rate:04d}_"
                               f"{args.pp_max_rate:04d}_"
                               f"{fb_weight:08.5f}_"
-                              f"{args.W_gc_hc:08.5f}_"
+                              f"{fb_weight:08.5f}_"
                               f"{args.W_bc_gc:08.5f}_"
-                              f"{args.W_hc_gc:08.5f}")
+                              f"{args.W_hc_gc:08.5f}_"
+                              f"{args.t_pp_to_bc_offset}_"
+                              f"{args.delta_t:08.5f}")
 
             if run == 0:
-                fig = nw.plot_aps(time=600)
+                fig = nw.plot_aps(time=200)
                 tuned_fig_file_name =save_data_name
                 nw.save_ap_fig(fig, args.savedir, tuned_fig_file_name)
-            
+
             pp_lines = np.empty(400, dtype = np.object)
             pp_lines[0+run:args.n_cells[4]+run] = temporal_patterns[0+run:args.n_cells[4]+run]
-            
-            curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-            curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-            curr_mc_ts = np.array(tsts(nw.populations[1].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-            curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-            curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
+
+            curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=300), dtype = np.bool)
+            curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=300), dtype = np.bool)
+            curr_mc_ts = np.array(tsts(nw.populations[1].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=300), dtype = np.bool)
+            curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=300), dtype = np.bool)
+            curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=300), dtype = np.bool)
 
             np.savez(args.savedir + os.path.sep + "time-stamps_" + save_data_name,
                      pp_ts = np.array(curr_pp_ts),
@@ -211,21 +236,27 @@ for ff_weight in pp_bc_weights:
                      bc_ts = np.array(curr_bc_ts),
                      hc_ts = np.array(curr_hc_ts))
 
+            np.savez(args.savedir + os.path.sep + "vrecords_" + save_data_name,
+                     gcs = np.array(np.array(nw.populations[0].VRecords)),
+                     mcs = np.array(np.array(nw.populations[1].VRecords)),
+                     bcs = np.array(np.array(nw.populations[2].VRecords)),
+                     hcs = np.array(np.array(nw.populations[3].VRecords)))
+
             if args.rec_cond:
-                pp_to_gc = np.array(nw.populations[0].connections[0].conductances).sum(axis=0).sum(axis=0)
+                pp_to_gc = np.nansum(np.nansum(np.array(nw.populations[0].connections[0].conductances), axis=0),axis=0)
+                pp_to_bc = np.array(nw.populations[2].connections[0].conductances).sum(axis=0).sum(axis=0)
                 gc_to_hc = np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0)
                 gc_to_bc = np.array(nw.populations[0].connections[2].conductances).sum(axis=0).sum(axis=0)
                 bc_to_gc = np.array(nw.populations[0].connections[4].conductances).sum(axis=0).sum(axis=0)
                 hc_to_gc = np.array(nw.populations[0].connections[5].conductances).sum(axis=0).sum(axis=0)
-    
+                sys.exit()
                 np.savez(args.savedir + os.path.sep + "conductances_" + save_data_name,
                          pp_to_gc = np.array(pp_to_gc),
                          gc_to_hc = np.array(gc_to_hc),
                          gc_to_bc = np.array(gc_to_bc),
                          bc_to_gc = np.array(bc_to_gc),
                          hc_to_gc = np.array(hc_to_gc))
-                del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
+                #del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
             
             del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
             del nw
-            
