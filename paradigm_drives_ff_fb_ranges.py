@@ -93,6 +93,11 @@ parser.add_argument('-W_hc_gc',
                     help='number of hc to gc synapses',
                     default=6e-3,
                     dest='W_hc_gc')
+parser.add_argument('-t_pp_to_bc_offset',
+                    type=float,
+                    help="temporal offset between pp innervation of gcs and bcs",
+                    default=0.0,
+                    dest="t_pp_to_bc_offset")
 parser.add_argument('-rec_cond',
                     type=int,
                     help='number of hc to gc synapses',
@@ -149,9 +154,9 @@ for ff_weight in ff_weights:
                                                     W_gc_hc=fb_weight,
                                                     W_bc_gc=args.W_bc_gc,
                                                     W_hc_gc=args.W_hc_gc,
+                                                    ff_t_offset=args.t_pp_to_bc_offset,
                                                     temporal_patterns=temporal_patterns,
                                                     rec_cond=bool(args.rec_cond))
-            pdb.set_trace()
             # Run the model
             """Initialization for -2000 to -100"""
             h.cvode.active(0)
@@ -193,7 +198,8 @@ for ff_weight in ff_weights:
                               f"{fb_weight:08.5f}_"
                               f"{fb_weight:08.5f}_"
                               f"{args.W_bc_gc:08.5f}_"
-                              f"{args.W_hc_gc:08.5f}")
+                              f"{args.W_hc_gc:08.5f}_"
+                              f"{args.t_pp_to_bc_offset}")
 
             if run == 0:
                 fig = nw.plot_aps(time=600)

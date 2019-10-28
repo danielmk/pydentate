@@ -469,8 +469,8 @@ class DivergentTmgsynConnectionExpProb(GenConnection):
                     curr_netcons.append(curr_netcon)
                     netcons.append(curr_netcons)
                     synapses.append(curr_syns)
-            if rec_cond:
-                conductances.append(curr_conductances)
+                if rec_cond:
+                    conductances.append(curr_conductances)
         self.conductances = conductances
         self.netcons = netcons
         self.pre_cell_targets = np.array(pre_cell_target)
@@ -541,13 +541,13 @@ class ImplicitConvergentTmgsynConnectionExpProb(GenConnection):
         targets = np.array([np.random.choice(t_patterns.shape[0], convergence, replace=False)
                                            for x in range(post_pop.get_cell_number())])
         targets = targets.swapaxes(0, 1)
-        
+
         implicit_post_mapping = []
         for x in range(0, 400):
             implicit_post_mapping.append(np.argwhere(targets == x)[:, 1])
-    
+
         spat_patterns = np.array(implicit_post_mapping)
-    
+
         self.init_parameters = locals()
         post_pop.add_connection(self)
         synapses = []
