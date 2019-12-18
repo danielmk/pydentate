@@ -5,10 +5,10 @@ Created on Mon Mar 05 13:41:23 2018
 @author: DanielM
 """
 
-from neuron import h, gui  # gui necessary for some parameters to h namespace 
+from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_tunedrev
-from burst_generator_inhomogeneous_poisson import inhom_poiss
+from burst_generator_inhomogeneous_poisson import hom_poiss
 import os
 import argparse
 
@@ -25,16 +25,27 @@ parser.add_argument('-savedir',
                     help='complete directory where data is saved',
                     default=os.getcwd(),
                     dest='savedir')
+parser.add_argument('-rate',
+                    type=int,
+                    help='standard deviation of gaussian distribution',
+                    default=200,
+                    dest='input_rate')
+parser.add_argument('-seed',
+                    type=int,
+                    help='standard deviation of gaussian distribution',
+                    default=0,
+                    dest='seed')
 
 args = parser.parse_args()
 runs = range(args.runs[0], args.runs[1], args.runs[2])
 savedir = args.savedir
+input_rate = args.input_rate
+seed = args.seed
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
-dll_files = [("C:\\Users\\Daniel\\repos\\pyDentate\\mechs_7-5\\nrnmech.dll"),
-             ("C:\\Users\\DanielM\\Repos\\models_dentate\\"
-              "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
-              "dentategyrusnet2005\\nrnmech.dll"),
+dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
+             "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
+             "dentategyrusnet2005\\nrnmech.dll"),
             "C:\\Users\\daniel\\Repos\\nrnmech.dll",
             ("C:\\Users\\Holger\\danielm\\models_dentate\\"
              "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
@@ -49,44 +60,44 @@ print("DLL loaded from: " + str(dll_dir))
 h.nrn_load_dll(dll_dir)
 
 # Generate temporal patterns for the 100 PP inputs
-np.random.seed(10000)
-temporal_patterns = inhom_poiss()
+np.random.seed(seed)
+temporal_patterns = hom_poiss(input_rate)
 
-# Generate the PP -> GC mapping so that each GC receives inputs from 20/400
-# randomly chosen PP inputs
-innervation_pattern_gc = np.array([np.random.choice(400, 20, replace=False)
+innervation_pattern_gc = np.array([np.random.choice(400,20, replace = False)
                                    for x in range(2000)])
-innervation_pattern_gc = innervation_pattern_gc.swapaxes(0, 1)
+innervation_pattern_gc = innervation_pattern_gc.swapaxes(0,1)
 
 PP_to_GCs = []
-for x in range(0, 400):
-    PP_to_GCs.append(np.argwhere(innervation_pattern_gc == x)[:, 1])
+for x in range(0,400):
+    PP_to_GCs.append(np.argwhere(innervation_pattern_gc == x)[:,1])
 
 PP_to_GCs = np.array(PP_to_GCs)
 
 # Generate the PP -> BC mapping as above
-innervation_pattern_bc = np.array([np.random.choice(400, 20, replace=False)
+innervation_pattern_bc = np.array([np.random.choice(400,20, replace = False)
                                    for x in range(24)])
-innervation_pattern_bc = innervation_pattern_bc.swapaxes(0, 1)
+innervation_pattern_bc = innervation_pattern_bc.swapaxes(0,1)
 
 PP_to_BCs = []
-for x in range(0, 400):
-    PP_to_BCs.append(np.argwhere(innervation_pattern_bc == x)[:, 1])
+for x in range(0,400):
+    PP_to_BCs.append(np.argwhere(innervation_pattern_bc == x)[:,1])
 
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
 # Start the runs of the model
 for run in runs:
-    nw = net_tunedrev.TunedNetwork(10000, temporal_patterns[0+run:24+run],
-                                   PP_to_GCs[0+run:24+run],
-                                   PP_to_BCs[0+run:24+run])
+    print("Starting Setup for run " + str(run))
+    nw = net_tunedrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
+                                PP_to_GCs[0+run:24+run],
+                                PP_to_BCs[0+run:24+run])
 
     # Attach voltage recordings to all cells
     nw.populations[0].voltage_recording(range(2000))
     nw.populations[1].voltage_recording(range(60))
     nw.populations[2].voltage_recording(range(24))
     nw.populations[3].voltage_recording(range(24))
+
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
@@ -102,17 +113,26 @@ for run in runs:
     h.secondorder = 2
     h.t = 0
     h.dt = 0.1
+    
+    print("Starting run " + str(run))
 
     """Setup run control for -100 to 1500"""
     h.frecord_init()  # Necessary after changing t to restart the vectors
 
     while h.t < 600:
         h.fadvance()
-    print("Done Running")
 
-    tuned_save_file_name = str(nw) + '_run_' + str(run)
+    print("Done Running " + str(run))
+
+    tuned_save_file_name = (str(nw) + "_data_paradigm_rate-pattern"
+                            "-separation_run_scale_seed_" +
+                            str(run).zfill(3) + '_' +
+                            str(input_rate).zfill(3) + '_' + str(seed)
     nw.shelve_network(savedir, tuned_save_file_name)
 
     fig = nw.plot_aps(time=600)
-    tuned_fig_file_name = str(nw) + '_spike_plot_run_' + str(run)
+    tuned_fig_file_name = (str(nw) + "_spike-plot_paradigm_rate-pattern"
+                           "-separation_run_scale_seed_" +
+                           str(run).zfill(3) + '_' +
+                           str(input_rate).zfill(3) + '_' + str(seed)
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)

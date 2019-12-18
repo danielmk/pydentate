@@ -30,7 +30,7 @@ class HippCell(GenNeuron):
                          sec_names=['proxd', 'midd', 'distd'],
                          diam=[3, 2, 1], L=[75, 75, 75], soma_loc=1.0)
 
-        parameters = params.read_parameters('C:\\Users\\Daniel\\repos\\pyDentate\\hippcellparams.txt')
+        parameters = params.read_parameters('hippcellparams.txt')
 
         self.parameters = parameters
 
