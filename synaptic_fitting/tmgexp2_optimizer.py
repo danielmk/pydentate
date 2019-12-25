@@ -16,7 +16,8 @@ begin = time.time()
 
 # Data path msut be given here either for gcmc or gcin, or another dataset
 # unused one was commented out
-data_path_gcmc = "/home/can/Downloads/gc_to_mc"
+#data_path_gcmc = "/home/can/Downloads/gc_to_mc"
+data_path_gcmc = "C:\\Users\\Daniel\\Dropbox\\02_MEC Project\\BarisProject\\data"
 #data_path_gcin = "/home/can/Downloads/gc_to_in"
 peaks = peakfinder(data_path_gcmc)[0]
 #peaks = peakfinder(data_path_gcin)[0]
@@ -83,7 +84,7 @@ res for granule cell to mossy cell, order [tau_facil, tau_rec, u0]
 
 Out[2]: 
  final_simplex: (array([[3.82057408e+03, 3.26025349e+01, 7.78641198e-02]
-           fun: 0.028299227264135973
+           fun: 0.028299227264135973resx
        message: 'Optimization terminated successfully.'
           nfev: 284
            nit: 155
@@ -91,5 +92,4 @@ Out[2]:
        success: True
              x: array([3.82057408e+03, 3.26025349e+01, 7.78641198e-02])
 
-"""
 """

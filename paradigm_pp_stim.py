@@ -171,7 +171,7 @@ for ff_weight in pp_bc_weights:
             h.dt = 10
             while h.t < -100:
                 h.fadvance()
-        
+
             h.secondorder = 2
             h.t = 0
             h.dt = 0.1
