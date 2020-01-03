@@ -43,7 +43,7 @@ for idx1, x in enumerate(tau_facil_space):
 result1 = np.array([2.22590184e+13, 3.12395254e+02, 8.15226996e-01])
 result1_sim = simulate(result1[0],
                        result1[1],
-                       5,
+                       10,
                        pp_to_gc_args[1],
                        pp_to_gc_args[2],
                        pp_to_gc_args[3],

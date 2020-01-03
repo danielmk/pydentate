@@ -269,6 +269,6 @@ if __name__ == "__main__":
     )
 
     pp_to_gc_args = (pp_to_gc_vec, GranuleCell, 1.5, 5.5, 0.5, -70.42, 'midd', [5,10])
-    pp_to_gc_x0 = [1000, 400, 0.5]
+    pp_to_gc_x0 = [1000, 1000, 0.1]
     #loss(gc_to_in_x0, gc_to_in_args)
-    res_pp_gc = minimize(loss, pp_to_gc_x0, pp_to_gc_args, method='Nelder-Mead', options={'maxfev': 2000, 'maxiter': 1000})
+    res_pp_gc = minimize(loss, pp_to_gc_x0, pp_to_gc_args, method='Nelder-Mead', options={'maxfev': 3000, 'maxiter': 2000})
