@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from mossycell import MossyCell
 from basketcell import BasketCell
 from granulecell import GranuleCell
+import matplotlib as mpl
 
 freqs = [1,10,30,50]
 gc_mc_sim_initial = []
@@ -111,38 +112,44 @@ fig1, axes = plt.subplots(2, 4)
 csiminit = '#1b9e77'
 csimopt = '#d95f02'
 cdata = '#7570b3'
+errorbar_marker = 'o'
+mpl.rcParams['lines.linewidth'] = 0.5
+mpl.rcParams['lines.markersize'] = 3
+mpl.rcParams['lines.marker'] = None
+mpl.rcParams['errorbar.capsize'] = 3
+
 legend = ("Initial", "Optimized ", "Data")
-axes[0,0].errorbar(x, gc_to_mc['peaks_norm_01'], yerr=gc_to_mc['peaks_sem_01'], marker='o', color = cdata,capsize=2, capthick=1)
+axes[0,0].errorbar(x, gc_to_mc['peaks_norm_01'], yerr=gc_to_mc['peaks_sem_01'], marker=errorbar_marker)
 axes[0,0].plot(x, gc_mc_sim_initial[0], marker='o', color = csiminit)
 axes[0,0].plot(x, gc_mc_sim_optimized[0], marker='o', color = csimopt)
 axes[0,0].legend(legend)
 
-axes[0,1].errorbar(x, gc_to_mc['peaks_norm_10'], yerr=gc_to_mc['peaks_sem_10'], marker='o', color = cdata,capsize=2, capthick=1)
+axes[0,1].errorbar(x, gc_to_mc['peaks_norm_10'], yerr=gc_to_mc['peaks_sem_10'], marker=errorbar_marker)
 axes[0,1].plot(x, gc_mc_sim_initial[1], marker='o', color = csiminit)
 axes[0,1].plot(x, gc_mc_sim_optimized[1], marker='o', color = csimopt)
 
-axes[0,2].errorbar(x, gc_to_mc['peaks_norm_30'], yerr=gc_to_mc['peaks_sem_30'], marker='o', color = cdata,capsize=2, capthick=1)
+axes[0,2].errorbar(x, gc_to_mc['peaks_norm_30'], yerr=gc_to_mc['peaks_sem_30'], marker=errorbar_marker)
 axes[0,2].plot(x, gc_mc_sim_initial[2], marker='o', color = csiminit)
 axes[0,2].plot(x, gc_mc_sim_optimized[2], marker='o', color = csimopt)
 
-axes[0,3].errorbar(x, gc_to_mc['peaks_norm_50'], yerr=gc_to_mc['peaks_sem_50'], marker='o', color = cdata,capsize=2, capthick=1)
+axes[0,3].errorbar(x, gc_to_mc['peaks_norm_50'], yerr=gc_to_mc['peaks_sem_50'], marker=errorbar_marker)
 axes[0,3].plot(x, gc_mc_sim_initial[3], marker='o', color = csiminit)
 axes[0,3].plot(x, gc_mc_sim_optimized[3], marker='o', color = csimopt)
 
-axes[1,0].errorbar(x, gc_to_in['peaks_norm_01'], yerr=gc_to_in['peaks_sem_01'], marker='o', color = cdata,capsize=2, capthick=1)
+axes[1,0].errorbar(x, gc_to_in['peaks_norm_01'], yerr=gc_to_in['peaks_sem_01'], marker=errorbar_marker)
 axes[1,0].plot(x, gc_in_sim_initial[0], marker='o', color = csiminit)
 axes[1,0].plot(x, gc_in_sim_optimized[0], marker='o', color = csimopt)
 axes[1,0].legend(legend)
 
-axes[1,1].errorbar(x, gc_to_in['peaks_norm_10'], yerr=gc_to_in['peaks_sem_10'], marker='o', color = cdata,capsize=2, capthick=1)
+axes[1,1].errorbar(x, gc_to_in['peaks_norm_10'], yerr=gc_to_in['peaks_sem_10'], marker=errorbar_marker)
 axes[1,1].plot(x, gc_in_sim_initial[1], marker='o', color = csiminit)
 axes[1,1].plot(x, gc_in_sim_optimized[1], marker='o', color = csimopt)
 
-axes[1,2].errorbar(x, gc_to_in['peaks_norm_30'], yerr=gc_to_in['peaks_sem_30'], marker='o', color = cdata,capsize=2, capthick=1)
+axes[1,2].errorbar(x, gc_to_in['peaks_norm_30'], yerr=gc_to_in['peaks_sem_30'], marker=errorbar_marker)
 axes[1,2].plot(x, gc_in_sim_initial[2], marker='o', color = csiminit)
 axes[1,2].plot(x, gc_in_sim_optimized[2], marker='o', color = csimopt)
 
-axes[1,3].errorbar(x, gc_to_in['peaks_norm_50'], yerr=gc_to_in['peaks_sem_50'], marker='o', color = cdata,capsize=2, capthick=1)
+axes[1,3].errorbar(x, gc_to_in['peaks_norm_50'], yerr=gc_to_in['peaks_sem_50'], marker=errorbar_marker)
 axes[1,3].plot(x, gc_in_sim_initial[3], marker='o', color = csiminit)
 axes[1,3].plot(x, gc_in_sim_optimized[3], marker='o', color = csimopt)
 
@@ -165,13 +172,13 @@ csiminit = '#1b9e77'
 csimopt = '#d95f02'
 cdata = '#7570b3'
 legend = ("Initial", "Optimized ", "Data")
-axes2[0].errorbar(x, pp_to_gc['peaks_norm_05'], yerr=pp_to_gc['peaks_sem_05'], marker='o', color = cdata,capsize=2, capthick=1)
+axes2[0].errorbar(x, pp_to_gc['peaks_norm_05'], yerr=pp_to_gc['peaks_sem_05'], marker=errorbar_marker, color = cdata)
 axes2[0].plot(x, pp_gc_sim_initial[0], marker='o', color = csiminit)
 axes2[0].plot(x, pp_gc_sim_optimized[0], marker='o', color = csimopt)
 axes2[0].legend(legend)
 axes2[0].set_title("5Hz")
 
-axes2[1].errorbar(x, pp_to_gc['peaks_norm_10'], yerr=pp_to_gc['peaks_sem_10'], marker='o', color = cdata,capsize=2, capthick=1)
+axes2[1].errorbar(x, pp_to_gc['peaks_norm_10'], yerr=pp_to_gc['peaks_sem_10'], marker=errorbar_marker, color = cdata)
 axes2[1].plot(x, pp_gc_sim_initial[1], marker='o', color = csiminit)
 axes2[1].plot(x, pp_gc_sim_optimized[1], marker='o', color = csimopt)
 axes2[1].set_title("10Hz")

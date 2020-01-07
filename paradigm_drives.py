@@ -22,7 +22,7 @@ parser.add_argument('-runs',
                     nargs=3,
                     type=int,
                     help='start stop range for the range of runs',
-                    default=[0, 25, 1],
+                    default=[0, 1, 1],
                     dest='runs')
 parser.add_argument('-savedir',
                     type=str,
@@ -58,7 +58,7 @@ parser.add_argument('-W_pp_gc',
 parser.add_argument('-W_pp_bc',
                     type=float,
                     help='the weight of the pp to bc connection',
-                    default=1e-3*0,
+                    default=1e-3,
                     dest='W_pp_bc')
 parser.add_argument('-n_pp_gc',
                     type=int,
@@ -90,6 +90,11 @@ parser.add_argument('-W_hc_gc',
                     help='number of hc to gc synapses',
                     default=6e-3,
                     dest='W_hc_gc')
+parser.add_argument('-rec_cond',
+                    type=int,
+                    help='number of hc to gc synapses',
+                    default=1,
+                    dest='rec_cond')
 
 args = parser.parse_args()
 
@@ -133,8 +138,9 @@ for run in runs:
                                             W_gc_hc=args.W_gc_hc,
                                             W_bc_gc=args.W_bc_gc,
                                             W_hc_gc=args.W_hc_gc,
-                                            temporal_patterns=temporal_patterns)
-    
+                                            temporal_patterns=temporal_patterns,
+                                            rec_cond=False)
+
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
@@ -185,17 +191,17 @@ for run in runs:
 
     pp_lines = np.empty(400, dtype = np.object)
     pp_lines[0+run:24+run] = temporal_patterns[0+run:24+run]
-    
+
     curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
     curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
     curr_mc_ts = np.array(tsts(nw.populations[1].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
     curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
     curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-    
+
     pp_lines = nw.populations[0].connections[0:24]
     summed_pp_lines = [np.array(x.conductances).sum(axis=0).sum(axis=0) for x in pp_lines]
     pp_to_gc = np.array(summed_pp_lines).sum(axis=0)
-    
+
     gc_to_hc = np.array(nw.populations[0].connections[2].conductances).sum(axis=0).sum(axis=0)
     gc_to_bc =np.array(nw.populations[0].connections[1].conductances).sum(axis=0).sum(axis=0)
     bc_to_gc = np.array(nw.populations[0].connections[3].conductances).sum(axis=0).sum(axis=0)
@@ -207,7 +213,7 @@ for run in runs:
              mc_ts = np.array(curr_mc_ts),
              bc_ts = np.array(curr_bc_ts),
              hc_ts = np.array(curr_hc_ts))
-    
+
     np.savez(args.savedir + os.path.sep + "conductances_" + save_data_name,
              pp_to_gc = np.array(pp_to_gc),
              gc_to_hc = np.array(gc_to_hc),
@@ -215,6 +221,6 @@ for run in runs:
              bc_to_gc = np.array(bc_to_gc),
              hc_to_gc = np.array(hc_to_gc))
 
-    del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
-    del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
-    del nw
+    #del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
+    #del pp_to_gc, gc_to_hc, gc_to_bc, bc_to_gc, hc_to_gc
+    #del nw

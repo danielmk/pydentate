@@ -52,6 +52,7 @@ class TunedNetwork(GenNetwork):
         # PP -> GC
         ImplicitConvergentTmgsynConnectionExpProb(self.populations[0], t_patterns, 'midd', n_pp_gc,
                      1.5, 10, 2.22590184e+13, 0.1, 3.12395254e+02, 8.15226996e-01, 0, W_pp_gc, rec_cond=rec_cond)
+
         # PP -> BC
         ImplicitConvergentTmgsynConnectionExpProb(self.populations[2], t_patterns, 'ddend', n_pp_bc,
                      2, 6.3, 0, 1, 0, 0, 0, W_pp_bc, rec_cond=rec_cond)
@@ -70,7 +71,7 @@ class TunedNetwork(GenNetwork):
 
         ConnDivergent(self.populations[0], self.populations[1],
                                   6/60, 'proxd', 1, h.tmgexp2syn, gc_mc_syn,  gc_mc_net, rec_cond=rec_cond)
-        
+
         # GC -> BC
         #Weight x4, target_pool = 2
         gc_bc_syn = {'tau_1': 0.3,
@@ -85,7 +86,7 @@ class TunedNetwork(GenNetwork):
                     'weight':  W_gc_bc}
         ConnDivergent(self.populations[0], self.populations[2],
                                            4/24, 'proxd', 1, h.tmgexp2syn, gc_bc_syn, gc_bc_net, rec_cond=rec_cond)
-        
+
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.
         gc_hc_syn = {'tau_1': 0.3,
