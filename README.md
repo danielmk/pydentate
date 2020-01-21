@@ -20,7 +20,7 @@ Follow these steps to get started with pyDentate
 </ol>
 
 # Usage
-To run an existing model you simple have to execute a paradigm_ file after following the setup steps above. paradigm_ files are scripts that take care of everything from creating networks, simulating the networks and saving the output. Networks in turn
+To run an existing model you simple have to execute a paradigm_ file after following the setup steps above. paradigm_ files are scripts that take care of everything from creating networks, simulating the networks and saving the output. Classes that implement networks are in net_ files. Those nets inherit from ouropy GenNetwork class which implements their generic network logic, such as creating populations and connections.
 
 # References
 pyDentate builds on a computational model from this paper: Santhakumar, V., Aradi, I., & Soltesz, I. (2005). Role of mossy fiber sprouting and mossy cell loss in hyperexcitability: a network model of the dentate gyrus incorporating cell types and axonal topography. Journal of Neurophysiology, 93(1), 437–453. https://doi.org/10.1152/jn.00777.2004
