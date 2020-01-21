@@ -1,6 +1,6 @@
 # pyDentate
 
-pyDentate is a biophysically realistic computational model of the dentate gyrus, a hippocampal brain region associated with memory formation and a computation called pattern separation. The properties of the this model are based on a [dentate model] (http://www.opensourcebrain.org/projects/dentate) from the Soltesz Laboratory. We made changes based on new literature and our own experimental findings. Furthermore, we introduced enhancements to study pattern separation.
+pyDentate is a biophysically realistic computational model of the dentate gyrus, a hippocampal brain region associated with memory formation and a computation called pattern separation.  We made changes based on new literature and our own experimental findings. Furthermore, we introduced enhancements to study pattern separation.
 
 # Getting started
 Follow these steps to get started with pyDentate
@@ -26,6 +26,7 @@ To run an existing model you simple have to execute a paradigm_ file after follo
 
 # References
 pyDentate builds on a computational model from this paper: Santhakumar, V., Aradi, I., & Soltesz, I. (2005). Role of mossy fiber sprouting and mossy cell loss in hyperexcitability: a network model of the dentate gyrus incorporating cell types and axonal topography. Journal of Neurophysiology, 93(1), 437–453. https://doi.org/10.1152/jn.00777.2004
+Their model can be found [here](http://www.opensourcebrain.org/projects/dentate)
 
 # Author
 
