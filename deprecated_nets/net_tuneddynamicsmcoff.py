@@ -26,8 +26,8 @@ class TunedNetwork(GenNetwork):
     name = "TunedNetworkExpDrives"
 
     def __init__(self, seed=None, n_gcs=2000, n_mcs=60, n_bcs=24, n_hcs=24,
-                 W_pp_gc=1e-3, W_pp_bc=1e-3, n_pp_gc = 20, n_pp_bc = 6, W_gc_bc=2.5e-2, W_gc_hc=2.5e-2,
-                 W_bc_gc=1.2e-3, W_hc_gc=6e-3, temporal_patterns=np.array([]), rec_cond=True):
+                 W_pp_gc=1e-3, W_pp_bc=1e-3, n_pp_gc = 20, n_pp_bc = 20, W_gc_bc=2.5e-2, W_gc_hc=2.5e-2,
+                 W_bc_gc=1.2e-3, W_hc_gc=6e-3, temporal_patterns=np.array([]), rec_cond=False):
         self.seed=seed
         # Set seed for reproducibility
         if seed:
@@ -117,7 +117,7 @@ class TunedNetwork(GenNetwork):
                      'e': 0,}
         mc_gc_net = {'threshold': 10,
                     'delay': 3,
-                    'weight':  3e-4}
+                    'weight':  3e-4*0}
         ConnDivergent(self.populations[1], self. populations[0],
                                            42/60, 'proxd',200, h.tmgexp2syn, mc_gc_syn, mc_gc_net, rec_cond=rec_cond)
 
@@ -131,7 +131,7 @@ class TunedNetwork(GenNetwork):
                      'e': 0,}
         mc_mc_net = {'threshold': 10,
                     'delay': 2,
-                    'weight':  5e-4}
+                    'weight':  5e-4*0}
         ConnDivergent(self.populations[1], self. populations[1],
                                            24/60, 'proxd',
                                            3, h.tmgexp2syn, mc_mc_syn, mc_mc_net, rec_cond=rec_cond)
@@ -146,7 +146,7 @@ class TunedNetwork(GenNetwork):
                      'e': 0,}
         mc_bc_net = {'threshold': 10,
                     'delay': 3,
-                    'weight':  3e-4}
+                    'weight':  3e-4*0}
         ConnDivergent(self.populations[1], self.populations[2],
                                            6/24, 'proxd',
                                            1, h.tmgexp2syn, mc_bc_syn, mc_bc_net, rec_cond=rec_cond)
@@ -161,7 +161,7 @@ class TunedNetwork(GenNetwork):
                      'e': 0,}
         mc_hc_net = {'threshold': 10,
                     'delay': 3,
-                    'weight': 2e-4}
+                    'weight': 2e-4*0}
         ConnDivergent(self.populations[1], self.populations[3],
                                            10/24, 'midd',
                                            2, h.tmgexp2syn, mc_hc_syn, mc_hc_net, rec_cond=rec_cond)

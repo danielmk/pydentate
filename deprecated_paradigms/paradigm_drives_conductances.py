@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h, gui  # gui necessary for some parameters to h namespace 
 import numpy as np
-import net_ppdynamicsoff
+import net_tuneddynamics
 from input_generator import inhom_poiss
 import os
 import argparse
@@ -45,6 +45,12 @@ parser.add_argument('-pp_max_rate',
                     help='The maximum frequency the input reaches',
                     default=100,
                     dest='pp_max_rate')
+parser.add_argument('-n_cells_gcs_mcs_bcs_hcs_pps',
+                    nargs=5,
+                    type=int,
+                    help='the cell numbers of the network',
+                    default=[2000, 60, 24, 24, 24],
+                    dest='n_cells')
 parser.add_argument('-W_pp_gc',
                     type=float,
                     help='the weight of the pp to gc connection',
@@ -55,6 +61,36 @@ parser.add_argument('-W_pp_bc',
                     help='the weight of the pp to bc connection',
                     default=1e-3,
                     dest='W_pp_bc')
+parser.add_argument('-n_pp_gc',
+                    type=int,
+                    help='number of pp to gc synapses ',
+                    default=6,
+                    dest='n_pp_gc')
+parser.add_argument('-n_pp_bc',
+                    type=int,
+                    help='number of pp to bc synapses',
+                    default=20,
+                    dest='n_pp_bc')
+parser.add_argument('-W_gc_bc',
+                    type=float,
+                    help='weight of gc to bc synapses',
+                    default=2.5e-2,
+                    dest='W_gc_bc')
+parser.add_argument('-W_gc_hc',
+                    type=float,
+                    help='number of gc to hc synapses',
+                    default=2.5e-2,
+                    dest='W_gc_hc')
+parser.add_argument('-W_bc_gc',
+                    type=float,
+                    help='number of bc to gc synapses',
+                    default=1.2e-3,
+                    dest='W_bc_gc')
+parser.add_argument('-W_hc_gc',
+                    type=float,
+                    help='number of hc to gc synapses',
+                    default=6e-3,
+                    dest='W_hc_gc')
 parser.add_argument('-rec_cond',
                     type=int,
                     help='number of hc to gc synapses',
@@ -81,20 +117,31 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
     temporal_patterns_full = inhom_poiss(mod_rate=args.pp_mod_rate,
                                     max_rate=args.pp_max_rate,
                                     n_inputs=400)
+
     for run in runs:
         start_proc_t = time.perf_counter()
         print("Run: " + str(run) + ". Total time: " + str(start_proc_t))
         temporal_patterns = temporal_patterns_full.copy()
-        for idx in range(run+24,temporal_patterns.shape[0]):
+        for idx in range(run+args.n_cells[4],temporal_patterns.shape[0]):
             temporal_patterns[idx] = np.array([])
         for idx in range(0,run):
             temporal_patterns[idx] = np.array([])
 
-        nw = net_ppdynamicsoff.TunedNetwork(seed=seed,
+        nw = net_tuneddynamics.TunedNetwork(seed=seed,
+                                            n_gcs=args.n_cells[0],
+                                            n_mcs=args.n_cells[1],
+                                            n_bcs=args.n_cells[2],
+                                            n_hcs=args.n_cells[3],
                                             W_pp_gc=args.W_pp_gc,
                                             W_pp_bc=args.W_pp_bc,
+                                            n_pp_gc=args.n_pp_gc,
+                                            n_pp_bc=args.n_pp_bc,
+                                            W_gc_bc=args.W_gc_bc,
+                                            W_gc_hc=args.W_gc_hc,
+                                            W_bc_gc=args.W_bc_gc,
+                                            W_hc_gc=args.W_hc_gc,
                                             temporal_patterns=temporal_patterns,
-                                            rec_cond=False)
+                                            rec_cond=True)
 
         # Run the model
         """Initialization for -2000 to -100"""
@@ -123,10 +170,21 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
         save_data_name = (f"{str(nw)}_"
                           f"{seed:06d}_"
                           f"{run:03d}_"
+                          f"{nw.populations[0].get_cell_number():05d}_"
+                          f"{nw.populations[1].get_cell_number():05d}_"
+                          f"{nw.populations[2].get_cell_number():05d}_"
+                          f"{nw.populations[3].get_cell_number():05d}_"
+                          f"{args.n_cells[4]:05d}_"
+                          f"{args.n_pp_gc:04d}_"
+                          f"{args.n_pp_bc:04d}_"
                           f"{args.W_pp_gc:08.5f}_"
                           f"{args.W_pp_bc:08.5f}_"
                           f"{args.pp_mod_rate:04d}_"
-                          f"{args.pp_max_rate:04d}_")
+                          f"{args.pp_max_rate:04d}_"
+                          f"{args.W_gc_bc:08.5f}_"
+                          f"{args.W_gc_hc:08.5f}_"
+                          f"{args.W_bc_gc:08.5f}_"
+                          f"{args.W_hc_gc:08.5f}")
 
         #if run == 0:
         fig = nw.plot_aps(time=600)

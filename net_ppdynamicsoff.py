@@ -51,7 +51,7 @@ class TunedNetwork(GenNetwork):
 
         # PP -> GC
         ImplicitConvergentTmgsynConnectionExpProb(self.populations[0], t_patterns, 'midd', n_pp_gc,
-                     1.5, 10, 2.22590184e+13, 0.1, 3.12395254e+02, 8.15226996e-01, 0, W_pp_gc, rec_cond=rec_cond)
+                     1.5, 10, 0, 0.1, 0, 0, 0, W_pp_gc, rec_cond=rec_cond)
 
         # PP -> BC
         ImplicitConvergentTmgsynConnectionExpProb(self.populations[2], t_patterns, 'ddend', n_pp_bc,
