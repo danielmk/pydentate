@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import linregress
 import pdb
 
-data_path = "/home/daniel/repos/output_dynamics_batch1/"
+data_path = "/home/daniel/repos/output_dynamics_gen2_long/"
 
 def make_filename(params, run):
     """Generate a filename based on params and run.

@@ -7,7 +7,7 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h, gui  # gui necessary for some parameters to h namespace 
 import numpy as np
-import net_ppdynamicstuned
+import net_ppdynamicsoff
 from input_generator import inhom_poiss
 import os
 import argparse
@@ -33,7 +33,7 @@ parser.add_argument('-seed',
                     nargs=3,
                     type=int,
                     help='the seed making the network reproducible',
-                    default=[10000, 10001, 1],
+                    default=[10006, 10007, 1],
                     dest='seed')
 parser.add_argument('-pp_mod_rate',
                     type=int,
@@ -43,17 +43,17 @@ parser.add_argument('-pp_mod_rate',
 parser.add_argument('-pp_max_rate',
                     type=int,
                     help='The maximum frequency the input reaches',
-                    default=50,
+                    default=100,
                     dest='pp_max_rate')
 parser.add_argument('-W_pp_gc',
                     type=float,
                     help='the weight of the pp to gc connection',
-                    default=1e-3,
+                    default=2.5e-4,
                     dest='W_pp_gc')
 parser.add_argument('-W_pp_bc',
                     type=float,
                     help='the weight of the pp to bc connection',
-                    default=1e-3,
+                    default=5e-4,
                     dest='W_pp_bc')
 parser.add_argument('-rec_cond',
                     type=int,
@@ -80,7 +80,8 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
     np.random.seed(seed)
     temporal_patterns_full = inhom_poiss(mod_rate=args.pp_mod_rate,
                                     max_rate=args.pp_max_rate,
-                                    n_inputs=400)
+                                    n_inputs=400,
+                                    dur=1)
     for run in runs:
         start_proc_t = time.perf_counter()
         print("Run: " + str(run) + ". Total time: " + str(start_proc_t))
@@ -90,11 +91,11 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
         for idx in range(0,run):
             temporal_patterns[idx] = np.array([])
 
-        nw = net_ppdynamicstuned.TunedNetwork(seed=seed,
+        nw = net_ppdynamicsoff.TunedNetwork(seed=seed,
                                             W_pp_gc=args.W_pp_gc,
                                             W_pp_bc=args.W_pp_bc,
                                             temporal_patterns=temporal_patterns,
-                                            rec_cond=False)
+                                            rec_cond=True)
 
         # Run the model
         """Initialization for -2000 to -100"""
@@ -115,7 +116,7 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
         """Setup run control for -100 to 1500"""
         h.frecord_init()  # Necessary after changing t to restart the vectors
     
-        while h.t < 600:
+        while h.t < 1100:
             h.fadvance()
         end_proc_t = time.perf_counter()
         print("Done Running at " + str(end_proc_t) + " after " + str((end_proc_t - start_proc_t)/60) + " minutes")
@@ -129,18 +130,18 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
                           f"{args.pp_max_rate:04d}_")
 
         #if run == 0:
-        fig = nw.plot_aps(time=600)
+        fig = nw.plot_aps(time=1100)
         tuned_fig_file_name = save_data_name
         nw.save_ap_fig(fig, args.savedir, tuned_fig_file_name)
 
         pp_lines = np.empty(400, dtype = np.object)
         pp_lines[0+run:24+run] = temporal_patterns[0+run:24+run]
 
-        curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-        curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-        curr_mc_ts = np.array(tsts(nw.populations[1].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-        curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-        curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
+        curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=1100), dtype = np.bool)
+        curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=1100), dtype = np.bool)
+        curr_mc_ts = np.array(tsts(nw.populations[1].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=1100), dtype = np.bool)
+        curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=1100), dtype = np.bool)
+        curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=1100), dtype = np.bool)
 
         np.savez(args.savedir + os.path.sep + "time-stamps_" + save_data_name,
                  pp_ts = np.array(curr_pp_ts),

@@ -1,0 +1,1 @@
+python3 paradigm_drives_long.py -runs 0 25 1 -savedir "/home/daniel/repos/output_dynamics_gen2_long/" -seed 10000 10005 1 -pp_mod_rate 10 -pp_max_rate 100 -W_pp_gc 2.5e-4 -W_pp_bc 5e-4

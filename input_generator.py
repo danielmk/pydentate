@@ -49,7 +49,7 @@ def inhom_poiss_30Hz():
     return array_like
 
 
-def inhom_poiss(mod_rate=10, max_rate=100, n_inputs=400):
+def inhom_poiss(mod_rate=10, max_rate=100, n_inputs=400, dur=0.5):
     """Generate an inhomogeneous poisson spike train with a rate profile that
     is a sine wave whose rate is given by the rate parameter and that maximum
     frequency is given by the max_rate parameter in Hz.
@@ -58,14 +58,14 @@ def inhom_poiss(mod_rate=10, max_rate=100, n_inputs=400):
 
     sampling_interval = 0.0001 * pq.s
 
-    t = np.arange(0, 0.5, sampling_interval.magnitude)
+    t = np.arange(0, dur, sampling_interval.magnitude)
 
     rate_profile = (np.sin(t*mod_rate*np.pi*2-np.pi/2) + 1) * max_rate / 2
 
     rate_profile_as_asig = AnalogSignal(rate_profile,
                                         units=1*pq.Hz,
                                         t_start=0*pq.s,
-                                        t_stop=0.5*pq.s,
+                                        t_stop=dur*pq.s,
                                         sampling_period=sampling_interval)
 
     spike_trains = []
@@ -87,7 +87,7 @@ def inhom_poiss(mod_rate=10, max_rate=100, n_inputs=400):
 
     return array_like
 
-def inhom_poiss_io(rate=10, max_rate=100):
+def inhom_poiss_io(rate=10, max_rate=100, dur=0.5):
     """Generate an inhomogeneous poisson spike train with a rate profile that
     is a sine wave whose rate is given by the rate parameter and that maximum
     frequency is given by the max_rate parameter in Hz.
@@ -102,7 +102,7 @@ def inhom_poiss_io(rate=10, max_rate=100):
     rate_profile_as_asig = AnalogSignal(rate_profile,
                                         units=1*pq.Hz,
                                         t_start=0*pq.s,
-                                        t_stop=0.5*pq.s,
+                                        t_stop=dur*pq.s,
                                         sampling_period=sampling_interval)
 
     spike_trains = []

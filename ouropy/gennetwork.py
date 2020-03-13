@@ -603,7 +603,7 @@ class ConnDivergent(GenConnection):
 class ImplicitConvergentTmgsynConnectionExpProb(GenConnection):
     def __init__(self, post_pop, t_patterns, target_segs, convergence,
                      tau_1, tau2, tau_facil, U, tau_rec, u0, e, weight,
-                     rec_cond=True):
+                     rec_cond=True, n_inputs=400):
         """Create a connection with tmgsyn as published by Tsodyks, Pawelzik &
         Markram, 1998.
         The tmgsyn is a dynamic three state implicit resource synapse model.
@@ -666,7 +666,7 @@ class ImplicitConvergentTmgsynConnectionExpProb(GenConnection):
         targets = targets.swapaxes(0, 1)
 
         implicit_post_mapping = []
-        for x in range(0, 400):
+        for x in range(0, n_inputs):
             implicit_post_mapping.append(np.argwhere(targets == x)[:, 1])
 
         spat_patterns = np.array(implicit_post_mapping)
