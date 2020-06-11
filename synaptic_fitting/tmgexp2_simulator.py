@@ -103,7 +103,7 @@ def simulate(tau_facil, tau_rec, freq, u0=None, sampling=None):
     ivec = ivec[start:end_cut]
     vvec = vvec[start:end_cut]
     tvec = tvec[start:end_cut]
-    stim_start = stim_start-cut
+    stim_start -= cut
     gvec = -np.divide(ivec, vvec)
     # Offset
     gvec = gvec-(np.average(gvec[0:cut]))

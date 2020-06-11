@@ -230,9 +230,7 @@ def loss(x, *args):
 
     sim_peaks = np.array(sim_peaks).flatten()
 
-    mean_squared_error = np.square(sim_peaks - args[0]).mean()
-
-    return mean_squared_error
+    return np.square(sim_peaks - args[0]).mean()
 
 
 if __name__ == "__main__":

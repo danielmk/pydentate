@@ -112,7 +112,7 @@ class Population(object):
         if not hasattr(self, 'cells'):
             self.cells = []
 
-        for x in range(n_cells):
+        for _ in range(n_cells):
             self.cells.append(cell_type())
 
         self.cells = np.array(self.cells, dtype=object)
@@ -122,10 +122,7 @@ class Population(object):
         return len(self.cells)
 
     def record_aps(self):
-        counters = []
-        for cell in self.cells:
-            counters.append(cell._AP_counter())
-
+        counters = [cell._AP_counter() for cell in self.cells]
         self.ap_counters = counters
         return counters
 
@@ -174,7 +171,7 @@ class Population(object):
         active_counter = 0
         for x in timing_arrays:
             if x.size != 0:
-                active_counter = active_counter + 1
+                active_counter += 1
 
         return (active_counter / float(self.get_cell_number())) * 100
 

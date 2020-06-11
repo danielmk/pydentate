@@ -5,6 +5,7 @@ Created on Sun Feb 25 16:17:11 2018
 @author: daniel
 """
 
+
 from neuron import h, gui
 import os
 import numpy as np
@@ -34,6 +35,7 @@ mc_apcs = []
 bc_apcs = []
 hc_apcs = []
 
+dt = 0.1
 for x in current_steps:
 
     gc = GranuleCell()
@@ -69,7 +71,6 @@ for x in current_steps:
     time_vec.record(h._ref_t)
 
     h.cvode.active(0)
-    dt = 0.1
     h.steps_per_ms = 1.0/dt
     h.tstop = 1500
     h.finitialize(-60)
@@ -94,7 +95,7 @@ for x in current_steps:
     mc_voltages.append(np.array(mc_rec))
     bc_voltages.append(np.array(bc_rec))
     hc_voltages.append(np.array(hc_rec))
-    
+
     gc_apcs.append(gc_apc_curr.n / 0.5)
     mc_apcs.append(mc_apc_curr.n / 0.5)
     bc_apcs.append(bc_apc_curr.n / 0.5)

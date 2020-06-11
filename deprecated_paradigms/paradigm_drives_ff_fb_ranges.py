@@ -5,6 +5,7 @@ Created on Mon Mar 05 13:41:23 2018
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace 
 import numpy as np
 import net_tunedrevexpdrives
@@ -130,6 +131,7 @@ print(ff_weights)
 print(fb_weights)
 print(bool(args.rec_cond))
 print(args.rec_cond)
+dt = 0.1
 for ff_weight in ff_weights:
     for fb_weight in fb_weights:
         for run in runs:
@@ -138,9 +140,9 @@ for ff_weight in ff_weights:
             temporal_patterns = temporal_patterns_full.copy()
             for idx in range(run+args.n_cells[4],temporal_patterns.shape[0]):
                 temporal_patterns[idx] = np.array([])
-            for idx in range(0,run):
+            for idx in range(run):
                 temporal_patterns[idx] = np.array([])
-        
+
             nw = net_tunedrevexpdrives.TunedNetwork(seed=args.seed+run,
                                                     n_gcs=args.n_cells[0],
                                                     n_mcs=args.n_cells[1],
@@ -160,7 +162,6 @@ for ff_weight in ff_weights:
             # Run the model
             """Initialization for -2000 to -100"""
             h.cvode.active(0)
-            dt = 0.1
             h.steps_per_ms = 1.0/dt
             h.finitialize(-60)
             h.t = -2000
@@ -172,10 +173,10 @@ for ff_weight in ff_weights:
             h.secondorder = 2
             h.t = 0
             h.dt = 0.1
-        
+
             """Setup run control for -100 to 1500"""
             h.frecord_init()  # Necessary after changing t to restart the vectors
-        
+
             while h.t < 600:
                 h.fadvance()
             end_proc_t = time.perf_counter()
@@ -208,7 +209,7 @@ for ff_weight in ff_weights:
 
             pp_lines = np.empty(400, dtype = np.object)
             pp_lines[0+run:args.n_cells[4]+run] = temporal_patterns[0+run:args.n_cells[4]+run]
-            
+
             curr_pp_ts = np.array(tsts(pp_lines, dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_gc_ts = np.array(tsts(nw.populations[0].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_mc_ts = np.array(tsts(nw.populations[1].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
@@ -218,13 +219,13 @@ for ff_weight in ff_weights:
             # All downstream analysis has to respect this switch!
             curr_hc_ts = np.array(tsts(nw.populations[2].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
             curr_bc_ts = np.array(tsts(nw.populations[3].get_properties()['ap_time_stamps'], dt_signal=0.1, t_start=0, t_stop=600), dtype = np.bool)
-            
+
             np.savez(args.savedir + os.path.sep + "time-stamps_" + save_data_name,
                      pp_ts = np.array(curr_pp_ts),
                      gc_ts = np.array(curr_gc_ts),
                      mc_ts = np.array(curr_mc_ts),
                      bc_ts = np.array(curr_bc_ts),
                      hc_ts = np.array(curr_hc_ts))
-            
+
             del curr_pp_ts, curr_gc_ts, curr_mc_ts, curr_hc_ts, curr_bc_ts
             del nw

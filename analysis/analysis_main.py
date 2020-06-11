@@ -34,8 +34,7 @@ def tri_filter(signal, kernel_delta):
     new_signal = []
     for x in signal:
         new_signal.append(convolve(x, kernel, 'same'))
-    signal_conv = np.array(new_signal)
-    return signal_conv
+    return np.array(new_signal)
 
 def correlate_signals(signal1,signal2):
     """Correlates two nxm dimensional signals.
@@ -61,8 +60,7 @@ def avg_dotprod_signals(signal1,signal2):
     non_silent_sigs.sort()
     product = signal1[non_silent_sigs]*signal2[non_silent_sigs]
     prod_sum = product.sum(axis=1)
-    avg_dot_product = prod_sum.mean()
-    return avg_dot_product
+    return prod_sum.mean()
 
 def ndp_signals(signal1, signal2):
     #pdb.set_trace()
@@ -101,7 +99,7 @@ def avg_dotprod_signals_tbinned(signal1,signal2, len_bin = 1000):
     for x in signal1:
         sig1.append(normalize(x,axis=1))
     signal1 = np.array(sig1)
-    
+
     sig2 = []
     for x in signal2:
         sig2.append(normalize(x, axis=1))
@@ -114,8 +112,7 @@ def avg_dotprod_signals_tbinned(signal1,signal2, len_bin = 1000):
 
     for x in silent_sigs:
         prod_sum[x[0],x[1]] = np.NaN
-    avg_dot_product = np.nanmean(prod_sum, axis=0)
-    return avg_dot_product
+    return np.nanmean(prod_sum, axis=0)
 
 def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
     """Convert an array of timestamps to a signal where 0 is absence and 1 is
@@ -164,10 +161,11 @@ def similarity_measure_leutgeb_BUGGY(signal1,signal2, len_bin):
                      (signal2.shape[0], signal2.shape[1]/len_bin,len_bin), len_bin)
     signal2 = signal2.sum(axis=2)
 
-    corr_vector = []
+    corr_vector = [
+        pearsonr(signal1[:, x], signal2[:, x])[0]
+        for x in range(signal1.shape[1])
+    ]
 
-    for x in range(signal1.shape[1]):
-        corr_vector.append(pearsonr(signal1[:,x], signal2[:,x])[0])
 
     return np.array(corr_vector)
 
@@ -179,10 +177,12 @@ def similarity_measure_leutgeb(signal1,signal2, len_bin):
     signal2 = np.reshape(signal2[:,0:int(len_bin*int(signal2.shape[1]/len_bin))], (signal2.shape[0],int(signal2.shape[1]/len_bin),len_bin))
     signal2 = signal2.sum(axis=2)
     pdb.set_trace()
-    corr_vector = []
+    corr_vector = [
+        pearsonr(signal1[:, x], signal2[:, x])[0]
+        for x in range(signal1.shape[1])
+    ]
 
-    for x in range(signal1.shape[1]):
-        corr_vector.append(pearsonr(signal1[:,x], signal2[:,x])[0])
+
     pdb.set_trace()
     return np.array(corr_vector)
 
@@ -225,29 +225,18 @@ def sqrt_diff_norm(signal1, signal2, len_bin):
     return subtr/total_spikes
 
 def inner_pearsonr_BUGGY(signal1, len_bin):
-    signal1 = np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
+    return np.reshape(signal1[:,0:int((signal1.shape[1]/len_bin)*len_bin)],
                  (signal1.shape[0], signal1.shape[1]/len_bin,len_bin), len_bin)
-    return signal1
-    signal1 = signal1.sum(axis=2)
-
-    corr_vector = []
-
-    for x in range(signal1.shape[1]):
-        corr_vector.append(pearsonr(signal1[:,0], signal1[:,x])[0])
-
-    return corr_vector
 
 def inner_pearsonr(signal1, len_bin):
     signal1 = np.reshape(signal1, (signal1.shape[0],signal1.shape[1]/len_bin,len_bin))
 
     signal1 = signal1.sum(axis=2)
 
-    corr_vector = []
-
-    for x in range(signal1.shape[1]):
-        corr_vector.append(pearsonr(signal1[:,0], signal1[:,x])[0])
-
-    return corr_vector
+    return [
+        pearsonr(signal1[:, 0], signal1[:, x])[0]
+        for x in range(signal1.shape[1])
+    ]
     
 
 if __name__ == '__main__':

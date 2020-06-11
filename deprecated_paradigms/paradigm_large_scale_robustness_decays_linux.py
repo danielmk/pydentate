@@ -6,6 +6,7 @@ nw-name_run_seed_input-freq_input-scale_bc-decay_hc-decay_bc-delay_hc-delay_gc-w
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_tunedrevdecaysdelayspeaknorm_linux
@@ -111,6 +112,7 @@ for x in dll_files:
 print("DLL loaded from: " + dll_dir)
 h.nrn_load_dll(dll_dir)
 
+dt = 0.1
 for seed in seeds:
     print("Network seed: " + str(seed))
     # Seed the numpy random number generator for replication
@@ -172,7 +174,6 @@ for seed in seeds:
         # Run the model
         """Initialization for -2000 to -100"""
         h.cvode.active(0)
-        dt = 0.1
         h.steps_per_ms = 1.0/dt
         h.finitialize(-60)
         h.t = -2000

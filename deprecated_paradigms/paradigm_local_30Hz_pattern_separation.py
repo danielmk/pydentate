@@ -5,6 +5,7 @@ Created on Mon Mar 05 13:41:23 2018
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_tunedrev
@@ -95,6 +96,7 @@ PP_to_BCs = np.array(PP_to_BCs)
 np.random.seed(seed)
 temporal_patterns = inhom_poiss(rate=30)
 
+dt = 0.1
 # Start the runs of the model
 for run in runs:
     nw = net_tunedrev.TunedNetwork(seed, temporal_patterns[0+run:24+run],
@@ -109,7 +111,6 @@ for run in runs:
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
-    dt = 0.1
     h.steps_per_ms = 1.0/dt
     h.finitialize(-60)
     h.t = -2000

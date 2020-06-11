@@ -119,8 +119,6 @@ class GenNetwork(object):
 
     def run_network(self, tstop=1000, dt=1):
         raise NotImplemented("run_network is not implemented yet")
-        h.tstop = tstop
-        h.run()
 
     def plot_aps(self, time=200):
         fig = plt.figure(figsize=(8.27, 11.69))
@@ -164,10 +162,9 @@ class GenNetwork(object):
         plt.close()
 
     def get_properties(self):
-        properties = {'populations': [x.get_properties()
+        return {'populations': [x.get_properties()
                                       for x in self.populations],
                       'init_params': self.init_params}
-        return properties
 
     def shelve_network(self, directory=None, file_name=None):
         """Saves the complete network information to a python shelve file.
@@ -666,7 +663,7 @@ class ImplicitConvergentTmgsynConnectionExpProb(GenConnection):
         targets = targets.swapaxes(0, 1)
 
         implicit_post_mapping = []
-        for x in range(0, n_inputs):
+        for x in range(n_inputs):
             implicit_post_mapping.append(np.argwhere(targets == x)[:, 1])
 
         spat_patterns = np.array(implicit_post_mapping)
@@ -819,7 +816,7 @@ class Population(object):
         if not hasattr(self, 'cells'):
             self.cells = []
 
-        for x in range(n_cells):
+        for _ in range(n_cells):
             self.cells.append(cell_type())
 
         self.cells = np.array(self.cells, dtype=object)
@@ -837,10 +834,7 @@ class Population(object):
         return len(self.cells)
 
     def record_aps(self):
-        counters = []
-        for cell in self.cells:
-            counters.append(cell._AP_counter())
-
+        counters = [cell._AP_counter() for cell in self.cells]
         self.ap_counters = counters
         return counters
 
@@ -889,7 +883,7 @@ class Population(object):
         active_counter = 0
         for x in timing_arrays:
             if x.size != 0:
-                active_counter = active_counter + 1
+                active_counter += 1
 
         return (active_counter / float(self.get_cell_number())) * 100
 

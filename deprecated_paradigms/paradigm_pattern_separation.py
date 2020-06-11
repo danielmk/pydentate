@@ -5,6 +5,7 @@ Created on Mon Mar 05 13:41:23 2018
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace 
 import numpy as np
 import net_tunedrevexpdrives
@@ -60,7 +61,7 @@ innervation_pattern_gc = np.array([np.random.choice(400, 20, replace=False)
 innervation_pattern_gc = innervation_pattern_gc.swapaxes(0, 1)
 
 PP_to_GCs = []
-for x in range(0, 400):
+for x in range(400):
     PP_to_GCs.append(np.argwhere(innervation_pattern_gc == x)[:, 1])
 
 PP_to_GCs = np.array(PP_to_GCs)
@@ -71,12 +72,13 @@ innervation_pattern_bc = np.array([np.random.choice(400, 20, replace=False)
 innervation_pattern_bc = innervation_pattern_bc.swapaxes(0, 1)
 
 PP_to_BCs = []
-for x in range(0, 400):
+for x in range(400):
     PP_to_BCs.append(np.argwhere(innervation_pattern_bc == x)[:, 1])
 
 PP_to_BCs = np.array(PP_to_BCs)
 all_targets = np.array([y for x in PP_to_GCs for y in x])
 
+dt = 0.1
 # Start the runs of the model
 for run in runs:
     nw = net_tunedrevexpdrives.TunedNetwork(10000, temporal_patterns[0+run:24+run],
@@ -91,7 +93,6 @@ for run in runs:
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
-    dt = 0.1
     h.steps_per_ms = 1.0/dt
     h.finitialize(-60)
     h.t = -2000

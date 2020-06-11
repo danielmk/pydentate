@@ -27,7 +27,6 @@ class Parameter(object):
     def next(self):
         if self._i == 0:
             return self
-            self._i += 1
         else:
             self._i = 0
             raise StopIteration()

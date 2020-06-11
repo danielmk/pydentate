@@ -5,6 +5,7 @@ Created on Thu Nov 21 15:36:56 2019
 
 @author: can
 """
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # PEP8
@@ -60,8 +61,8 @@ for files in os.walk(data_path):
 loads = [freq_1, freq_10, freq_30, freq_50]
 
 'PEAK FINDER'
-for i in range(len(loads)):
-    data = loads[i]
+for load in loads:
+    data = load
     '''Data is current response, values are negative.
     For stimulus artifact, both positive and negative
     positive threshold was used to define the indices for stimuli'''
@@ -119,9 +120,7 @@ def loss(x):
     mse10 = (np.square(output10hz - Hz10)).mean(axis=None)
     mse30 = (np.square(output30hz - Hz30)).mean(axis=None)
     mse50 = (np.square(output50hz - Hz50)).mean(axis=None)
-    mse = (mse1 + mse10 + mse30 + mse50)/4
-
-    return mse
+    return (mse1 + mse10 + mse30 + mse50)/4
 
 
 # with 1hz, 770 hours

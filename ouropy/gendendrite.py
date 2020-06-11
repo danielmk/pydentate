@@ -85,11 +85,9 @@ class GenDendrite(object):
         """Change the diameter of the dendrite"""
         if not bool(self.secs):
             raise StandardError("Can't set diameter before sections are made")
-            return
         if hasattr(diam, '__getitem__'):
             if len(diam) != len(self.secs):
                 raise StandardError("List of diams does not fit n_secs")
-                return
             for idx, curr_seg in enumerate(self.secs):
                 curr_seg.diam = diam[idx]
             return
@@ -101,11 +99,9 @@ class GenDendrite(object):
         """Change the length of the dendrite"""
         if not bool(self.secs):
             raise Warning("Can't set L before segments are made")
-            return
         if hasattr(L, '__getitem__'):
             if len(L) != len(self.secs):
                 raise Warning("List of diams does not fit number of segments")
-                return
             for idx, curr_seg in enumerate(self.secs):
                 curr_seg.L = L[idx]
             return

@@ -5,6 +5,7 @@ Created on Mon Mar 05 13:41:23 2018
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace 
 import numpy as np
 import net_tuneddynamics
@@ -111,6 +112,7 @@ h.nrn_load_dll(dll_dir)
 # Start the runs of the model
 runs = range(args.runs[0], args.runs[1], args.runs[2])
 initial_run = runs[0]
+dt = 0.1
 for seed in range(args.seed[0], args.seed[1], args.seed[2]):
     # Generate temporal patterns for the 100 PP inputs
     np.random.seed(seed)
@@ -124,7 +126,7 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
         temporal_patterns = temporal_patterns_full.copy()
         for idx in range(run+args.n_cells[4],temporal_patterns.shape[0]):
             temporal_patterns[idx] = np.array([])
-        for idx in range(0,run):
+        for idx in range(run):
             temporal_patterns[idx] = np.array([])
 
         nw = net_tuneddynamics.TunedNetwork(seed=seed,
@@ -146,7 +148,6 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
         # Run the model
         """Initialization for -2000 to -100"""
         h.cvode.active(0)
-        dt = 0.1
         h.steps_per_ms = 1.0/dt
         h.finitialize(-60)
         h.t = -2000
@@ -154,14 +155,14 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
         h.dt = 10
         while h.t < -100:
             h.fadvance()
-    
+
         h.secondorder = 2
         h.t = 0
         h.dt = 0.1
-    
+
         """Setup run control for -100 to 1500"""
         h.frecord_init()  # Necessary after changing t to restart the vectors
-    
+
         while h.t < 600:
             h.fadvance()
         end_proc_t = time.perf_counter()
@@ -190,7 +191,7 @@ for seed in range(args.seed[0], args.seed[1], args.seed[2]):
         fig = nw.plot_aps(time=600)
         tuned_fig_file_name = save_data_name
         nw.save_ap_fig(fig, args.savedir, tuned_fig_file_name)
-    
+
         pp_lines = np.empty(400, dtype = np.object)
         pp_lines[0+run:24+run] = temporal_patterns[0+run:24+run]
 

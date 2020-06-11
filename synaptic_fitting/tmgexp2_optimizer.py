@@ -43,9 +43,7 @@ def loss(x):
     mse10 = (np.square(output10hz - Hz10)).mean(axis=None)
     mse30 = (np.square(output30hz - Hz30)).mean(axis=None)
     mse50 = (np.square(output50hz - Hz50)).mean(axis=None)
-    mse = (mse1 + mse10 + mse30 + mse50)/4
-
-    return mse
+    return (mse1 + mse10 + mse30 + mse50)/4
 
 
 'OPTIMIZATION'

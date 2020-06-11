@@ -5,6 +5,7 @@ Created on Mon Mar 05 13:41:23 2018
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_tunedrev
@@ -72,6 +73,7 @@ for x in dll_files:
 print("DLL loaded from: " + dll_dir)
 h.nrn_load_dll(dll_dir)
 
+dt = 0.1
 # Start the runs of the model
 for run in runs:
     # Seed the numpy random number generator for replication
@@ -123,7 +125,6 @@ for run in runs:
     # Run the model
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
-    dt = 0.1
     h.steps_per_ms = 1.0/dt
     h.finitialize(-60)
     h.t = -2000

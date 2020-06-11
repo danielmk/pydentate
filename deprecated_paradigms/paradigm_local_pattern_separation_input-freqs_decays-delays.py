@@ -6,6 +6,7 @@ nw-name_run_seed_input-freq_input-scale_bc-decay_hc-decay_bc-delay_hc-delay_gc-w
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_tunedrevdecaysdelays
@@ -116,11 +117,14 @@ for x in dll_files:
 print("DLL loaded from: " + dll_dir)
 h.nrn_load_dll(dll_dir)
 
+seed_input_patterns = []
+seed_output_patterns = []
+dt = 0.1
 for seed in seeds:
     print("Network seed: " + str(seed))
     # Seed the numpy random number generator for replication
     np.random.seed(input_seed)
-    
+
     # Randomly choose target cells for the PP lines
     gauss_gc = stats.norm(loc=1000, scale=input_scale)
     gauss_bc = stats.norm(loc=12, scale=(input_scale/2000.0)*24)
@@ -154,8 +158,6 @@ for seed in seeds:
     np.random.seed(input_seed)
     temporal_patterns = inhom_poiss(rate=10)
 
-    seed_input_patterns = []
-    seed_output_patterns = []
     # Start the runs of the model
     for run in runs:
         print("Run: " + str(run))
@@ -179,7 +181,6 @@ for seed in seeds:
         # Run the model
         """Initialization for -2000 to -100"""
         h.cvode.active(0)
-        dt = 0.1
         h.steps_per_ms = 1.0/dt
         h.finitialize(-60)
         h.t = -2000
@@ -214,7 +215,7 @@ for seed in seeds:
 
         fig = nw.plot_aps(time=600)
         nw.save_ap_fig(fig, savedir, 'figure_' + save_file_name)
-        
+
         if run==0:
             nw.shelve_network(savedir, 'nw-specs_' + save_file_name)
         break

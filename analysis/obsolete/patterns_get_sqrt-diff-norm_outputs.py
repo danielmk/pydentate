@@ -5,6 +5,7 @@ Created on Sun May 20 11:35:03 2018
 @author: DanielM
 """
 
+
 import os
 import numpy as np
 import shelve
@@ -23,8 +24,7 @@ corr_matrix = np.empty((len(data_files), len(data_files)))
 
 data_list = []
 for x in data_files:
-    data_list.append(np.load(data_path + x)['arr_0'])
-
+    data_list.append(np.load(save_path + x)['arr_0'])
 row_idx_start = 0
 row_idx_stop = 25
 # 376
@@ -33,5 +33,5 @@ len_bins = 6000
 for row_idx, x in enumerate(data_list[row_idx_start:row_idx_stop]):
     for col_idx, y in enumerate(data_list[row_idx+row_idx_start:len(data_list)]):
         corr_matrix[row_idx+row_idx_start,col_idx+row_idx+row_idx_start]=analysis_main.sqrt_diff_norm(x,y,len_bins)
-        
+
 np.savetxt(save_path + "1_sqrt-diff-norm_matrix_len-bin_" + str(len_bins) +  ".txt", corr_matrix, delimiter="\t")

@@ -6,6 +6,7 @@ Auto init and run
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_nonfacilitatingrev
@@ -69,6 +70,7 @@ stim_delay = 100
 # Setup specs for measurements
 cells_to_measure = np.arange(0, 2000, 100)
 
+dt = 0.01
 for run in runs:
     # Create a networks
     nw = net_nonfacilitatingrev.TunedNetwork(seed=10000+run)
@@ -103,7 +105,6 @@ for run in runs:
 
     """Initialization for -2000 to -100"""
     h.cvode.active(0)
-    dt = 0.01
     h.steps_per_ms = 1.0/dt
     h.tstop = 1500
     h.finitialize(-60)

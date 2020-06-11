@@ -155,7 +155,7 @@ class GenNeuron(object):
                     result.append(x)
         else:
             for x in name:
-                if not (type(x) == str):
+                if type(x) != str:
                     raise TypeError("All elements of name must be str")
                 for y in self.all_secs:
                     if y.name() == x:
