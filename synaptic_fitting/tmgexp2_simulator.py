@@ -3,8 +3,9 @@
 """
 Created on Thu Nov  7 14:48:40 2019
 
-@author: can
+@author: barisckuru
 """
+
 
 import numpy as np
 from mossycell import MossyCell
