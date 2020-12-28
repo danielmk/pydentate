@@ -3,8 +3,9 @@
 """
 Created on Tue Dec 17 13:31:34 2019
 
-@author: can
+@author: barisckuru
 """
+
 import numpy as np
 import matplotlib.pyplot as plt
 
