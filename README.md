@@ -31,4 +31,5 @@ Their model can be found [here](http://www.opensourcebrain.org/projects/dentate)
 # Author
 
 Daniel Müller-Komorowska - [Institute of Experimental Epileptology and Cognition Research](https://eecr-bonn.de/)
+
 Barış Can Kuru (synaptic_fitting add on) - [Institute of Experimental Epileptology and Cognition Research](https://eecr-bonn.de/)
