@@ -3,16 +3,9 @@
 """
 Created on Thu Nov 21 15:36:56 2019
 
-@author: can
+@author: barisckuru
 """
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# PEP8
-"""
-Created on Thu Nov  7 14:48:40 2019
 
-@author: can
-"""
 
 import numpy as np
 import os
