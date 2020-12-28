@@ -4,8 +4,9 @@
 """
 Created on Thu Nov  7 14:48:40 2019
 
-@author: can
+@author: barisckuru
 """
+
 from scipy.optimize import minimize
 import numpy as np
 import time
