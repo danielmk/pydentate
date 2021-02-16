@@ -1,1 +1,0 @@
-../tmgexp2syn.mod
