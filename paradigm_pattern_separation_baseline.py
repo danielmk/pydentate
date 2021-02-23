@@ -8,7 +8,7 @@ Created on Mon Mar 05 13:41:23 2018
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 import net_tunedrev
-from burst_generator_inhomogeneous_poisson import inhom_poiss
+from inputs import inhom_poiss
 import os
 import argparse
 import scipy.stats as stats
@@ -63,7 +63,7 @@ dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
              ("C:\\Users\\Holger\\danielm\\models_dentate\\"
               "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
               "dentategyrusnet2005\\nrnmech.dll"),
-             (r"C:\Users\Daniel\repos\pyDentate\mechs_7-6_win\nrnmech.dll")]
+             (r"C:\Users\Daniel\repos\pyDentate\mechs\nrnmech.dll")]
 
 for x in dll_files:
     if os.path.isfile(x):
@@ -108,7 +108,7 @@ for run in runs:
     PP_to_BCs = PP_to_BCs[0:24]
 
     # Generate temporal patterns for the 100 PP inputs
-    temporal_patterns = inhom_poiss(rate=input_frequency)
+    temporal_patterns = inhom_poiss(modulation_rate=input_frequency)
     temporal_patterns[0:24]
     nw = net_tunedrev.TunedNetwork(nw_seed[0], temporal_patterns,
                                    PP_to_GCs,
