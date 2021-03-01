@@ -2,13 +2,17 @@
 """
 Created on Tue Feb 16 12:49:13 2021
 
-@author: Daniel
+@author: Daniel & barisckuru
 """
 
 import numpy as np
 from elephant import spike_train_generation as stg
 from neo.core import AnalogSignal
 import quantities as pq
+from scipy.stats import skewnorm
+from skimage.measure import profile_line
+
+
 
 
 def inhom_poiss(modulation_rate=10, max_rate=100, n_cells=400):
