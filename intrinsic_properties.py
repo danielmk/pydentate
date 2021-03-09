@@ -41,15 +41,6 @@ for x in current_steps:
     bc = BasketCell()
     hc = HippCell()
 
-    for sec in gc.all_secs:
-        sec.ek = sec.ek+0
-    for sec in mc.all_secs:
-        sec.ek = sec.ek+0
-    for sec in bc.all_secs:
-        sec.ek = sec.ek+0
-    for sec in hc.all_secs:
-        sec.ek = sec.ek+0
-
     gc_stim = gc._current_clamp_soma(x, 500, 50)
     mc_stim = mc._current_clamp_soma(x, 500, 50)
     bc_stim = bc._current_clamp_soma(x, 500, 50)
