@@ -95,7 +95,7 @@ def _grid_maker(spacing, orientation, pos_peak, arr_size, sizexy, max_rate):
     rate = max_rate*2/3*(rate+1/2)   # arr is the resulting 2d grid out of 3 gratings
     return rate
     
-def _grid_population(n_grid, max_rate, seed, arr_size=200):
+def _grid_population(n_grid, max_rate, seed, arena_size=[1,1], arr_size=200):
     # skewed normal distribution for grid spacings
     np.random.seed(seed)
     median_spc = 43
@@ -115,7 +115,7 @@ def _grid_population(n_grid, max_rate, seed, arr_size=200):
     for i in range(n_grid):
         x = grid_phase[i][0]
         y = grid_phase[i][1]
-        rate = grid_maker(grid_spc[i], grid_ori[i], [x, y], arr_size, [1,1], max_rate)
+        rate = grid_maker(grid_spc[i], grid_ori[i], [x, y], arr_size, arena_size, max_rate)
         rate_grids[:, :, i] = rate
     return rate_grids, grid_spc
 
