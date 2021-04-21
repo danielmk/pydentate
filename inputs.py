@@ -62,21 +62,17 @@ def grid_cell_spikes(arena_size=(1, 1), t_span=(0, 500), n_cells=400):
     pass
 
 
-def _grid_field(spacing):
-    pass
-
-
 def _grid_spatial_navigation():
     pass
 
 #Solstad 2006 Grid Model
 def _grid_maker(spacing, orientation, pos_peak, arr_size, sizexy, max_rate):
     #define the params from input here, scale the resulting array for maxrate and sperate the xy for size and shift
-    arr_size = arr_size
+    arr_size = arr_size #200*200 dp was good enough in terms of resolution
     x, y = pos_peak
     pos_peak = np.array([x,y])
     max_rate = max_rate
-    lambda_spacing = spacing*(arr_size/100) #100 required for conversion, they have probably used 100*100 matrix in 
+    lambda_spacing = spacing*(arr_size/100) #100 required for conversion
     k = (4*np.pi)/(lambda_spacing*np.sqrt(3))
     degrees = orientation
     theta = np.pi*(degrees/180)
@@ -86,7 +82,7 @@ def _grid_maker(spacing, orientation, pos_peak, arr_size, sizexy, max_rate):
     dims = np.array([arrx,arry])
     rate = np.ones(dims)
     #implementation of grid function
-    # 3 ks for 3 cos gratings with different angles
+    # 3 k values for 3 cos gratings with different angles to generate grid fields
     k1 = ((k/np.sqrt(2))*np.array((np.cos(theta+(np.pi)/12) + np.sin(theta+(np.pi)/12),
           np.cos(theta+(np.pi)/12) - np.sin(theta+(np.pi)/12)))).reshape(2,)
     k2 = ((k/np.sqrt(2))*np.array((np.cos(theta+(5*np.pi)/12) + np.sin(theta+(5*np.pi)/12),
@@ -100,7 +96,7 @@ def _grid_maker(spacing, orientation, pos_peak, arr_size, sizexy, max_rate):
     return rate
     
 def _grid_population(n_grid, max_rate, seed, arr_size=200):
-    # skewed normal distribution for grid_spc
+    # skewed normal distribution for grid spacings
     np.random.seed(seed)
     median_spc = 43
     spc_max = 100
@@ -111,7 +107,7 @@ def _grid_population(n_grid, max_rate, seed, arr_size=200):
     grid_spc = grid_spc * spc_max         #Multiply the standardized values by the maximum value.
     grid_spc = grid_spc + (median_spc - np.median(grid_spc))
     
-    grid_ori = np.random.randint(0, high=60, size=[n_grid,1]) #uniform dist btw 0-60 degrees
+    grid_ori = np.random.randint(0, high=60, size=[n_grid,1]) #uniform dist for orientation btw 0-60 degrees
     grid_phase = np.random.randint(0, high=(arr_size-1), size=[n_grid,2]) #uniform dist grid phase
     
     # create a 3d array with grids for n_grid
@@ -121,8 +117,6 @@ def _grid_population(n_grid, max_rate, seed, arr_size=200):
         y = grid_phase[i][1]
         rate = grid_maker(grid_spc[i], grid_ori[i], [x, y], arr_size, [1,1], max_rate)
         rate_grids[:, :, i] = rate
-
-    
     return rate_grids, grid_spc
 
 
