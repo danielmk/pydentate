@@ -13,7 +13,7 @@ Follow these steps to get started with pyDentate
 </li>
 <li>Install elephant
   <p><blockquote>pip install elephant</blockquote></li></p>
-<li><a href="https://www.neuron.yale.edu/neuron/download/compile_mswin">Compile the NEURON mechanisms</a> in /mechs_7-6</li>
+<li><a href="https://www.neuron.yale.edu/neuron/download/compile_mswin">Compile the NEURON mechanisms</a> in /mechs</li>
 <li>Download the pyDentateeLife2020 repository and unpack</li>
 <li>Open paradigm_pattern_separation_baseline.py  and add the path to your compiled mechanisms to dll_files variable</li>
 <li>Run a paradigm_ file</li>
