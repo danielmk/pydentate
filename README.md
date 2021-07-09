@@ -19,7 +19,8 @@ Follow these steps to get started with pyDentate
 <li>Run a paradigm_ file</li>
 </ol>
 
-If you encounter problems with running pyDentate or have questions feel free to contact me (muellerkomorowska@gmail.com or https://twitter.com/scidanm).
+If you encounter problems with running pyDentate or have questions feel free to contact me (muellerkomorowska@protonmail.com
+ or https://twitter.com/scidanm).
 
 # Usage
 To run an existing model you simple have to execute a paradigm_ file after following the setup steps above. paradigm_ files are scripts that take care of everything from creating networks, simulating the networks and saving the output. Classes that implement networks are in net_ files. Those nets inherit from ouropy GenNetwork class which implements their generic network logic, such as creating populations and connections. To create your own network, it is recommended that you also create a class that inherits from GenNetwork and follow the style of net_tuneddynamics.
