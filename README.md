@@ -27,9 +27,12 @@ To run an existing model you simple have to execute a paradigm_ file after follo
 
 # References
 pyDentate builds on a computational model from this paper: Santhakumar, V., Aradi, I., & Soltesz, I. (2005). Role of mossy fiber sprouting and mossy cell loss in hyperexcitability: a network model of the dentate gyrus incorporating cell types and axonal topography. Journal of Neurophysiology, 93(1), 437–453. https://doi.org/10.1152/jn.00777.2004
-Their model can be found [here](http://www.opensourcebrain.org/projects/dentate)
+Their model can be found [here](http://www.opensourcebrain.org/projects/dentate).
 
-# Author
+We decribe pyDentate in our eLife paper: Braganza, O., Müller-Komorowska, D., Kelly, T., & Beck, H. (2020). Quantitative properties of a feedback circuit predict frequency-dependent pattern separation. ELife, 813188. https://doi.org/10.7554/eLife.53148
+You can find a separated repository that is dedicated to reproducing the paper results [here](https://github.com/danielmk/pyDentateeLife2020).
+
+# Authors
 
 Daniel Müller-Komorowska - [Institute of Experimental Epileptology and Cognition Research](https://eecr-bonn.de/)
 
