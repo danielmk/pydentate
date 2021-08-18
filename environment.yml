@@ -11,4 +11,4 @@ dependencies:
   - matplotlib
   - scipy
   - neo
-  
+  - scikit-image

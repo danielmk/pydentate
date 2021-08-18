@@ -25,4 +25,5 @@ setup(
           'scipy',
           'neo',
           'neuron',
+          'scikit-image'
       ])
