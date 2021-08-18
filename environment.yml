@@ -1,0 +1,14 @@
+name: pyDentate
+channels:
+  - conda-forge
+  - pypi
+  - defaults
+dependencies:
+  - numpy
+  - pandas
+  - elephant
+  - neuron
+  - matplotlib
+  - scipy
+  - neo
+  
