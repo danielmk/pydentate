@@ -1,0 +1,17 @@
+#!/bin/sh
+if test "x${NRNHOME}" = "x" ; then
+    NRNHOME="/home/danielmk/miniconda3/envs/pydentate/lib/python3.8/site-packages/neuron/.data"
+fi
+if test "${NEURONHOME}" = "" ; then
+    NEURONHOME=${NRNHOME}/share/nrn
+    export NEURONHOME
+fi
+if test "x${NRNBIN}" = "x" ; then
+    NRNBIN="/home/danielmk/miniconda3/envs/pydentate/bin"
+fi
+if test "" = "yes" ; then
+    NRNIV="${NRNBIN}/nrniv.app/Contents/MacOS/nrniv"
+else
+    NRNIV="${NRNBIN}/nrniv"
+fi
+"${NRNIV}" -dll "/home/danielmk/repos/pyDentate/x86_64/.libs/libnrnmech.so" "$@"

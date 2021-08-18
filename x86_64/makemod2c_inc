@@ -1,0 +1,121 @@
+
+./bgka.c: ../mechs/bgka.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) bgka.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./bgka.o: ./bgka.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./CaBK.c: ../mechs/CaBK.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) CaBK.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./CaBK.o: ./CaBK.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./ccanl.c: ../mechs/ccanl.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) ccanl.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./ccanl.o: ./ccanl.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./Gfluct2.c: ../mechs/Gfluct2.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) Gfluct2.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./Gfluct2.o: ./Gfluct2.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./gskch.c: ../mechs/gskch.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) gskch.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./gskch.o: ./gskch.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./hyperde3.c: ../mechs/hyperde3.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) hyperde3.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./hyperde3.o: ./hyperde3.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./ichan2.c: ../mechs/ichan2.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) ichan2.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./ichan2.o: ./ichan2.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./LcaMig.c: ../mechs/LcaMig.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) LcaMig.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./LcaMig.o: ./LcaMig.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./nca.c: ../mechs/nca.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) nca.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./nca.o: ./nca.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./netstim125.c: ../mechs/netstim125.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) netstim125.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./netstim125.o: ./netstim125.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./netstimbox.c: ../mechs/netstimbox.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) netstimbox.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./netstimbox.o: ./netstimbox.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./tca.c: ../mechs/tca.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) tca.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./tca.o: ./tca.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./tmgexp2syn.c: ../mechs/tmgexp2syn.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) tmgexp2syn.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./tmgexp2syn.o: ./tmgexp2syn.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./tmgsyn.c: ../mechs/tmgsyn.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) tmgsyn.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./tmgsyn.o: ./tmgsyn.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
+./vecevent.c: ../mechs/vecevent.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd "../mechs"; MODLUNIT=$(NRNUNITS) $(NOCMODL) vecevent.mod -o "/home/danielmk/repos/pyDentate/x86_64")
+
+./vecevent.o: ./vecevent.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I"../mechs" $(INCLUDES) -fPIC -c $< -o $@
+
