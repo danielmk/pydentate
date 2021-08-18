@@ -65,7 +65,7 @@ dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
               "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
               "dentategyrusnet2005\\nrnmech.dll"),
              (r"C:\Users\Daniel\repos\pyDentate\mechs\nrnmech.dll"),
-             (os.path.join(dirname, '/x86_64/libnrnmech.so')]
+             (os.path.join(dirname, '/x86_64/libnrnmech.so'))]
 
 for x in dll_files:
     if os.path.isfile(x):
