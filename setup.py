@@ -24,6 +24,6 @@ setup(
           'matplotlib',
           'scipy',
           'neo',
-          'neuron ; platform_system=="linux"',
+          'neuron ; platform_system=="Linux"',
           'scikit-image'
       ])
