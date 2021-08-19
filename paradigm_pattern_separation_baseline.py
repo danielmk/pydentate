@@ -12,6 +12,7 @@ from inputs import inhom_poiss
 import os
 import argparse
 import scipy.stats as stats
+import platform
 
 # Handle command line inputs
 pr = argparse.ArgumentParser(description='Local pattern separation paradigm')
@@ -57,24 +58,14 @@ input_frequency = args.input_frequency
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
 dirname = os.path.dirname(__file__)
-dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
-              "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
-              "dentategyrusnet2005\\nrnmech.dll"),
-             "C:\\Users\\daniel\\Repos\\nrnmech.dll",
-             ("C:\\Users\\Holger\\danielm\\models_dentate\\"
-              "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
-              "dentategyrusnet2005\\nrnmech.dll"),
-             (r"C:\Users\Daniel\repos\pyDentate\mechs\nrnmech.dll"),
-             os.path.join(dirname, '/x86_64/libnrnmech.so')]
-
-print(os.path.isfile(os.path.join(dirname, 'x86_64/libnrnmech.so')))
-for x in dll_files:
-    print(x)
-    if os.path.isfile(x):
-        dll_dir = x
-dll_dir = os.path.join(dirname, '/x86_64/libnrnmech.so')       
+if platform.system() == 'Windows':
+    dll_dir = os.path.join(dirname, 'win64', 'nrnmech.dll')
+else:
+    dll_dir = os.path.join(dirname, 'x86_64', 'libnrnmech.so')    
 print("DLL loaded from: " + dll_dir)
-h.nrn_load_dll(dll_dir)
+h.nrn_load_dll(dll_dir)   
+
+
 
 # Start the runs of the model
 for run in runs:
@@ -126,6 +117,7 @@ for run in runs:
     nw.populations[3].voltage_recording(range(24))
     # Run the model
     """Initialization for -2000 to -100"""
+    print("Running model")
     h.cvode.active(0)
     dt = 0.1
     h.steps_per_ms = 1.0/dt
