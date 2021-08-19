@@ -56,6 +56,7 @@ input_seed = args.input_seed
 input_frequency = args.input_frequency
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
+dirname = os.path.dirname(__file__)
 dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
               "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
               "dentategyrusnet2005\\nrnmech.dll"),
@@ -63,11 +64,15 @@ dll_files = [("C:\\Users\\DanielM\\Repos\\models_dentate\\"
              ("C:\\Users\\Holger\\danielm\\models_dentate\\"
               "dentate_gyrus_Santhakumar2005_and_Yim_patterns\\"
               "dentategyrusnet2005\\nrnmech.dll"),
-             (r"C:\Users\Daniel\repos\pyDentate\mechs\nrnmech.dll")]
+             (r"C:\Users\Daniel\repos\pyDentate\mechs\nrnmech.dll"),
+             os.path.join(dirname, '/x86_64/libnrnmech.so')]
 
+print(os.path.isfile(os.path.join(dirname, 'x86_64/libnrnmech.so')))
 for x in dll_files:
+    print(x)
     if os.path.isfile(x):
         dll_dir = x
+dll_dir = os.path.join(dirname, '/x86_64/libnrnmech.so')       
 print("DLL loaded from: " + dll_dir)
 h.nrn_load_dll(dll_dir)
 
