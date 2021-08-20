@@ -11,8 +11,8 @@ from neo.core import AnalogSignal
 import quantities as pq
 from scipy.stats import skewnorm
 from skimage.measure import profile_line
-
-
+from scipy import stats
+import pdb
 
 
 def inhom_poiss(modulation_rate=10, max_rate=100, n_cells=400):
@@ -54,16 +54,58 @@ def inhom_poiss(modulation_rate=10, max_rate=100, n_cells=400):
 
     return array_like
 
+def gaussian_connectivity_gc_bc(n_pre, n_gc, n_bc, n_syn_gc, n_syn_bc, scale_gc, scale_bc):
+    """TODO"""
+    pass
+def gaussian_connectivity(n_pre, n_post, n_syn=[100,], scale=[1000, 12]):
+    """TODO THIS IS A STUB FOR A GENERALIZED VERSION OF gaussian_connectivity_gc_bc
+    Choose n_syn postsynaptic cells for each presynaptic cells.
+    Clean up this function. It is not Pythonic.
+    Possibly vectorize the for loops.
 
-def grid_cell_spikes(arena_size=(1, 1), t_span=(0, 500), n_cells=400):
-    """Generate spike trains from an inhomogeneous poisson process based on a
-    grid cell model with phase precession.
+    Parameters
+    ----------
+    n_pre : int
+        Number of presynaptic cells.
+    n_post : list
+        A list of cell numbers in postsnaptic populations.
+    n_syn : int
+        Number of synapses from pre to post.
+    scale : float
+        The scale of the gaussien distribution.
+
+    Returns
+    -------
+    list : len(n_post)
+        Each list entry contains a 2darray of shape (n_pre, n_post).
     """
-    pass
+
+    center = np.array(n_post) // 2
+    gauss = stats.norm(loc=center[0], scale=scale[0])
+    pdf = gauss.pdf(np.arange(n_post[0]))
+    pdf = pdf/pdf.sum()
+    post_idc = np.arange(n_post[0])
+    start_idc = np.random.randint(0, n_post[0]-1, size=n_pre)
+
+    out_list = []
+    for idx, n_post_pop in enumerate(n_post):
+        pre_to_post = []
+        # pdb.set_trace()
+        for x in start_idc:
+            curr_idc = np.concatenate((post_idc[x:n_post_pop], post_idc[0:x]))
+            # pdb.set_trace()
+            pre_to_post.append(np.random.choice(curr_idc, size=n_syn[idx], replace=False,
+                                                p=pdf))
+        out_list.append(pre_to_post)
+        if idx+1 < len(n_post):
+            gauss = stats.norm(loc=center[idx+1], scale=scale[idx+1])
+            pdf = gauss.pdf(n_post[idx+1])
+            pdf = pdf/pdf.sum()
+            post_idc = np.arange(n_post[idx+1])
+            start_idc = np.array(((start_idc/n_post_pop)*n_post[idx+1]), dtype=int)
 
 
-def _grid_spatial_navigation():
-    pass
+    return np.array(pre_to_post)
 
 #Solstad 2006 Grid Model
 def _grid_maker(spacing, orientation, pos_peak, arr_size, sizexy, max_rate):
@@ -115,7 +157,7 @@ def _grid_population(n_grid, max_rate, seed, arena_size=[1,1], arr_size=200):
     for i in range(n_grid):
         x = grid_phase[i][0]
         y = grid_phase[i][1]
-        rate = grid_maker(grid_spc[i], grid_ori[i], [x, y], arr_size, arena_size, max_rate)
+        rate = _grid_maker(grid_spc[i], grid_ori[i], [x, y], arr_size, arena_size, max_rate)
         rate_grids[:, :, i] = rate
     return rate_grids, grid_spc
 

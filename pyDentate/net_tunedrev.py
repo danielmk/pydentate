@@ -9,7 +9,6 @@ Created on Tue Nov 28 13:01:38 2017
 @author: DanielM
 """
 
-from pyDentate import mossycell
 from ouropy import gennetwork
 import numpy as np
 # from granulecell import GranuleCell
