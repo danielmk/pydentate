@@ -5,6 +5,7 @@
 
 from ouropy.genneuron import GenNeuron
 import ouropy.parameters as params
+import os
 
 
 class BasketCell(GenNeuron):
@@ -30,6 +31,8 @@ class BasketCell(GenNeuron):
                          sec_names=['proxd', 'mid1', 'mid2', 'ddend'],
                          diam=[4, 3, 2, 1], L=[75, 75, 75, 75], soma_loc=1.0)
 
-        parameters = params.read_parameters('basketcellparams.txt')
+        dirname = os.path.dirname(__file__)
+        filepath = os.path.join(dirname, 'basketcellparams.txt')
+        parameters = params.read_parameters(filepath)
 
         self.insert_mechs(parameters)

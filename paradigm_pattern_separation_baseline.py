@@ -7,8 +7,8 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
-import net_tunedrev
-from inputs import inhom_poiss
+from pyDentate import net_tunedrev, neuron_tools
+from pyDentate.inputs import inhom_poiss
 import os
 import argparse
 import scipy.stats as stats
@@ -57,15 +57,16 @@ input_seed = args.input_seed
 input_frequency = args.input_frequency
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
+"""
 dirname = os.path.dirname(__file__)
 if platform.system() == 'Windows':
     dll_dir = os.path.join(dirname, 'win64', 'nrnmech.dll')
 else:
     dll_dir = os.path.join(dirname, 'x86_64', 'libnrnmech.so')    
 print("DLL loaded from: " + dll_dir)
-h.nrn_load_dll(dll_dir)   
-
-
+# h.nrn_load_dll(dll_dir)
+""" 
+neuron_tools.load_compiled_mechanisms(path='precompiled')
 
 # Start the runs of the model
 for run in runs:
@@ -118,6 +119,7 @@ for run in runs:
     # Run the model
     """Initialization for -2000 to -100"""
     print("Running model")
+    """
     h.cvode.active(0)
     dt = 0.1
     h.steps_per_ms = 1.0/dt
@@ -131,12 +133,15 @@ for run in runs:
     h.secondorder = 2
     h.t = 0
     h.dt = 0.1
-
+    """
     """Setup run control for -100 to 1500"""
+    """
     h.frecord_init()  # Necessary after changing t to restart the vectors
     while h.t < 600:
         h.fadvance()
     print("Done Running")
+    """
+    neuron_tools.run_neuron_simulator()
 
     tuned_save_file_name = (str(nw) + "-data-paradigm-local-pattern" +
                             "-separation_nw-seed_input-seed_input-frequency_scale_run_" +

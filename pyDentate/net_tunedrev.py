@@ -9,13 +9,23 @@ Created on Tue Nov 28 13:01:38 2017
 @author: DanielM
 """
 
+from pyDentate import mossycell
 from ouropy import gennetwork
 import numpy as np
-from granulecell import GranuleCell
-from mossycell_cat import MossyCell
-from basketcell import BasketCell
-from hippcell import HippCell
+# from granulecell import GranuleCell
+# from mossycell_cat import MossyCell
+# from basketcell import BasketCell
+# from hippcell import HippCell
 
+from . import granulecell
+from . import mossycell_cat
+from . import  basketcell
+from . import hippcell
+
+GranuleCell = granulecell.GranuleCell
+MossyCell = mossycell_cat.MossyCell
+BasketCell = basketcell.BasketCell
+HippCell = hippcell.HippCell
 
 class TunedNetwork(gennetwork.GenNetwork):
     """ This model implements the ring model from Santhakumar et al. 2005.

@@ -9,7 +9,7 @@ from ouropy.genneuron import GenNeuron
 import ouropy.parameters as params
 
 
-class MossyCell(GenNeuron):
+class MossyCell_old(GenNeuron):
     """Implements the HippCell class with logic inherited from
     ouropy.GenNeuron, a generic neuron class"""
     name = "MossyCell"
@@ -41,8 +41,6 @@ class MossyCell(GenNeuron):
                          diam=[5.78, 4, 2.5, 1], L=[50, 50, 50, 50],
                          soma_loc=0)
 
-        # Difference between mossycell and mossycell_cat.
-        # mossycell_cat imports mossycellparams_cat.txt
-        parameters = params.read_parameters('mossycellparams_cat.txt')
+        parameters = params.read_parameters('mossycellparams.txt')
 
         self.insert_mechs(parameters)

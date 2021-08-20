@@ -16,7 +16,7 @@ setup(
     author_email='danielmuellermsc@gmail.com',
     url='https://github.com/danielmk/pyDentate',
     license=license,
-    packages=['ouropy'],
+    packages=['ouropy', 'pyDentate'],
     install_requires=[
           'elephant',
           'numpy',

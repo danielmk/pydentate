@@ -7,6 +7,7 @@ Created on Thu Apr 13 10:42:49 2017
 
 from ouropy.genneuron import GenNeuron
 import ouropy.parameters as params
+import os
 
 
 class HippCell(GenNeuron):
@@ -30,7 +31,9 @@ class HippCell(GenNeuron):
                          sec_names=['proxd', 'midd', 'distd'],
                          diam=[3, 2, 1], L=[75, 75, 75], soma_loc=1.0)
 
-        parameters = params.read_parameters('hippcellparams.txt')
+        dirname = os.path.dirname(__file__)
+        filepath = os.path.join(dirname, 'hippcellparams.txt')
+        parameters = params.read_parameters(filepath)
 
         self.parameters = parameters
 

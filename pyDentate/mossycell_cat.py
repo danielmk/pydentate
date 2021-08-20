@@ -7,6 +7,7 @@ Created on Wed Apr 12 15:16:40 2017
 
 from ouropy.genneuron import GenNeuron
 import ouropy.parameters as params
+import os
 
 
 class MossyCell(GenNeuron):
@@ -41,6 +42,10 @@ class MossyCell(GenNeuron):
                          diam=[5.78, 4, 2.5, 1], L=[50, 50, 50, 50],
                          soma_loc=0)
 
-        parameters = params.read_parameters('mossycellparams.txt')
+        # Difference between mossycell and mossycell_cat.
+        # mossycell_cat imports mossycellparams_cat.txt
+        dirname = os.path.dirname(__file__)
+        filepath = os.path.join(dirname, 'mossycellparams_cat.txt')
+        parameters = params.read_parameters(filepath)
 
         self.insert_mechs(parameters)

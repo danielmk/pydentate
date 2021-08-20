@@ -6,6 +6,7 @@ Created on Wed Apr 12 14:36:11 2017
 """
 from ouropy.genneuron import GenNeuron
 import ouropy.parameters as params
+import os
 
 
 class GranuleCell(GenNeuron):
@@ -27,6 +28,8 @@ class GranuleCell(GenNeuron):
                          diam=[3.0, 3.0, 3.0, 3.0],
                          L=[50.0, 150.0, 150.0, 150.0], soma_loc=1.0)
 
-        parameters = params.read_parameters('granulecellparams.txt')
+        dirname = os.path.dirname(__file__)
+        filepath = os.path.join(dirname, 'granulecellparams.txt')
+        parameters = params.read_parameters(filepath)
 
         self.insert_mechs(parameters)
