@@ -1,5 +1,5 @@
 from neuron import h, gui
-import pyDentate
+from pydentate import windows_precompiled, linux_precompiled
 import platform
 
 def load_compiled_mechanisms(path='precompiled'):
@@ -9,9 +9,9 @@ def load_compiled_mechanisms(path='precompiled'):
         h.nrn_load_dll(path)
     else:
         if platform.system() == 'Windows':
-            h.nrn_load_dll(pyDentate.windows_precompiled)
+            h.nrn_load_dll(windows_precompiled)
         else:
-            h.nrn_load_dll(pyDentate.linux_precompiled)
+            h.nrn_load_dll(linux_precompiled)
 
 def run_neuron_simulator(warmup=2000, dt_warmup=10, dt_sim=0.1, t_start=0,
                         t_stop=600, v_init=-60):

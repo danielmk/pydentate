@@ -7,8 +7,8 @@ Created on Mon Mar 05 13:41:23 2018
 
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
-from pyDentate import net_tunedrev, neuron_tools
-from pyDentate.inputs import inhom_poiss
+from pydentate import net_tunedrev, neuron_tools
+from pydentate.inputs import inhom_poiss
 import os
 import argparse
 import scipy.stats as stats
