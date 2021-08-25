@@ -164,6 +164,9 @@ class Population(object):
         except:
             ap_list = [np.array(x[0]) for x in self.ap_counters]
         np.savez(path, *ap_list)
+        
+    def get_timestamps(self):
+        ap_list = [np.array(x[0]) for x in self.ap_counters]
 
     def perc_active_cells(self):
         try:

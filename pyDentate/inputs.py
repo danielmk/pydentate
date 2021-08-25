@@ -57,6 +57,7 @@ def inhom_poiss(modulation_rate=10, max_rate=100, n_cells=400):
 def gaussian_connectivity_gc_bc(n_pre, n_gc, n_bc, n_syn_gc, n_syn_bc, scale_gc, scale_bc):
     """TODO"""
     pass
+
 def gaussian_connectivity(n_pre, n_post, n_syn=[100,], scale=[1000, 12]):
     """TODO THIS IS A STUB FOR A GENERALIZED VERSION OF gaussian_connectivity_gc_bc
     Choose n_syn postsynaptic cells for each presynaptic cells.

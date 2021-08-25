@@ -971,6 +971,9 @@ class Population(object):
             for delay in delays:
                 self.cells[cell]._current_clamp_soma(amp=amp, dur=dur,
                                                      delay=delay)
+    def get_timestamps(self):
+        ap_list = [np.array(x[0]) for x in self.ap_counters]
+        return ap_list
 
     def current_clamp_rnd(self, n_cells, amp=0.3, dur=5, delay=3):
         """DEPRECATE"""
