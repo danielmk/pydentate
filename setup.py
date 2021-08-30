@@ -10,7 +10,7 @@ with open('LICENSE') as f:
 setup(
     name='pydentate',
     version='0.1.1',
-    description='pyDentate is a biophysically realistic computational model of the dentate gyrus.',
+    description='pydentate is a biophysically realistic computational model of the dentate gyrus.',
     long_description=readme,
     author='Daniel Müller-Komorowska',
     author_email='danielmuellermsc@gmail.com',
