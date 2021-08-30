@@ -8,7 +8,7 @@ with open('LICENSE') as f:
     license = f.read()
 
 setup(
-    name='pyDentate',
+    name='pydentate',
     version='0.1.1',
     description='pyDentate is a biophysically realistic computational model of the dentate gyrus.',
     long_description=readme,
