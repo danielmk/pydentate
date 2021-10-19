@@ -6,9 +6,11 @@ channels:
 dependencies:
   - numpy
   - pandas
-  - elephant
-  - neuron
   - matplotlib
   - scipy
-  - neo
   - scikit-image
+  - pip
+  - pip:
+    - neo
+    - elephant
+    - neuron
