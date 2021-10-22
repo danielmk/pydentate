@@ -1,4 +1,4 @@
-name: pyDentate
+name: pydentate
 channels:
   - conda-forge
   - pypi
