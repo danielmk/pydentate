@@ -26,4 +26,4 @@ setup(
           'neo',
           'neuron ; platform_system=="Linux"',
           'scikit-image'],
-    package_data={'pydentate': ['*.csv']})
+    package_data={'pydentate': ['*.txt']})
