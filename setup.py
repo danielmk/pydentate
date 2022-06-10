@@ -14,7 +14,7 @@ setup(
     long_description=readme,
     author='Daniel Müller-Komorowska',
     author_email='danielmuellermsc@gmail.com',
-    url='https://github.com/danielmk/pyDentate',
+    url='https://github.com/danielmk/pydentate',
     license=license,
     packages=['ouropy', 'pydentate'],
     install_requires=[
