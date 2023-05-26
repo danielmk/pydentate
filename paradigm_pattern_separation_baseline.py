@@ -129,7 +129,7 @@ for run in runs:
                             str(input_scale).zfill(3) + '_' +
                             str(run).zfill(3) + '_')
 
-    nw.shelve_network(savedir, tuned_save_file_name)
+    nw.shelve_aps(savedir, tuned_save_file_name)
 
     fig = nw.plot_aps(time=600)
     tuned_fig_file_name = (str(nw) + "_spike-plot_paradigm_local-pattern" +

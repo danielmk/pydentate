@@ -153,7 +153,7 @@ class GenNetwork(object):
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
-        full_file_path = directory + "\\" + file_name
+        full_file_path = os.path.join(directory, file_name)
         if os.path.isfile(full_file_path):
             raise ValueError("The file already exists.\n" +
                              "shelve_network does not overwrite files.")
@@ -181,7 +181,7 @@ class GenNetwork(object):
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
-        full_file_path = directory + "\\" + file_name + '.pydd'
+        full_file_path = os.path.join(directory, file_name+'.pydd')
         if os.path.isfile(full_file_path):
             raise ValueError("The file already exists.\n" +
                              "shelve_network does not overwrite files.")
@@ -190,6 +190,26 @@ class GenNetwork(object):
         # BUG with paradigm_frequency_inhibition at 1Hz, possibly too long sim?
         curr_shelve[str(self)] = self.get_properties()
         curr_shelve.close()
+    
+    def shelve_aps(self, directory=None, file_name=None):
+        if not directory:
+            directory = os.getcwd()
+        if not file_name:
+            loc_time_str = '_'.join(time.asctime(time.localtime()).split(' '))
+            file_name = str(self) + '_' + loc_time_str
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
+
+        full_file_path = os.path.join(directory, file_name+'.pydd')
+        if os.path.isfile(full_file_path):
+            raise ValueError("The file already exists.\n" +
+                             "shelve_aps does not overwrite files.")
+
+        curr_shelve = shelve.open(full_file_path, flag='n')
+        # BUG with paradigm_frequency_inhibition at 1Hz, possibly too long sim?
+        curr_shelve['populations'] = [[(i, timestamps) for i, timestamps in enumerate(p.get_timestamps()) if len(timestamps) > 0] for p in self.populations]
+        curr_shelve.close()
+
 
     def __str__(self):
         return str(self.__class__).split("'")[1]
@@ -939,7 +959,7 @@ class Population(object):
             directory = os.getcwd()
         if not os.path.isdir(directory):
             os.mkdir(directory)
-        path = directory + '\\' + fname + '.npz'
+        path = os.path.join(directory, f'{fname}.npz')
         try:
             ap_list = [x[0].as_numpy() for x in self.ap_counters]
         except:
@@ -972,8 +992,10 @@ class Population(object):
                 self.cells[cell]._current_clamp_soma(amp=amp, dur=dur,
                                                      delay=delay)
     def get_timestamps(self):
-        ap_list = [np.array(x[0]) for x in self.ap_counters]
-        return ap_list
+        try:
+            return [x[0].as_numpy() for x in self.ap_counters]
+        except:
+            return [np.array(x[0]) for x in self.ap_counters]
 
     def current_clamp_rnd(self, n_cells, amp=0.3, dur=5, delay=3):
         """DEPRECATE"""
@@ -1003,10 +1025,7 @@ class Population(object):
 
     def get_properties(self):
         """Get the properties of the network"""
-        try:
-            ap_time_stamps = [x[0].as_numpy() for x in self.ap_counters]
-        except:
-            ap_time_stamps = [np.array(x[0]) for x in self.ap_counters]
+        ap_time_stamps = self.get_timestamps()
         ap_numbers = [x[1].n for x in self.ap_counters]
         try:
             v_rec = [x.as_numpy() for x in self.VRecords]
@@ -1024,7 +1043,6 @@ class Population(object):
                       'v_records': v_rec,
                       'VClamps_i': vclamp_i}
 
-        properties
         return properties
 
     def __str__(self):
