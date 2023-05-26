@@ -5,6 +5,7 @@ Created on Mon Mar 05 13:41:23 2018
 @author: DanielM
 """
 
+
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
 from pydentate import net_tunedrev, neuron_tools
@@ -65,7 +66,7 @@ else:
     dll_dir = os.path.join(dirname, 'x86_64', 'libnrnmech.so')    
 print("DLL loaded from: " + dll_dir)
 # h.nrn_load_dll(dll_dir)
-""" 
+"""
 neuron_tools.load_compiled_mechanisms(path='precompiled')
 
 # Start the runs of the model
@@ -85,28 +86,28 @@ for run in runs:
 
     PP_to_GCs = []
     for x in start_idc:
-        curr_idc = np.concatenate((GC_indices[x:2000], GC_indices[0:x]))
+        curr_idc = np.concatenate((GC_indices[x:2000], GC_indices[:x]))
         PP_to_GCs.append(np.random.choice(curr_idc, size=100, replace=False,
                                           p=pdf_gc))
 
     PP_to_GCs = np.array(PP_to_GCs)
-    PP_to_GCs = PP_to_GCs[0:24]
+    PP_to_GCs = PP_to_GCs[:24]
 
     BC_indices = np.arange(24)
     start_idc = np.array(((start_idc/2000.0)*24), dtype=int)
 
     PP_to_BCs = []
     for x in start_idc:
-        curr_idc = np.concatenate((BC_indices[x:24], BC_indices[0:x]))
+        curr_idc = np.concatenate((BC_indices[x:24], BC_indices[:x]))
         PP_to_BCs.append(np.random.choice(curr_idc, size=1, replace=False,
                                           p=pdf_bc))
 
     PP_to_BCs = np.array(PP_to_BCs)
-    PP_to_BCs = PP_to_BCs[0:24]
+    PP_to_BCs = PP_to_BCs[:24]
 
     # Generate temporal patterns for the 100 PP inputs
     temporal_patterns = inhom_poiss(modulation_rate=input_frequency)
-    temporal_patterns[0:24]
+    temporal_patterns[:24]
     nw = net_tunedrev.TunedNetwork(nw_seed[0], temporal_patterns,
                                    PP_to_GCs,
                                    PP_to_BCs)
@@ -121,21 +122,11 @@ for run in runs:
     print("Running model")
     neuron_tools.run_neuron_simulator()
 
-    tuned_save_file_name = (str(nw) + "-data-paradigm-local-pattern" +
-                            "-separation_nw-seed_input-seed_input-frequency_scale_run_" +
-                            str(nw_seed[0]) + '_' +
-                            str(input_seed[0]) + '_' + 
-                            str(input_frequency[0]) + '_' + 
-                            str(input_scale).zfill(3) + '_' +
-                            str(run).zfill(3) + '_')
+    tuned_save_file_name = f"{str(nw)}-data-paradigm-local-pattern-separation_nw-seed_input-seed_input-frequency_scale_run_{str(nw_seed[0])}_{str(input_seed[0])}_{str(input_frequency[0])}_{str(input_scale).zfill(3)}_{str(run).zfill(3)}_"
 
     nw.shelve_aps(savedir, tuned_save_file_name)
 
     fig = nw.plot_aps(time=600)
-    tuned_fig_file_name = (str(nw) + "_spike-plot_paradigm_local-pattern" +
-                           "-separation_run_scale_seed_input-seed_nw-seed_" +
-                           str(run).zfill(3) + '_' +
-                           str(input_scale).zfill(3) + '_' + str(10000) +
-                           str(input_seed) + str(nw_seed))
+    tuned_fig_file_name = f"{str(nw)}_spike-plot_paradigm_local-pattern-separation_run_scale_seed_input-seed_nw-seed_{str(run).zfill(3)}_{str(input_scale).zfill(3)}_10000{str(input_seed)}{str(nw_seed)}"
     nw.save_ap_fig(fig, savedir, tuned_fig_file_name)
 

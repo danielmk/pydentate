@@ -32,7 +32,7 @@ def inhom_poiss(modulation_rate=10, max_rate=100, n_cells=400):
     rate_profile_as_asig = AnalogSignal(rate_profile, units=1 * pq.Hz, t_start=0 * pq.s, t_stop=0.5 * pq.s, sampling_period=sampling_interval)
 
     spike_trains = []
-    for x in range(n_cells):
+    for _ in range(n_cells):
         curr_train = stg.inhomogeneous_poisson_process(rate_profile_as_asig)
         # We have to make sure that there is sufficient space between spikes.
         # If there is not, we move the next spike by 0.1ms
@@ -98,7 +98,7 @@ def gaussian_connectivity(
         pre_to_post = []
         # pdb.set_trace()
         for x in start_idc:
-            curr_idc = np.concatenate((post_idc[x:n_post_pop], post_idc[0:x]))
+            curr_idc = np.concatenate((post_idc[x:n_post_pop], post_idc[:x]))
             # pdb.set_trace()
             pre_to_post.append(np.random.choice(curr_idc, size=n_syn[idx], replace=False, p=pdf))
         out_list.append(pre_to_post)
