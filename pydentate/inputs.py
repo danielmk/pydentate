@@ -5,7 +5,6 @@ Created on Tue Feb 16 12:49:13 2021
 @author: Daniel & barisckuru
 """
 
-import pdb
 
 import numpy as np
 import quantities as pq
@@ -13,7 +12,6 @@ from elephant import spike_train_generation as stg
 from neo.core import AnalogSignal
 from scipy import stats
 from scipy.stats import skewnorm
-from skimage.measure import profile_line
 
 
 def inhom_poiss(modulation_rate=10, max_rate=100, n_cells=400):

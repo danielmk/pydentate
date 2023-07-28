@@ -102,9 +102,7 @@ INITIAL {
       hys = hysinf
 	hyhtf = hyhtfinf
 	hyhts = hyhtsinf
-	VERBATIM
-	return 0;
-	ENDVERBATIM
+
 }
 
 ? states
@@ -116,9 +114,6 @@ PROCEDURE states() {	:Computes state variables m, h, and n
 	  hyhtf = hyhtf + hyhtfexp*(hyhtfinf-hyhtf)
 	  hyhts = hyhts + hyhtsexp*(hyhtsinf-hyhts)
 
-        VERBATIM
-        return 0;
-        ENDVERBATIM
 }
  
 LOCAL q10

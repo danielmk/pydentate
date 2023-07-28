@@ -90,9 +90,7 @@ INITIAL {
       nf = nfinf
       ns = nsinf
 	
-	VERBATIM
-	return 0;
-	ENDVERBATIM
+
 }
 
 ? states
@@ -102,9 +100,7 @@ PROCEDURE states() {	:Computes state variables m, h, and n
         h = h + hexp*(hinf-h)
         nf = nf + nfexp*(nfinf-nf)
         ns = ns + nsexp*(nsinf-ns)
-        VERBATIM
-        return 0;
-        ENDVERBATIM
+    
 }
  
 LOCAL q10
