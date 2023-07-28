@@ -9,37 +9,33 @@ Created on Tue Nov 28 13:01:38 2017
 @author: DanielM
 """
 
-from ouropy import gennetwork
 import numpy as np
+
+from ouropy import gennetwork
+
 # from granulecell import GranuleCell
 # from mossycell_cat import MossyCell
 # from basketcell import BasketCell
 # from hippcell import HippCell
-
-from . import granulecell
-from . import mossycell_cat
-from . import  basketcell
-from . import hippcell
+from . import basketcell, granulecell, hippcell, mossycell_cat
 
 GranuleCell = granulecell.GranuleCell
 MossyCell = mossycell_cat.MossyCell
 BasketCell = basketcell.BasketCell
 HippCell = hippcell.HippCell
 
+
 class TunedNetwork(gennetwork.GenNetwork):
-    """ This model implements the ring model from Santhakumar et al. 2005.
+    """This model implements the ring model from Santhakumar et al. 2005.
     with some changes as in Yim et al. 2015.
     It features inhibition but omits the MC->GC connection.
     """
+
     name = "TunedNetwork"
 
-    def __init__(self, seed=None, temporal_patterns=np.array([]),
-                 spatial_patterns_gcs=np.array([]),
-                 spatial_patterns_bcs=np.array([]),
-                 network_type='full',
-                 pp_weight=1e-3):
+    def __init__(self, seed=None, temporal_patterns=np.array([]), spatial_patterns_gcs=np.array([]), spatial_patterns_bcs=np.array([]), network_type="full", pp_weight=1e-3):
         self.init_params = locals()
-        self.init_params['self'] = str(self.init_params['self'])
+        self.init_params["self"] = str(self.init_params["self"])
         # Setup cells
         self.mk_population(GranuleCell, 2000)
         self.mk_population(MossyCell, 60)
@@ -86,92 +82,61 @@ class TunedNetwork(gennetwork.GenNetwork):
                 'no-feedback', 'no-feedforward' or 'disinhibited'"""
             )
 
-        if (type(spatial_patterns_gcs) == np.ndarray and
-           type(temporal_patterns) == np.ndarray):
+        if type(spatial_patterns_gcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
+            print(len(spatial_patterns_gcs))
             for pa in range(len(spatial_patterns_gcs)):
                 # PP -> GC
-                gennetwork.PerforantPathPoissonTmgsyn(self.populations[0],
-                                                      temporal_patterns[pa],
-                                                      spatial_patterns_gcs[pa],
-                                                      'midd', 10, 0, 1, 0, 0,
-                                                      pp_weight)
+                gennetwork.PerforantPathPoissonTmgsyn(self.populations[0], temporal_patterns[pa], spatial_patterns_gcs[pa], "midd", 10, 0, 1, 0, 0, pp_weight)
 
-        if (type(spatial_patterns_bcs) == np.ndarray and
-           type(temporal_patterns) == np.ndarray):
+        if type(spatial_patterns_bcs) == np.ndarray and type(temporal_patterns) == np.ndarray:
+            print(len(spatial_patterns_bcs))
             for pa in range(len(spatial_patterns_bcs)):
                 # PP -> BC
-                gennetwork.PerforantPathPoissonTmgsyn(self.populations[2],
-                                                      temporal_patterns[pa],
-                                                      spatial_patterns_bcs[pa],
-                                                      'ddend', 6.3, 0, 1, 0, 0,
-                                                      pp_bc)
+                gennetwork.PerforantPathPoissonTmgsyn(self.populations[2], temporal_patterns[pa], spatial_patterns_bcs[pa], "ddend", 6.3, 0, 1, 0, 0, pp_bc)
 
         # GC -> MC
-        gennetwork.tmgsynConnection(self.populations[0], self.populations[1],
-                                    12, 'proxd', 1, 7.6, 500, 0.1, 0, 0, 10,
-                                    1.5, gc_mc)
+        gennetwork.tmgsynConnection(self.populations[0], self.populations[1], 12, "proxd", 1, 7.6, 500, 0.1, 0, 0, 10, 1.5, gc_mc)
 
         # GC -> BC
         # Weight x4, target_pool = 2
-        gennetwork.tmgsynConnection(self.populations[0], self.populations[2],
-                                    8, 'proxd', 1, 8.7, 500, 0.1, 0, 0, 10,
-                                    0.8, gc_bc)
+        gennetwork.tmgsynConnection(self.populations[0], self.populations[2], 8, "proxd", 1, 8.7, 500, 0.1, 0, 0, 10, 0.8, gc_bc)
 
         # GC -> HC
         # Divergence x4; Weight doubled; Connected randomly.
-        gennetwork.tmgsynConnection(self.populations[0], self.populations[3],
-                                    24, 'proxd', 1, 8.7, 500, 0.1, 0, 0, 10,
-                                    1.5, gc_hc)
+        gennetwork.tmgsynConnection(self.populations[0], self.populations[3], 24, "proxd", 1, 8.7, 500, 0.1, 0, 0, 10, 1.5, gc_hc)
 
         # MC -> MC
-        gennetwork.tmgsynConnection(self.populations[1], self. populations[1],
-                                    24, 'proxd', 3, 2.2, 0, 1, 0, 0, 10,
-                                    2, 5e-4)
+        # pre_pop, post_pop, target_pool, target_segs, divergence, tau_1, tau_facil, U, tau_rec, e, thr, delay, weight
+        gennetwork.tmgsynConnection(self.populations[1], self.populations[1], 24, "proxd", 3, 2.2, 0, 1, 0, 0, 10, 2, 5e-4)
 
         # MC -> BC
-        gennetwork.tmgsynConnection(self.populations[1], self.populations[2],
-                                    12, 'proxd', 1, 2, 0, 1, 0, 0, 10,
-                                    3, 3e-4)
+        gennetwork.tmgsynConnection(self.populations[1], self.populations[2], 12, "proxd", 1, 2, 0, 1, 0, 0, 10, 3, 3e-4)
 
         # MC -> HC
-        gennetwork.tmgsynConnection(self.populations[1], self.populations[3],
-                                    20, 'midd', 2, 6.2, 0, 1, 0, 0, 10,
-                                    3, 2e-4)
+        gennetwork.tmgsynConnection(self.populations[1], self.populations[3], 20, "midd", 2, 6.2, 0, 1, 0, 0, 10, 3, 2e-4)
 
         # BC -> GC
         # # synapses x3; Weight *1/4; tau from 5.5 to 20 (Hefft & Jonas, 2005)
-        gennetwork.tmgsynConnection(self.populations[2], self.populations[0],
-                                    560, 'soma', 400, 20, 0, 1, 0, -70, 10,
-                                    0.85, bc_gc)
+        gennetwork.tmgsynConnection(self.populations[2], self.populations[0], 560, "soma", 400, 20, 0, 1, 0, -70, 10, 0.85, bc_gc)
 
         # We reseed here to make sure that those connections are consistent
         # between this and net_global which has a global target pool for
         # BC->GC.
         if seed:
-            self.set_numpy_seed(seed+1)
+            self.set_numpy_seed(seed + 1)
 
         # BC -> MC
-        gennetwork.tmgsynConnection(self.populations[2], self.populations[1],
-                                    28, 'proxd', 3, 3.3, 0, 1, 0, -70, 10,
-                                    1.5, 1.5e-3)
+        gennetwork.tmgsynConnection(self.populations[2], self.populations[1], 28, "proxd", 3, 3.3, 0, 1, 0, -70, 10, 1.5, 1.5e-3)
 
         # BC -> BC
-        gennetwork.tmgsynConnection(self.populations[2], self.populations[2],
-                                    12, 'proxd', 2, 1.8, 0, 1, 0, -70, 10,
-                                    0.8, 7.6e-3)
+        gennetwork.tmgsynConnection(self.populations[2], self.populations[2], 12, "proxd", 2, 1.8, 0, 1, 0, -70, 10, 0.8, 7.6e-3)
 
         # HC -> GC
         # Weight x10; Nr synapses x4; tau from 6 to 20 (Hefft & Jonas, 2005)
-        gennetwork.tmgsynConnection(self.populations[3], self.populations[0],
-                                    2000, 'dd', 640, 20, 0, 1, 0, -70, 10,
-                                    3.8, hc_gc)
+        gennetwork.tmgsynConnection(self.populations[3], self.populations[0], 2000, "dd", 640, 20, 0, 1, 0, -70, 10, 3.8, hc_gc)
 
         # HC -> MC
-        gennetwork.tmgsynConnection(self.populations[3], self.populations[1],
-                                    60, ['mid1d', 'mid2d'], 4, 6, 0, 1, 0, -70,
-                                    10, 1, 1.5e-3)
+        gennetwork.tmgsynConnection(self.populations[3], self.populations[1], 60, ["mid1d", "mid2d"], 4, 6, 0, 1, 0, -70, 10, 1, 1.5e-3)
 
         # HC -> BC
-        gennetwork.tmgsynConnection(self.populations[3], self.populations[2],
-                                    24, 'ddend', 4, 5.8, 0, 1, 0, -70, 10,
-                                    1.6, 5e-4)
+        gennetwork.tmgsynConnection(self.populations[3], self.populations[2], 24, "ddend", 4, 5.8, 0, 1, 0, -70, 10, 1.6, 5e-4)

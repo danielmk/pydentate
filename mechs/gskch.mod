@@ -67,9 +67,7 @@ PROCEDURE state() {  :Computes state variable q at current v and dt.
 	cai = ncai + lcai + tcai
 	rate(cai)
 	q = q + (qinf-q) * qexp
-	VERBATIM
-	return 0;
-	ENDVERBATIM
+
 }
 
 LOCAL q10

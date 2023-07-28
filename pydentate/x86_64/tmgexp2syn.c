@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "scoplib_ansi.h"
+#include "mech_api.h"
 #undef PI
 #define nil 0
 #include "md1redef.h"
@@ -32,9 +32,9 @@ extern double hoc_Exp(double);
 #define state state__tmgexp2syn 
  
 #define _threadargscomma_ _p, _ppvar, _thread, _nt,
-#define _threadargsprotocomma_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt,
+#define _threadargsprotocomma_ double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt,
 #define _threadargs_ _p, _ppvar, _thread, _nt
-#define _threadargsproto_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt
+#define _threadargsproto_ double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
 	/*SUPPRESS 763*/
@@ -45,23 +45,41 @@ extern double hoc_Exp(double);
 #define t _nt->_t
 #define dt _nt->_dt
 #define e _p[0]
+#define e_columnindex 0
 #define tau_1 _p[1]
+#define tau_1_columnindex 1
 #define tau_2 _p[2]
+#define tau_2_columnindex 2
 #define tau_rec _p[3]
+#define tau_rec_columnindex 3
 #define tau_facil _p[4]
+#define tau_facil_columnindex 4
 #define U _p[5]
+#define U_columnindex 5
 #define u0 _p[6]
+#define u0_columnindex 6
 #define i _p[7]
+#define i_columnindex 7
 #define g _p[8]
+#define g_columnindex 8
 #define A _p[9]
+#define A_columnindex 9
 #define B _p[10]
+#define B_columnindex 10
 #define x _p[11]
+#define x_columnindex 11
 #define factor _p[12]
+#define factor_columnindex 12
 #define DA _p[13]
+#define DA_columnindex 13
 #define DB _p[14]
+#define DB_columnindex 14
 #define v _p[15]
+#define v_columnindex 15
 #define _g _p[16]
+#define _g_columnindex 16
 #define _tsav _p[17]
+#define _tsav_columnindex 17
 #define _nd_area  *_ppvar[0]._pval
  
 #if MAC
@@ -99,18 +117,18 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 
  extern Prop* nrn_point_prop_;
  static int _pointtype;
- static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
+ static void* _hoc_create_pnt(Object* _ho) { void* create_point_process(int, Object*);
  return create_point_process(_pointtype, _ho);
 }
- static void _hoc_destroy_pnt();
- static double _hoc_loc_pnt(_vptr) void* _vptr; {double loc_point_process();
+ static void _hoc_destroy_pnt(void*);
+ static double _hoc_loc_pnt(void* _vptr) {double loc_point_process(int, void*);
  return loc_point_process(_pointtype, _vptr);
 }
- static double _hoc_has_loc(_vptr) void* _vptr; {double has_loc_point();
+ static double _hoc_has_loc(void* _vptr) {double has_loc_point(void*);
  return has_loc_point(_vptr);
 }
- static double _hoc_get_loc_pnt(_vptr)void* _vptr; {
- double get_loc_point_process(); return (get_loc_point_process(_vptr));
+ static double _hoc_get_loc_pnt(void* _vptr) {
+ double get_loc_point_process(void*); return (get_loc_point_process(_vptr));
 }
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
@@ -165,18 +183,18 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 };
  static double _sav_indep;
  static void nrn_alloc(Prop*);
-static void  nrn_init(_NrnThread*, _Memb_list*, int);
-static void nrn_state(_NrnThread*, _Memb_list*, int);
- static void nrn_cur(_NrnThread*, _Memb_list*, int);
-static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
- static void _hoc_destroy_pnt(_vptr) void* _vptr; {
+static void  nrn_init(NrnThread*, _Memb_list*, int);
+static void nrn_state(NrnThread*, _Memb_list*, int);
+ static void nrn_cur(NrnThread*, _Memb_list*, int);
+static void  nrn_jacob(NrnThread*, _Memb_list*, int);
+ static void _hoc_destroy_pnt(void* _vptr) {
    destroy_point_process(_vptr);
 }
  
 static int _ode_count(int);
 static void _ode_map(int, double**, double**, double*, Datum*, double*, int);
-static void _ode_spec(_NrnThread*, _Memb_list*, int);
-static void _ode_matsol(_NrnThread*, _Memb_list*, int);
+static void _ode_spec(NrnThread*, _Memb_list*, int);
+static void _ode_matsol(NrnThread*, _Memb_list*, int);
  
 #define _cvode_ieq _ppvar[2]._i
  static void _ode_matsol_instance1(_threadargsproto_);
@@ -239,7 +257,7 @@ static void nrn_alloc(Prop* _prop) {
  static void _net_init(Point_process*, double*, double);
  extern Symbol* hoc_lookup(const char*);
 extern void _nrn_thread_reg(int, int, void(*)(Datum*));
-extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
+extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
 
@@ -266,7 +284,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive_init[_mechtype] = _net_init;
  pnt_receive_size[_mechtype] = 5;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 tmgexp2syn /home/danielmk/repos/pyDentate/mechs/tmgexp2syn.mod\n");
+ 	ivoc_help("help ?1 tmgexp2syn /Users/temma/ghq/pydentate/mechs/tmgexp2syn.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -284,28 +302,28 @@ static int _ode_spec1(_threadargsproto_);
  static int state(_threadargsproto_);
  
 /*CVODE*/
- static int _ode_spec1 (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {int _reset = 0; {
+ static int _ode_spec1 (double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt) {int _reset = 0; {
    DA = - A / tau_1 ;
    DB = - B / tau_2 ;
    }
  return _reset;
 }
- static int _ode_matsol1 (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
+ static int _ode_matsol1 (double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt) {
  DA = DA  / (1. - dt*( ( - 1.0 ) / tau_1 )) ;
  DB = DB  / (1. - dt*( ( - 1.0 ) / tau_2 )) ;
   return 0;
 }
  /*END CVODE*/
- static int state (double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) { {
+ static int state (double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt) { {
     A = A + (1. - exp(dt*(( - 1.0 ) / tau_1)))*(- ( 0.0 ) / ( ( - 1.0 ) / tau_1 ) - A) ;
     B = B + (1. - exp(dt*(( - 1.0 ) / tau_2)))*(- ( 0.0 ) / ( ( - 1.0 ) / tau_2 ) - B) ;
    }
   return 0;
 }
  
-static void _net_receive (_pnt, _args, _lflag) Point_process* _pnt; double* _args; double _lflag; 
-{  double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
-   _thread = (Datum*)0; _nt = (_NrnThread*)_pnt->_vnt;   _p = _pnt->_prop->param; _ppvar = _pnt->_prop->dparam;
+static void _net_receive (Point_process* _pnt, double* _args, double _lflag) 
+{  double* _p; Datum* _ppvar; Datum* _thread; NrnThread* _nt;
+   _thread = (Datum*)0; _nt = (NrnThread*)_pnt->_vnt;   _p = _pnt->_prop->param; _ppvar = _pnt->_prop->dparam;
   if (_tsav > t){ extern char* hoc_object_name(); hoc_execerror(hoc_object_name(_pnt->ob), ":Event arrived out of order. Must call ParallelContext.set_maxstep AFTER assigning minimum NetCon.delay");}
  _tsav = t; {
    _args[2] = _args[2] * exp ( - ( t - _args[4] ) / tau_rec ) ;
@@ -348,7 +366,7 @@ static void _net_init(Point_process* _pnt, double* _args, double _lflag) {
        double* _p = _pnt->_prop->param;
     Datum* _ppvar = _pnt->_prop->dparam;
     Datum* _thread = (Datum*)0;
-    _NrnThread* _nt = (_NrnThread*)_pnt->_vnt;
+    NrnThread* _nt = (NrnThread*)_pnt->_vnt;
  _args[1] = 0.0 ;
    _args[2] = 0.0 ;
    _args[3] = u0 ;
@@ -357,7 +375,7 @@ static void _net_init(Point_process* _pnt, double* _args, double _lflag) {
  
 static int _ode_count(int _type){ return 2;}
  
-static void _ode_spec(_NrnThread* _nt, _Memb_list* _ml, int _type) {
+static void _ode_spec(NrnThread* _nt, _Memb_list* _ml, int _type) {
    double* _p; Datum* _ppvar; Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
   _cntml = _ml->_nodecount;
@@ -383,7 +401,7 @@ static void _ode_matsol_instance1(_threadargsproto_) {
  _ode_matsol1 (_p, _ppvar, _thread, _nt);
  }
  
-static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
+static void _ode_matsol(NrnThread* _nt, _Memb_list* _ml, int _type) {
    double* _p; Datum* _ppvar; Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
   _cntml = _ml->_nodecount;
@@ -395,7 +413,7 @@ static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
  _ode_matsol_instance1(_threadargs_);
  }}
 
-static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt) {
+static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt) {
   int _i; double _save;{
   A = A0;
   B = B0;
@@ -418,7 +436,7 @@ static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt
 }
 }
 
-static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_init(NrnThread* _nt, _Memb_list* _ml, int _type){
 double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; double _v; int* _ni; int _iml, _cntml;
 #if CACHEVEC
@@ -443,7 +461,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 }
 }
 
-static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt, double _v){double _current=0.;v=_v;{ {
+static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt, double _v){double _current=0.;v=_v;{ {
    g = B - A ;
    i = g * ( v - e ) ;
    }
@@ -452,7 +470,7 @@ static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread
 } return _current;
 }
 
-static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type) {
+static void nrn_cur(NrnThread* _nt, _Memb_list* _ml, int _type) {
 double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; int* _ni; double _rhs, _v; int _iml, _cntml;
 #if CACHEVEC
@@ -490,7 +508,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
  
 }
 
-static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type) {
+static void nrn_jacob(NrnThread* _nt, _Memb_list* _ml, int _type) {
 double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; int* _ni; int _iml, _cntml;
 #if CACHEVEC
@@ -514,7 +532,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
  
 }
 
-static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
+static void nrn_state(NrnThread* _nt, _Memb_list* _ml, int _type) {
 double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
 #if CACHEVEC
@@ -547,8 +565,8 @@ static void _initlists(){
  double _x; double* _p = &_x;
  int _i; static int _first = 1;
   if (!_first) return;
- _slist1[0] = &(A) - _p;  _dlist1[0] = &(DA) - _p;
- _slist1[1] = &(B) - _p;  _dlist1[1] = &(DB) - _p;
+ _slist1[0] = A_columnindex;  _dlist1[0] = DA_columnindex;
+ _slist1[1] = B_columnindex;  _dlist1[1] = DB_columnindex;
 _first = 0;
 }
 
@@ -557,7 +575,7 @@ _first = 0;
 #endif
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/home/danielmk/repos/pyDentate/mechs/tmgexp2syn.mod";
+static const char* nmodl_filename = "/Users/temma/ghq/pydentate/mechs/tmgexp2syn.mod";
 static const char* nmodl_file_text = 
   "COMMENT\n"
   "Revised 12/15/2000 in light of a personal communication \n"

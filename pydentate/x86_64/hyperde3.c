@@ -1,10 +1,10 @@
 /* Created by Language version: 7.7.0 */
-/* NOT VECTORIZED */
-#define NRN_VECTORIZED 0
+/* VECTORIZED */
+#define NRN_VECTORIZED 1
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "scoplib_ansi.h"
+#include "mech_api.h"
 #undef PI
 #define nil 0
 #include "md1redef.h"
@@ -34,56 +34,95 @@ extern double hoc_Exp(double);
 #define states states__hyperde3 
 #define trates trates__hyperde3 
  
-#define _threadargscomma_ /**/
-#define _threadargsprotocomma_ /**/
-#define _threadargs_ /**/
-#define _threadargsproto_ /**/
+#define _threadargscomma_ _p, _ppvar, _thread, _nt,
+#define _threadargsprotocomma_ double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt,
+#define _threadargs_ _p, _ppvar, _thread, _nt
+#define _threadargsproto_ double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
 	/*SUPPRESS 763*/
 	/*SUPPRESS 765*/
 	 extern double *getarg();
- static double *_p; static Datum *_ppvar;
+ /* Thread safe. No static _p or _ppvar. */
  
-#define t nrn_threads->_t
-#define dt nrn_threads->_dt
+#define t _nt->_t
+#define dt _nt->_dt
 #define ghyfbar _p[0]
+#define ghyfbar_columnindex 0
 #define ghysbar _p[1]
+#define ghysbar_columnindex 1
 #define ghyhtfbar _p[2]
+#define ghyhtfbar_columnindex 2
 #define ghyhtsbar _p[3]
+#define ghyhtsbar_columnindex 3
 #define ghyf _p[4]
+#define ghyf_columnindex 4
 #define ghys _p[5]
+#define ghys_columnindex 5
 #define ghyhtf _p[6]
+#define ghyhtf_columnindex 6
 #define ghyhts _p[7]
+#define ghyhts_columnindex 7
 #define ihyf _p[8]
+#define ihyf_columnindex 8
 #define ihys _p[9]
+#define ihys_columnindex 9
 #define hyfinf _p[10]
+#define hyfinf_columnindex 10
 #define hysinf _p[11]
+#define hysinf_columnindex 11
 #define hyhtfinf _p[12]
+#define hyhtfinf_columnindex 12
 #define hyhtsinf _p[13]
+#define hyhtsinf_columnindex 13
 #define hyftau _p[14]
+#define hyftau_columnindex 14
 #define hystau _p[15]
+#define hystau_columnindex 15
 #define hyhtftau _p[16]
+#define hyhtftau_columnindex 16
 #define hyhtstau _p[17]
+#define hyhtstau_columnindex 17
 #define hyf _p[18]
+#define hyf_columnindex 18
 #define hys _p[19]
+#define hys_columnindex 19
 #define hyhtf _p[20]
+#define hyhtf_columnindex 20
 #define hyhts _p[21]
+#define hyhts_columnindex 21
 #define ehyf _p[22]
+#define ehyf_columnindex 22
 #define ehys _p[23]
+#define ehys_columnindex 23
 #define ehyhtf _p[24]
+#define ehyhtf_columnindex 24
 #define ehyhts _p[25]
+#define ehyhts_columnindex 25
 #define Dhyf _p[26]
+#define Dhyf_columnindex 26
 #define Dhys _p[27]
+#define Dhys_columnindex 27
 #define Dhyhtf _p[28]
+#define Dhyhtf_columnindex 28
 #define Dhyhts _p[29]
+#define Dhyhts_columnindex 29
 #define ihyhtf _p[30]
+#define ihyhtf_columnindex 30
 #define ihyhts _p[31]
+#define ihyhts_columnindex 31
 #define hyfexp _p[32]
+#define hyfexp_columnindex 32
 #define hysexp _p[33]
+#define hysexp_columnindex 33
 #define hyhtfexp _p[34]
+#define hyhtfexp_columnindex 34
 #define hyhtsexp _p[35]
-#define _g _p[36]
+#define hyhtsexp_columnindex 35
+#define v _p[36]
+#define v_columnindex 36
+#define _g _p[37]
+#define _g_columnindex 37
 #define _ion_ehyf	*_ppvar[0]._pval
 #define _ion_ihyf	*_ppvar[1]._pval
 #define _ion_dihyfdv	*_ppvar[2]._pval
@@ -110,6 +149,8 @@ extern double hoc_Exp(double);
 extern "C" {
 #endif
  static int hoc_nrnpointerindex =  -1;
+ static Datum* _extcall_thread;
+ static Prop* _extcall_prop;
  /* external NEURON variables */
  extern double celsius;
  /* declaration of user functions */
@@ -135,7 +176,7 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
- _p = _prop->param; _ppvar = _prop->dparam;
+ _extcall_prop = _prop;
  }
  static void _hoc_setdata() {
  Prop *_prop, *hoc_getdata_range(int);
@@ -153,7 +194,13 @@ extern void hoc_reg_nmodl_filename(int, const char*);
  0, 0
 };
 #define vtrap vtrap_hyperde3
- extern double vtrap( double , double );
+ extern double vtrap( _threadargsprotocomma_ double , double );
+ 
+static void _check_trates(double*, Datum*, Datum*, NrnThread*); 
+static void _check_table_thread(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt, int _type) {
+   _check_trates(_p, _ppvar, _thread, _nt);
+ }
+ #define _zq10 _thread[0]._pval[0]
  /* declare global and static user variables */
 #define usetable usetable_hyperde3
  double usetable = 1;
@@ -184,7 +231,6 @@ extern void hoc_reg_nmodl_filename(int, const char*);
  static double hyhtf0 = 0;
  static double hys0 = 0;
  static double hyf0 = 0;
- static double v = 0;
  /* connect global user variables to hoc */
  static DoubScal hoc_scdoub[] = {
  "usetable_hyperde3", &usetable_hyperde3,
@@ -195,10 +241,10 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 };
  static double _sav_indep;
  static void nrn_alloc(Prop*);
-static void  nrn_init(_NrnThread*, _Memb_list*, int);
-static void nrn_state(_NrnThread*, _Memb_list*, int);
- static void nrn_cur(_NrnThread*, _Memb_list*, int);
-static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
+static void  nrn_init(NrnThread*, _Memb_list*, int);
+static void nrn_state(NrnThread*, _Memb_list*, int);
+ static void nrn_cur(NrnThread*, _Memb_list*, int);
+static void  nrn_jacob(NrnThread*, _Memb_list*, int);
  
 static int _ode_count(int);
  /* connect range variables in _p that hoc is supposed to know about */
@@ -241,14 +287,14 @@ extern Prop* need_memb(Symbol*);
 static void nrn_alloc(Prop* _prop) {
 	Prop *prop_ion;
 	double *_p; Datum *_ppvar;
- 	_p = nrn_prop_data_alloc(_mechtype, 37, _prop);
+ 	_p = nrn_prop_data_alloc(_mechtype, 38, _prop);
  	/*initialize range parameters*/
  	ghyfbar = 0;
  	ghysbar = 0;
  	ghyhtfbar = 0;
  	ghyhtsbar = 0;
  	_prop->param = _p;
- 	_prop->param_size = 37;
+ 	_prop->param_size = 38;
  	_ppvar = nrn_prop_datum_alloc(_mechtype, 12, _prop);
  	_prop->dparam = _ppvar;
  	/*connect ionic variables to this model*/
@@ -275,15 +321,17 @@ static void nrn_alloc(Prop* _prop) {
  
 }
  static void _initlists();
+ static void _thread_mem_init(Datum*);
+ static void _thread_cleanup(Datum*);
  static void _update_ion_pointer(Datum*);
  extern Symbol* hoc_lookup(const char*);
 extern void _nrn_thread_reg(int, int, void(*)(Datum*));
-extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
+extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
 
  void _hyperde3_reg() {
-	int _vectorized = 0;
+	int _vectorized = 1;
   _initlists();
  	ion_reg("hyf", 1.0);
  	ion_reg("hys", 1.0);
@@ -293,15 +341,20 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	_hys_sym = hoc_lookup("hys_ion");
  	_hyhtf_sym = hoc_lookup("hyhtf_ion");
  	_hyhts_sym = hoc_lookup("hyhts_ion");
- 	register_mech(_mechanism, nrn_alloc,nrn_cur, nrn_jacob, nrn_state, nrn_init, hoc_nrnpointerindex, 0);
+ 	register_mech(_mechanism, nrn_alloc,nrn_cur, nrn_jacob, nrn_state, nrn_init, hoc_nrnpointerindex, 2);
+  _extcall_thread = (Datum*)ecalloc(1, sizeof(Datum));
+  _thread_mem_init(_extcall_thread);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+     _nrn_thread_reg(_mechtype, 1, _thread_mem_init);
+     _nrn_thread_reg(_mechtype, 0, _thread_cleanup);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+     _nrn_thread_table_reg(_mechtype, _check_table_thread);
  #if NMODL_TEXT
   hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
   hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
 #endif
-  hoc_register_prop_size(_mechtype, 37, 12);
+  hoc_register_prop_size(_mechtype, 38, 12);
   hoc_register_dparam_semantics(_mechtype, 0, "hyf_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "hyf_ion");
   hoc_register_dparam_semantics(_mechtype, 2, "hyf_ion");
@@ -316,13 +369,13 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 11, "hyhts_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 hyperde3 /home/danielmk/repos/pyDentate/mechs/hyperde3.mod\n");
+ 	ivoc_help("help ?1 hyperde3 /Users/temma/ghq/pydentate/mechs/hyperde3.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
  static double FARADAY = 96520.0;
  static double R = 8.3134;
- static double _zq10 ;
+ /*Top LOCAL _zq10 */
  static double *_t_hyfinf;
  static double *_t_hyhtfinf;
  static double *_t_hyfexp;
@@ -342,31 +395,32 @@ static int error;
 static int _ninits = 0;
 static int _match_recurse=1;
 static void _modl_cleanup(){ _match_recurse=1;}
-static int _f_trates(double);
-static int rates(double);
-static int states();
-static int trates(double);
- static void _n_trates(double);
+static int _f_trates(_threadargsprotocomma_ double);
+static int rates(_threadargsprotocomma_ double);
+static int states(_threadargsproto_);
+static int trates(_threadargsprotocomma_ double);
+ static void _n_trates(_threadargsprotocomma_ double _lv);
  
-static int  states (  ) {
+static int  states ( _threadargsproto_ ) {
    trates ( _threadargscomma_ v ) ;
    hyf = hyf + hyfexp * ( hyfinf - hyf ) ;
    hys = hys + hysexp * ( hysinf - hys ) ;
    hyhtf = hyhtf + hyhtfexp * ( hyhtfinf - hyhtf ) ;
    hyhts = hyhts + hyhtsexp * ( hyhtsinf - hyhts ) ;
-   
-/*VERBATIM*/
-        return 0;
-  return 0; }
+    return 0; }
  
 static void _hoc_states(void) {
   double _r;
-   _r = 1.;
- states (  );
+   double* _p; Datum* _ppvar; Datum* _thread; NrnThread* _nt;
+   if (_extcall_prop) {_p = _extcall_prop->param; _ppvar = _extcall_prop->dparam;}else{ _p = (double*)0; _ppvar = (Datum*)0; }
+  _thread = _extcall_thread;
+  _nt = nrn_threads;
+ _r = 1.;
+ states ( _p, _ppvar, _thread, _nt );
  hoc_retpushx(_r);
 }
  
-static int  rates (  double _lv ) {
+static int  rates ( _threadargsprotocomma_ double _lv ) {
    double _lalpha , _lbeta , _lsum ;
  _zq10 = pow( 3.0 , ( ( celsius - 6.3 ) / 10.0 ) ) ;
    hyfinf = 1.0 / ( 1.0 + exp ( ( _lv + 91.0 ) / 10.0 ) ) ;
@@ -381,13 +435,16 @@ static int  rates (  double _lv ) {
  
 static void _hoc_rates(void) {
   double _r;
-   _r = 1.;
- rates (  *getarg(1) );
+   double* _p; Datum* _ppvar; Datum* _thread; NrnThread* _nt;
+   if (_extcall_prop) {_p = _extcall_prop->param; _ppvar = _extcall_prop->dparam;}else{ _p = (double*)0; _ppvar = (Datum*)0; }
+  _thread = _extcall_thread;
+  _nt = nrn_threads;
+ _r = 1.;
+ rates ( _p, _ppvar, _thread, _nt, *getarg(1) );
  hoc_retpushx(_r);
 }
  static double _mfac_trates, _tmin_trates;
- static void _check_trates();
- static void _check_trates() {
+  static void _check_trates(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt) {
   static int _maktable=1; int _i, _j, _ix = 0;
   double _xi, _tmax;
   static double _sav_dt;
@@ -400,7 +457,7 @@ static void _hoc_rates(void) {
    _tmax =  100.0 ;
    _dx = (_tmax - _tmin_trates)/220.; _mfac_trates = 1./_dx;
    for (_i=0, _x=_tmin_trates; _i < 221; _x += _dx, _i++) {
-    _f_trates(_x);
+    _f_trates(_p, _ppvar, _thread, _nt, _x);
     _t_hyfinf[_i] = hyfinf;
     _t_hyhtfinf[_i] = hyhtfinf;
     _t_hyfexp[_i] = hyfexp;
@@ -419,15 +476,18 @@ static void _hoc_rates(void) {
   }
  }
 
- static int trates(double _lv){ _check_trates();
- _n_trates(_lv);
+ static int trates(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt, double _lv) { 
+#if 0
+_check_trates(_p, _ppvar, _thread, _nt);
+#endif
+ _n_trates(_p, _ppvar, _thread, _nt, _lv);
  return 0;
  }
 
- static void _n_trates(double _lv){ int _i, _j;
+ static void _n_trates(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt, double _lv){ int _i, _j;
  double _xi, _theta;
  if (!usetable) {
- _f_trates(_lv); return; 
+ _f_trates(_p, _ppvar, _thread, _nt, _lv); return; 
 }
  _xi = _mfac_trates * (_lv - _tmin_trates);
  if (isnan(_xi)) {
@@ -490,7 +550,7 @@ static void _hoc_rates(void) {
  }
 
  
-static int  _f_trates (  double _lv ) {
+static int  _f_trates ( _threadargsprotocomma_ double _lv ) {
    double _ltinc ;
  rates ( _threadargscomma_ _lv ) ;
    _ltinc = - dt * _zq10 ;
@@ -502,12 +562,20 @@ static int  _f_trates (  double _lv ) {
  
 static void _hoc_trates(void) {
   double _r;
-    _r = 1.;
- trates (  *getarg(1) );
+   double* _p; Datum* _ppvar; Datum* _thread; NrnThread* _nt;
+   if (_extcall_prop) {_p = _extcall_prop->param; _ppvar = _extcall_prop->dparam;}else{ _p = (double*)0; _ppvar = (Datum*)0; }
+  _thread = _extcall_thread;
+  _nt = nrn_threads;
+ 
+#if 1
+ _check_trates(_p, _ppvar, _thread, _nt);
+#endif
+ _r = 1.;
+ trates ( _p, _ppvar, _thread, _nt, *getarg(1) );
  hoc_retpushx(_r);
 }
  
-double vtrap (  double _lx , double _ly ) {
+double vtrap ( _threadargsprotocomma_ double _lx , double _ly ) {
    double _lvtrap;
  if ( fabs ( _lx / _ly ) < 1e-6 ) {
      _lvtrap = _ly * ( 1.0 - _lx / _ly / 2.0 ) ;
@@ -521,11 +589,23 @@ return _lvtrap;
  
 static void _hoc_vtrap(void) {
   double _r;
-   _r =  vtrap (  *getarg(1) , *getarg(2) );
+   double* _p; Datum* _ppvar; Datum* _thread; NrnThread* _nt;
+   if (_extcall_prop) {_p = _extcall_prop->param; _ppvar = _extcall_prop->dparam;}else{ _p = (double*)0; _ppvar = (Datum*)0; }
+  _thread = _extcall_thread;
+  _nt = nrn_threads;
+ _r =  vtrap ( _p, _ppvar, _thread, _nt, *getarg(1) , *getarg(2) );
  hoc_retpushx(_r);
 }
  
 static int _ode_count(int _type){ hoc_execerror("hyperde3", "cannot be used with CVODE"); return 0;}
+ 
+static void _thread_mem_init(Datum* _thread) {
+   _thread[0]._pval = (double*)ecalloc(1, sizeof(double));
+ }
+ 
+static void _thread_cleanup(Datum* _thread) {
+   free((void*)(_thread[0]._pval));
+ }
  extern void nrn_update_ion_pointer(Symbol*, Datum*, int, int);
  static void _update_ion_pointer(Datum* _ppvar) {
    nrn_update_ion_pointer(_hyf_sym, _ppvar, 0, 0);
@@ -542,11 +622,8 @@ static int _ode_count(int _type){ hoc_execerror("hyperde3", "cannot be used with
    nrn_update_ion_pointer(_hyhts_sym, _ppvar, 11, 4);
  }
 
-static void initmodel() {
-  int _i; double _save;_ninits++;
- _save = t;
- t = 0.0;
-{
+static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt) {
+  int _i; double _save;{
   hyhts = hyhts0;
   hyhtf = hyhtf0;
   hys = hys0;
@@ -557,23 +634,25 @@ static void initmodel() {
    hys = hysinf ;
    hyhtf = hyhtfinf ;
    hyhts = hyhtsinf ;
-   
-/*VERBATIM*/
-	return 0;
- }
-  _sav_indep = t; t = _save;
-
+   }
+ 
 }
 }
 
-static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_init(NrnThread* _nt, _Memb_list* _ml, int _type){
+double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; double _v; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
 _cntml = _ml->_nodecount;
+_thread = _ml->_thread;
 for (_iml = 0; _iml < _cntml; ++_iml) {
  _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
+
+#if 0
+ _check_trates(_p, _ppvar, _thread, _nt);
+#endif
 #if CACHEVEC
   if (use_cachevec) {
     _v = VEC_V(_ni[_iml]);
@@ -588,10 +667,11 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
   ehys = _ion_ehys;
   ehyhtf = _ion_ehyhtf;
   ehyhts = _ion_ehyhts;
- initmodel();
-    }}
+ initmodel(_p, _ppvar, _thread, _nt);
+    }
+}
 
-static double _nrn_current(double _v){double _current=0.;v=_v;{ {
+static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, NrnThread* _nt, double _v){double _current=0.;v=_v;{ {
    ghyf = ghyfbar * hyf * hyf ;
    ihyf = ghyf * ( v - ehyf ) ;
    ghys = ghysbar * hys * hys ;
@@ -609,12 +689,14 @@ static double _nrn_current(double _v){double _current=0.;v=_v;{ {
 } return _current;
 }
 
-static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_cur(NrnThread* _nt, _Memb_list* _ml, int _type) {
+double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; int* _ni; double _rhs, _v; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
 _cntml = _ml->_nodecount;
+_thread = _ml->_thread;
 for (_iml = 0; _iml < _cntml; ++_iml) {
  _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
 #if CACHEVEC
@@ -630,7 +712,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
   ehys = _ion_ehys;
   ehyhtf = _ion_ehyhtf;
   ehyhts = _ion_ehyhts;
- _g = _nrn_current(_v + .001);
+ _g = _nrn_current(_p, _ppvar, _thread, _nt, _v + .001);
  	{ double _dihyhts;
  double _dihyhtf;
  double _dihys;
@@ -639,7 +721,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
   _dihys = ihys;
   _dihyhtf = ihyhtf;
   _dihyhts = ihyhts;
- _rhs = _nrn_current(_v);
+ _rhs = _nrn_current(_p, _ppvar, _thread, _nt, _v);
   _ion_dihyfdv += (_dihyf - ihyf)/.001 ;
   _ion_dihysdv += (_dihys - ihys)/.001 ;
   _ion_dihyhtfdv += (_dihyhtf - ihyhtf)/.001 ;
@@ -659,14 +741,18 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 	NODERHS(_nd) -= _rhs;
   }
  
-}}
+}
+ 
+}
 
-static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_jacob(NrnThread* _nt, _Memb_list* _ml, int _type) {
+double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
 _cntml = _ml->_nodecount;
+_thread = _ml->_thread;
 for (_iml = 0; _iml < _cntml; ++_iml) {
  _p = _ml->_data[_iml];
 #if CACHEVEC
@@ -679,14 +765,18 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 	NODED(_nd) += _g;
   }
  
-}}
+}
+ 
+}
 
-static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_state(NrnThread* _nt, _Memb_list* _ml, int _type) {
+double* _p; Datum* _ppvar; Datum* _thread;
 Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
 _cntml = _ml->_nodecount;
+_thread = _ml->_thread;
 for (_iml = 0; _iml < _cntml; ++_iml) {
  _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
  _nd = _ml->_nodelist[_iml];
@@ -705,15 +795,15 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
   ehys = _ion_ehys;
   ehyhtf = _ion_ehyhtf;
   ehyhts = _ion_ehyhts;
- { error =  states();
- if(error){fprintf(stderr,"at line 83 in file hyperde3.mod:\n\n"); nrn_complain(_p); abort_run(error);}
- }    }}
+ {  { states(_p, _ppvar, _thread, _nt); }
+  }    }}
 
 }
 
 static void terminal(){}
 
-static void _initlists() {
+static void _initlists(){
+ double _x; double* _p = &_x;
  int _i; static int _first = 1;
   if (!_first) return;
    _t_hyfinf = makevector(221*sizeof(double));
@@ -731,8 +821,12 @@ static void _initlists() {
 _first = 0;
 }
 
+#if defined(__cplusplus)
+} /* extern "C" */
+#endif
+
 #if NMODL_TEXT
-static const char* nmodl_filename = "/home/danielmk/repos/pyDentate/mechs/hyperde3.mod";
+static const char* nmodl_filename = "/Users/temma/ghq/pydentate/mechs/hyperde3.mod";
 static const char* nmodl_file_text = 
   "TITLE hyperde3.mod  \n"
   " \n"
@@ -838,9 +932,6 @@ static const char* nmodl_file_text =
   "      hys = hysinf\n"
   "	hyhtf = hyhtfinf\n"
   "	hyhts = hyhtsinf\n"
-  "	VERBATIM\n"
-  "	return 0;\n"
-  "	ENDVERBATIM\n"
   "}\n"
   "\n"
   "? states\n"
@@ -852,9 +943,6 @@ static const char* nmodl_file_text =
   "	  hyhtf = hyhtf + hyhtfexp*(hyhtfinf-hyhtf)\n"
   "	  hyhts = hyhts + hyhtsexp*(hyhtsinf-hyhts)\n"
   "\n"
-  "        VERBATIM\n"
-  "        return 0;\n"
-  "        ENDVERBATIM\n"
   "}\n"
   " \n"
   "LOCAL q10\n"
