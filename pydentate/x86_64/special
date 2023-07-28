@@ -15,17 +15,18 @@ from sysconfig import get_config_vars, get_config_var
 # This replaces the now depricated distutils.sysutils.customize_compiler
 def _customize_compiler(compiler):
     """Do platform-sepcific customizations of compilers on unix platforms."""
-    if compiler.compiler_type == "unix":
-        (cc, cxx, cflags) = get_config_vars("CC", "CXX", "CFLAGS")
-        if "CC" in os.environ:
-            cc = os.environ["CC"]
-        if "CXX" in os.environ:
-            cxx = os.environ["CXX"]
-        if "CFLAGS" in os.environ:
-            cflags = cflags + " " + os.environ["CFLAGS"]
-        cc_cmd = cc + " " + cflags
-        # We update executables in compiler to take advantage of distutils arg splitting
-        compiler.set_executables(compiler=cc_cmd, compiler_cxx=cxx)
+    if compiler.compiler_type != "unix":
+        return
+    (cc, cxx, cflags) = get_config_vars("CC", "CXX", "CFLAGS")
+    if "CC" in os.environ:
+        cc = os.environ["CC"]
+    if "CXX" in os.environ:
+        cxx = os.environ["CXX"]
+    if "CFLAGS" in os.environ:
+        cflags = f"{cflags} " + os.environ["CFLAGS"]
+    cc_cmd = f"{cc} {cflags}"
+    # We update executables in compiler to take advantage of distutils arg splitting
+    compiler.set_executables(compiler=cc_cmd, compiler_cxx=cxx)
 
 
 def _set_default_compiler():
@@ -82,7 +83,7 @@ def _wrap_executable(output_name):
     release_dir = os.path.join(os.environ["NEURONHOME"], "demo/release")
     arch_name = next(os.walk(release_dir))[1][0]  # first dir
     file_path = os.path.join(arch_name, output_name)
-    shutil.move(file_path, file_path + ".nrn")
+    shutil.move(file_path, f"{file_path}.nrn")
     shutil.copy(__file__, file_path)
 
 
@@ -96,8 +97,6 @@ if __name__ == "__main__":
         sys.exit(0)
 
     if exe.endswith("special"):
-        exe = os.path.join(
-            sys.argv[0] + ".nrn"
-        )  # original special is renamed special.nrn
+        exe = os.path.join(f"{sys.argv[0]}.nrn")
 
     os.execv(exe, sys.argv)

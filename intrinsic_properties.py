@@ -5,6 +5,7 @@ Created on Sun Feb 25 16:17:11 2018
 @author: daniel
 """
 
+
 import matplotlib.pyplot as plt
 import numpy as np
 from neuron import h
@@ -33,6 +34,7 @@ mc_apcs = []
 bc_apcs = []
 hc_apcs = []
 
+dt = 0.1
 for x in current_steps:
     gc = GranuleCell()
     mc = MossyCell()
@@ -58,7 +60,6 @@ for x in current_steps:
     time_vec.record(h._ref_t)
 
     h.cvode.active(0)
-    dt = 0.1
     h.steps_per_ms = 1.0 / dt
     h.tstop = 1500
     h.finitialize(-60)

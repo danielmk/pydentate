@@ -112,7 +112,7 @@ class Population(object):
         if not hasattr(self, 'cells'):
             self.cells = []
 
-        for x in range(n_cells):
+        for _ in range(n_cells):
             self.cells.append(cell_type())
 
         self.cells = np.array(self.cells, dtype=object)
@@ -122,10 +122,7 @@ class Population(object):
         return len(self.cells)
 
     def record_aps(self):
-        counters = []
-        for cell in self.cells:
-            counters.append(cell._AP_counter())
-
+        counters = [cell._AP_counter() for cell in self.cells]
         self.ap_counters = counters
         return counters
 
@@ -152,7 +149,7 @@ class Population(object):
             time_str = '_'.join(time_str.split(' '))
             nw_name = self.parent_network.__class__.name
             pop_name = self.cell_type.name
-            fname = nw_name + '_' + pop_name + '_' + time_str
+            fname = f'{nw_name}_{pop_name}_{time_str}'
             fname = fname.replace(':', '-')
         if not directory:
             directory = os.getcwd()
@@ -247,7 +244,7 @@ class Population(object):
         return properties
 
     def __str__(self):
-        return self.cell_type.name + 'Population'
+        return f'{self.cell_type.name}Population'
 
     def __iter__(self):
         return self
