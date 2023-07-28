@@ -78,8 +78,10 @@ class GenNetwork(object):
         if cellnums is None:
             return
 
-        for idx, cell_type in enumerate(celltypes):
-            self.populations.append(Population(cell_type, cellnums[idx], self))
+        self.populations.extend(
+            Population(cell_type, cellnums[idx], self)
+            for idx, cell_type in enumerate(celltypes)
+        )
 
     def mk_population(self, cell_type, n_cells):
         """Initialize instance empty or with cell populations.
@@ -119,8 +121,6 @@ class GenNetwork(object):
 
     def run_network(self, tstop=1000, dt=1):
         raise NotImplementedError("run_network is not implemented yet")
-        h.tstop = tstop
-        h.run()
 
     def plot_aps(self, time=200):
         fig = plt.figure(figsize=(8.27, 11.69))
@@ -139,7 +139,7 @@ class GenNetwork(object):
 
             plt.subplot(4, 1, idx + 1)
             plt.eventplot(cells)
-            plt.ylabel(str(pop) + "\n" + str(pop.perc_active_cells())[0:4] + "% active")
+            plt.ylabel(str(pop) + "\n" + str(pop.perc_active_cells())[:4] + "% active")
             plt.xlim((0, time))
         plt.xlabel("time (ms)")
         return fig
@@ -149,7 +149,7 @@ class GenNetwork(object):
             directory = os.getcwd()
         if not file_name:
             loc_time_str = "_".join(time.asctime(time.localtime()).split(" "))
-            file_name = str(self) + "_" + loc_time_str
+            file_name = f"{str(self)}_{loc_time_str}"
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
@@ -157,13 +157,15 @@ class GenNetwork(object):
         if os.path.isfile(full_file_path):
             raise ValueError("The file already exists.\n" + "shelve_network does not overwrite files.")
 
-        fig.savefig(full_file_path + ".pdf", dpi=300, format="pdf")
-        fig.savefig(full_file_path + ".eps", dpi=300, format="eps")
+        fig.savefig(f"{full_file_path}.pdf", dpi=300, format="pdf")
+        fig.savefig(f"{full_file_path}.eps", dpi=300, format="eps")
         plt.close()
 
     def get_properties(self):
-        properties = {"populations": [x.get_properties() for x in self.populations], "init_params": self.init_params}
-        return properties
+        return {
+            "populations": [x.get_properties() for x in self.populations],
+            "init_params": self.init_params,
+        }
 
     def shelve_network(self, directory=None, file_name=None):
         """Saves the complete network information to a python shelve file.
@@ -174,11 +176,11 @@ class GenNetwork(object):
             directory = os.getcwd()
         if not file_name:
             loc_time_str = "_".join(time.asctime(time.localtime()).split(" "))
-            file_name = str(self) + "_" + loc_time_str
+            file_name = f"{str(self)}_{loc_time_str}"
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
-        full_file_path = os.path.join(directory, file_name + ".pydd")
+        full_file_path = os.path.join(directory, f"{file_name}.pydd")
         if os.path.isfile(full_file_path):
             raise ValueError("The file already exists.\n" + "shelve_network does not overwrite files.")
 
@@ -192,11 +194,11 @@ class GenNetwork(object):
             directory = os.getcwd()
         if not file_name:
             loc_time_str = "_".join(time.asctime(time.localtime()).split(" "))
-            file_name = str(self) + "_" + loc_time_str
+            file_name = f"{str(self)}_{loc_time_str}"
         if not os.path.isdir(directory):
             os.mkdir(directory)
 
-        full_file_path = os.path.join(directory, file_name + ".pydd")
+        full_file_path = os.path.join(directory, f"{file_name}.pydd")
         if os.path.isfile(full_file_path):
             raise ValueError("The file already exists.\n" + "shelve_aps does not overwrite files.")
 
@@ -215,15 +217,15 @@ class GenConnection(object):
 
     def get_description(self):
         """Return a descriptive string for the connection"""
-        name = self.pre_pop.name + " to " + self.post_pop.name + "\n"
+        name = f"{self.pre_pop.name} to {self.post_pop.name}" + "\n"
         pre_cell_targets = "\n".join([str(x) for x in self.pre_cell_targets])
         return name + pre_cell_targets
 
     def get_name(self):
         if type(self.pre_pop) == str:
-            return self.pre_pop + " to " + str(self.post_pop)
+            return f"{self.pre_pop} to {str(self.post_pop)}"
         else:
-            return str(self.pre_pop) + " to " + str(self.post_pop)
+            return f"{str(self.pre_pop)} to {str(self.post_pop)}"
 
     def get_properties(self):
         """Get the and make them suitable for pickling"""
@@ -312,12 +314,12 @@ class tmgsynConnection(GenConnection):
         conductances = []
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
-            curr_dist = []
-            for post_cell_pos in post_pop_pos:
-                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
-
+            curr_dist = [
+                euclidian_dist(curr_cell_pos, post_cell_pos)
+                for post_cell_pos in post_pop_pos
+            ]
             sort_idc = np.argsort(curr_dist)
-            closest_cells = sort_idc[0:target_pool]
+            closest_cells = sort_idc[:target_pool]
             picked_cells = np.random.choice(closest_cells, divergence, replace=False)
             pre_cell_target.append(picked_cells)
             for tar_c in picked_cells:
@@ -430,10 +432,10 @@ class tmgsynConnectionExponentialProb(GenConnection):
         pdf = pdf / pdf.sum()
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
-            curr_dist = []
-            for post_cell_pos in post_pop_pos:
-                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
-
+            curr_dist = [
+                euclidian_dist(curr_cell_pos, post_cell_pos)
+                for post_cell_pos in post_pop_pos
+            ]
             sort_idc = np.argsort(curr_dist)
             picked_cells = np.random.choice(sort_idc, divergence, replace=True, p=pdf)
             pre_cell_target.append(picked_cells)
@@ -535,12 +537,12 @@ class tmgsynConnection_old(GenConnection):
         netcons = []
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
-            curr_dist = []
-            for post_cell_pos in post_pop_pos:
-                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
-
+            curr_dist = [
+                euclidian_dist(curr_cell_pos, post_cell_pos)
+                for post_cell_pos in post_pop_pos
+            ]
             sort_idc = np.argsort(curr_dist)
-            closest_cells = sort_idc[0:target_pool]
+            closest_cells = sort_idc[:target_pool]
             picked_cells = np.random.choice(closest_cells, divergence, replace=False)
             pre_cell_target.append(picked_cells)
             for tar_c in picked_cells:
@@ -595,12 +597,12 @@ class Exp2SynConnection(GenConnection):
         netcons = []
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
-            curr_dist = []
-            for post_cell_pos in post_pop_pos:
-                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
-
+            curr_dist = [
+                euclidian_dist(curr_cell_pos, post_cell_pos)
+                for post_cell_pos in post_pop_pos
+            ]
             sort_idc = np.argsort(curr_dist)
-            closest_cells = sort_idc[0:target_pool]
+            closest_cells = sort_idc[:target_pool]
             picked_cells = np.random.choice(closest_cells, divergence, replace=False)
             pre_cell_target.append(picked_cells)
             for tar_c in picked_cells:
@@ -853,7 +855,7 @@ class Population(object):
         if not hasattr(self, "cells"):
             self.cells = []
 
-        for x in range(n_cells):
+        for _ in range(n_cells):
             self.cells.append(cell_type())
 
         self.cells = np.array(self.cells, dtype=object)
@@ -870,10 +872,7 @@ class Population(object):
         return len(self.cells)
 
     def record_aps(self):
-        counters = []
-        for cell in self.cells:
-            counters.append(cell._AP_counter())
-
+        counters = [cell._AP_counter() for cell in self.cells]
         self.ap_counters = counters
         return counters
 
@@ -900,7 +899,7 @@ class Population(object):
             time_str = "_".join(time_str.split(" "))
             nw_name = self.parent_network.__class__.name
             pop_name = self.cell_type.name
-            fname = nw_name + "_" + pop_name + "_" + time_str
+            fname = f"{nw_name}_{pop_name}_{time_str}"
             fname = fname.replace(":", "-")
         if not directory:
             directory = os.getcwd()
@@ -979,12 +978,19 @@ class Population(object):
         except:
             v_rec = [np.array(x) for x in self.VRecords]
             vclamp_i = [np.array(x) for x in self.VClamps_i]
-        properties = {"parent_network": str(self.parent_network), "cell_type": self.cell_type.name, "cell_number": self.get_cell_number(), "connections": [conn.get_properties() for conn in self.connections], "ap_time_stamps": ap_time_stamps, "ap_number": ap_numbers, "v_records": v_rec, "VClamps_i": vclamp_i}
-
-        return properties
+        return {
+            "parent_network": str(self.parent_network),
+            "cell_type": self.cell_type.name,
+            "cell_number": self.get_cell_number(),
+            "connections": [conn.get_properties() for conn in self.connections],
+            "ap_time_stamps": ap_time_stamps,
+            "ap_number": ap_numbers,
+            "v_records": v_rec,
+            "VClamps_i": vclamp_i,
+        }
 
     def __str__(self):
-        return self.cell_type.name + "Population"
+        return f"{self.cell_type.name}Population"
 
     def __iter__(self):
         return self

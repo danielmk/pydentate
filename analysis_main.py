@@ -32,13 +32,8 @@ def tri_filter(signal, kernel_delta):
         width of kernel in datapoints
     """
     kernel = np.append(np.arange(kernel_delta / 2), np.arange(kernel_delta / 2, -1, -1))
-    # convolve2d has proven PAINFULLY slow for some reason
-    # signal_conv = convolve2d(signal,kernel,'same')
-    new_signal = []
-    for x in signal:
-        new_signal.append(convolve(x, kernel, "same"))
-    signal_conv = np.array(new_signal)
-    return signal_conv
+    new_signal = [convolve(x, kernel, "same") for x in signal]
+    return np.array(new_signal)
 
 
 def correlate_signals(signal1, signal2):
@@ -66,8 +61,7 @@ def avg_dotprod_signals(signal1, signal2):
     non_silent_sigs.sort()
     product = signal1[non_silent_sigs] * signal2[non_silent_sigs]
     prod_sum = product.sum(axis=1)
-    avg_dot_product = prod_sum.mean()
-    return avg_dot_product
+    return prod_sum.mean()
 
 
 def ndp_signals(signal1, signal2):
@@ -103,14 +97,10 @@ def avg_dotprod_signals_tbinned(signal1, signal2, len_bin=1000):
     signal2 = np.reshape(signal2[:, 0 : int((signal2.shape[1] / len_bin) * len_bin)], (signal2.shape[0], signal2.shape[1] / len_bin, len_bin), len_bin)
     signal2 = signal2[:, 0:5, :]
 
-    sig1 = []
-    for x in signal1:
-        sig1.append(normalize(x, axis=1))
+    sig1 = [normalize(x, axis=1) for x in signal1]
     signal1 = np.array(sig1)
 
-    sig2 = []
-    for x in signal2:
-        sig2.append(normalize(x, axis=1))
+    sig2 = [normalize(x, axis=1) for x in signal2]
     signal2 = np.array(sig2)
 
     product = signal1 * signal2
@@ -120,8 +110,7 @@ def avg_dotprod_signals_tbinned(signal1, signal2, len_bin=1000):
 
     for x in silent_sigs:
         prod_sum[x[0], x[1]] = np.NaN
-    avg_dot_product = np.nanmean(prod_sum, axis=0)
-    return avg_dot_product
+    return np.nanmean(prod_sum, axis=0)
 
 
 def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
@@ -135,8 +124,7 @@ def time_stamps_to_signal(time_stamps, dt_signal, t_start, t_stop):
     for x in time_stamps:
         curr_idc = []
         if np.any(x):
-            for y in x:
-                curr_idc.append((y - t_start) / dt_signal)
+            curr_idc.extend((y - t_start) / dt_signal for y in x)
         time_idc.append(curr_idc)
 
     # Set the spike indices to 1
@@ -173,11 +161,10 @@ def similarity_measure_leutgeb_BUGGY(signal1, signal2, len_bin):
     signal2 = np.reshape(signal2[:, 0 : int((signal2.shape[1] / len_bin) * len_bin)], (signal2.shape[0], signal2.shape[1] / len_bin, len_bin), len_bin)
     signal2 = signal2.sum(axis=2)
 
-    corr_vector = []
-
-    for x in range(signal1.shape[1]):
-        corr_vector.append(pearsonr(signal1[:, x], signal2[:, x])[0])
-
+    corr_vector = [
+        pearsonr(signal1[:, x], signal2[:, x])[0]
+        for x in range(signal1.shape[1])
+    ]
     return np.array(corr_vector)
 
 
@@ -189,10 +176,10 @@ def similarity_measure_leutgeb(signal1, signal2, len_bin):
     signal2 = np.reshape(signal2[:, 0 : int(len_bin * int(signal2.shape[1] / len_bin))], (signal2.shape[0], int(signal2.shape[1] / len_bin), len_bin))
     signal2 = signal2.sum(axis=2)
     pdb.set_trace()
-    corr_vector = []
-
-    for x in range(signal1.shape[1]):
-        corr_vector.append(pearsonr(signal1[:, x], signal2[:, x])[0])
+    corr_vector = [
+        pearsonr(signal1[:, x], signal2[:, x])[0]
+        for x in range(signal1.shape[1])
+    ]
     pdb.set_trace()
     return np.array(corr_vector)
 
@@ -239,14 +226,6 @@ def sqrt_diff_norm(signal1, signal2, len_bin):
 def inner_pearsonr_BUGGY(signal1, len_bin):
     signal1 = np.reshape(signal1[:, 0 : int((signal1.shape[1] / len_bin) * len_bin)], (signal1.shape[0], signal1.shape[1] / len_bin, len_bin), len_bin)
     return signal1
-    signal1 = signal1.sum(axis=2)
-
-    corr_vector = []
-
-    for x in range(signal1.shape[1]):
-        corr_vector.append(pearsonr(signal1[:, 0], signal1[:, x])[0])
-
-    return corr_vector
 
 
 def inner_pearsonr(signal1, len_bin):
@@ -254,12 +233,10 @@ def inner_pearsonr(signal1, len_bin):
 
     signal1 = signal1.sum(axis=2)
 
-    corr_vector = []
-
-    for x in range(signal1.shape[1]):
-        corr_vector.append(pearsonr(signal1[:, 0], signal1[:, x])[0])
-
-    return corr_vector
+    return [
+        pearsonr(signal1[:, 0], signal1[:, x])[0]
+        for x in range(signal1.shape[1])
+    ]
 
 
 if __name__ == "__main__":

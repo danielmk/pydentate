@@ -10,12 +10,11 @@ def load_compiled_mechanisms(path="precompiled"):
     path defines the full path to a compiled mechanism file."""
     if path != "precompiled":
         h.nrn_load_dll(path)
+    elif platform.system() == "Windows":
+        h.nrn_load_dll(windows_precompiled)
     else:
-        if platform.system() == "Windows":
-            h.nrn_load_dll(windows_precompiled)
-        else:
-            print("DLL loaded from: " + linux_precompiled)
-            h.nrn_load_dll(linux_precompiled)
+        print(f"DLL loaded from: {linux_precompiled}")
+        h.nrn_load_dll(linux_precompiled)
 
 
 def run_neuron_simulator(warmup=2000, dt_warmup=10, dt_sim=0.1, t_start=0, t_stop=600, v_init=-60):

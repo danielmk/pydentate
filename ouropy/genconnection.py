@@ -23,15 +23,15 @@ class GenConnection(object):
 
     def get_description(self):
         """Return a descriptive string for the connection"""
-        name = self.pre_pop.name + ' to ' + self.post_pop.name + '\n'
+        name = f'{self.pre_pop.name} to {self.post_pop.name}' + '\n'
         pre_cell_targets = '\n'.join([str(x) for x in self.pre_cell_targets])
         return name + pre_cell_targets
 
     def get_name(self):
         if type(self.pre_pop) == str:
-            return self.pre_pop + ' to ' + str(self.post_pop)
+            return f'{self.pre_pop} to {str(self.post_pop)}'
         else:
-            return str(self.pre_pop) + ' to ' + str(self.post_pop)
+            return f'{str(self.pre_pop)} to {str(self.post_pop)}'
 
     def get_properties(self):
         """Get the and make them suitable for pickling"""
@@ -128,12 +128,12 @@ class tmgsynConnection(GenConnection):
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
 
-            curr_dist = []
-            for post_cell_pos in post_pop_pos:
-                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
-
+            curr_dist = [
+                euclidian_dist(curr_cell_pos, post_cell_pos)
+                for post_cell_pos in post_pop_pos
+            ]
             sort_idc = np.argsort(curr_dist)
-            closest_cells = sort_idc[0:target_pool]
+            closest_cells = sort_idc[:target_pool]
             picked_cells = np.random.choice(closest_cells,
                                             divergence,
                                             replace=False)
@@ -248,20 +248,18 @@ class pyr2pyrConnCA3(GenConnection):
 
         for idx, curr_cell_pos in enumerate(pre_pop_pos):
 
-            curr_dist = []
-            for post_cell_pos in post_pop_pos:
-                curr_dist.append(euclidian_dist(curr_cell_pos, post_cell_pos))
-
+            curr_dist = [
+                euclidian_dist(curr_cell_pos, post_cell_pos)
+                for post_cell_pos in post_pop_pos
+            ]
             sort_idc = np.argsort(curr_dist)
-            closest_cells = sort_idc[0:target_pool]
+            closest_cells = sort_idc[:target_pool]
             picked_cells = np.random.choice(closest_cells,
                                             divergence,
                                             replace=False)
             pre_cell_target.append(picked_cells)
             for tar_c in picked_cells:
 
-                curr_syns = []
-                curr_netcons = []
                 curr_conductances = []
 
                 curr_syn = h.pyr2pyr(post_pop[tar_c].soma(0.5))
@@ -293,14 +291,11 @@ class pyr2pyrConnCA3(GenConnection):
                 curr_syn.Cdur_nmda = Cdur_nmda
                 curr_syn.gbar_nmda = gbar_nmda
 
-                curr_syns.append(curr_syn)
+                curr_syns = [curr_syn]
                 curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
                                        curr_syn, thr, Delay,
                                        weight, sec=pre_pop[idx].soma)
-                #curr_gvec = h.Vector()
-                #curr_gvec.record(curr_syn._ref_g)
-                #curr_conductances.append(curr_gvec)
-                curr_netcons.append(curr_netcon)
+                curr_netcons = [curr_netcon]
                 netcons.append(curr_netcons)
                 synapses.append(curr_syns)
             conductances.append(curr_conductances)
