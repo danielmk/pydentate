@@ -158,7 +158,7 @@ class Population(object):
             directory = os.getcwd()
         if not os.path.isdir(directory):
             os.mkdir(directory)
-        path = directory + '\\' + fname + '.npz'
+        path = os.path.join(directory, f'{fname}.npz')
         try:
             ap_list = [x[0].as_numpy() for x in self.ap_counters]
         except:

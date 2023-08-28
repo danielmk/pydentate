@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "scoplib_ansi.h"
+#include "mech_api.h"
 #undef PI
 #define nil 0
 #include "md1redef.h"
@@ -46,25 +46,45 @@ extern double hoc_Exp(double);
 #define t nrn_threads->_t
 #define dt nrn_threads->_dt
 #define E_e _p[0]
+#define E_e_columnindex 0
 #define E_i _p[1]
+#define E_i_columnindex 1
 #define g_e0 _p[2]
+#define g_e0_columnindex 2
 #define g_i0 _p[3]
+#define g_i0_columnindex 3
 #define std_e _p[4]
+#define std_e_columnindex 4
 #define std_i _p[5]
+#define std_i_columnindex 5
 #define tau_e _p[6]
+#define tau_e_columnindex 6
 #define tau_i _p[7]
+#define tau_i_columnindex 7
 #define i _p[8]
+#define i_columnindex 8
 #define g_e _p[9]
+#define g_e_columnindex 9
 #define g_i _p[10]
+#define g_i_columnindex 10
 #define g_e1 _p[11]
+#define g_e1_columnindex 11
 #define g_i1 _p[12]
+#define g_i1_columnindex 12
 #define D_e _p[13]
+#define D_e_columnindex 13
 #define D_i _p[14]
+#define D_i_columnindex 14
 #define exp_e _p[15]
+#define exp_e_columnindex 15
 #define exp_i _p[16]
+#define exp_i_columnindex 16
 #define amp_e _p[17]
+#define amp_e_columnindex 17
 #define amp_i _p[18]
+#define amp_i_columnindex 18
 #define _g _p[19]
+#define _g_columnindex 19
 #define _nd_area  *_ppvar[0]._pval
  
 #if MAC
@@ -82,8 +102,8 @@ extern "C" {
  static int hoc_nrnpointerindex =  -1;
  /* external NEURON variables */
  /* declaration of user functions */
- static double _hoc_new_seed();
- static double _hoc_oup();
+ static double _hoc_new_seed(void*);
+ static double _hoc_oup(void*);
  static int _mechtype;
 extern void _nrn_cacheloop_reg(int, int);
 extern void hoc_register_prop_size(int, int, int);
@@ -102,18 +122,18 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 
  extern Prop* nrn_point_prop_;
  static int _pointtype;
- static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
+ static void* _hoc_create_pnt(Object* _ho) { void* create_point_process(int, Object*);
  return create_point_process(_pointtype, _ho);
 }
- static void _hoc_destroy_pnt();
- static double _hoc_loc_pnt(_vptr) void* _vptr; {double loc_point_process();
+ static void _hoc_destroy_pnt(void*);
+ static double _hoc_loc_pnt(void* _vptr) {double loc_point_process(int, void*);
  return loc_point_process(_pointtype, _vptr);
 }
- static double _hoc_has_loc(_vptr) void* _vptr; {double has_loc_point();
+ static double _hoc_has_loc(void* _vptr) {double has_loc_point(void*);
  return has_loc_point(_vptr);
 }
- static double _hoc_get_loc_pnt(_vptr)void* _vptr; {
- double get_loc_point_process(); return (get_loc_point_process(_vptr));
+ static double _hoc_get_loc_pnt(void* _vptr) {
+ double get_loc_point_process(void*); return (get_loc_point_process(_vptr));
 }
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
@@ -169,11 +189,11 @@ extern void hoc_reg_nmodl_filename(int, const char*);
 };
  static double _sav_indep;
  static void nrn_alloc(Prop*);
-static void  nrn_init(_NrnThread*, _Memb_list*, int);
-static void nrn_state(_NrnThread*, _Memb_list*, int);
- static void nrn_cur(_NrnThread*, _Memb_list*, int);
-static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
- static void _hoc_destroy_pnt(_vptr) void* _vptr; {
+static void  nrn_init(NrnThread*, _Memb_list*, int);
+static void nrn_state(NrnThread*, _Memb_list*, int);
+ static void nrn_cur(NrnThread*, _Memb_list*, int);
+static void  nrn_jacob(NrnThread*, _Memb_list*, int);
+ static void _hoc_destroy_pnt(void* _vptr) {
    destroy_point_process(_vptr);
 }
  
@@ -235,7 +255,7 @@ static void nrn_alloc(Prop* _prop) {
  static void _initlists();
  extern Symbol* hoc_lookup(const char*);
 extern void _nrn_thread_reg(int, int, void(*)(Datum*));
-extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
+extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
 
@@ -257,7 +277,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 Gfluct2 /home/danielmk/repos/pyDentate/mechs/Gfluct2.mod\n");
+ 	ivoc_help("help ?1 Gfluct2 /Users/temma/ghq/pydentate/mechs/Gfluct2.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -329,7 +349,7 @@ static void initmodel() {
 }
 }
 
-static void nrn_init(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_init(NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; double _v; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
@@ -372,7 +392,7 @@ static double _nrn_current(double _v){double _current=0.;v=_v;{ {
 } return _current;
 }
 
-static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_cur(NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; int* _ni; double _rhs, _v; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
@@ -406,7 +426,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
  
 }}
 
-static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_jacob(NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
@@ -426,7 +446,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
  
 }}
 
-static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type){
+static void nrn_state(NrnThread* _nt, _Memb_list* _ml, int _type){
 Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
@@ -461,7 +481,7 @@ _first = 0;
 }
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/home/danielmk/repos/pyDentate/mechs/Gfluct2.mod";
+static const char* nmodl_filename = "/Users/temma/ghq/pydentate/mechs/Gfluct2.mod";
 static const char* nmodl_file_text = 
   "TITLE Fluctuating conductances\n"
   "\n"

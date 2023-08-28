@@ -68,9 +68,7 @@ PROCEDURE states() {	:Computes state variables m, h, and n
         trates(v)	:      at the current v and dt.
 	c = c + cexp*(cinf-c)
 	d = d + dexp*(dinf-d)
-        VERBATIM
-        return 0;
-        ENDVERBATIM
+
 }
  
 LOCAL q10
