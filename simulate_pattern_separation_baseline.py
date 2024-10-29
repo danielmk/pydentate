@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Mon Mar 05 13:41:23 2018
 
@@ -66,7 +65,7 @@ else:
 print("DLL loaded from: " + dll_dir)
 # h.nrn_load_dll(dll_dir)
 """ 
-neuron_tools.load_compiled_mechanisms(path='precompiled')
+neuron_tools.load_compiled_mechanisms(path=r'C:\Users\Daniel\repos\pydentate\mechs\nrnmech.dll')
 
 # Start the runs of the model
 for run in runs:

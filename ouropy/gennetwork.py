@@ -352,6 +352,111 @@ class tmgsynConnection(GenConnection):
         self.pre_cell_targets = np.array(pre_cell_target)
         self.synapses = synapses
 
+class tmgsynConnectionMatrix(GenConnection):
+    def __init__(self, pre_pop, post_pop,
+                 matrix, target_segs,
+                 tau_1, tau_facil, U, tau_rec, e, thr, delay, weight,
+                 rec_cond=False):
+        """Like tmgsynConnection but connectivity is given by the matrix
+        parameter. The matrix should have shape (output, input)"""
+        self.init_parameters = locals()
+        self.pre_pop = pre_pop
+        self.post_pop = post_pop
+        pre_pop.add_connection(self)
+        post_pop.add_connection(self)
+
+        pre_cell_target = []
+        synapses = []
+        netcons = []
+        conductances = []
+
+        for idx, curr_cell_pos in enumerate(matrix):
+
+            for tar_c in np.argwhere(matrix[idx]).flatten():
+
+                curr_syns = []
+                curr_netcons = []
+                curr_conductances = []
+
+                curr_seg_pool = post_pop[tar_c].get_segs_by_name(target_segs)
+                chosen_seg = np.random.choice(curr_seg_pool)
+                for seg in chosen_seg:
+                    curr_syn = h.tmgsyn(chosen_seg(0.5))
+                    curr_syn.tau_1 = tau_1
+                    curr_syn.tau_facil = tau_facil
+                    curr_syn.U = U
+                    curr_syn.e = e
+                    curr_syn.tau_rec = tau_rec
+                    curr_syns.append(curr_syn)
+                    curr_netcon = h.NetCon(pre_pop[idx].soma(0.5)._ref_v,
+                                           curr_syn, thr, delay,
+                                           weight, sec=pre_pop[idx].soma)
+                    curr_gvec = h.Vector()
+                    curr_gvec.record(curr_syn._ref_g)
+                    curr_conductances.append(curr_gvec)
+                    curr_netcons.append(curr_netcon)
+                    netcons.append(curr_netcons)
+                    synapses.append(curr_syns)
+            if rec_cond:
+                conductances.append(curr_conductances)
+        self.conductances = conductances
+        self.netcons = netcons
+        self.pre_cell_targets = np.array(pre_cell_target)
+        self.synapses = synapses
+        
+class GapJunctionConnectionMatrix(GenConnection):
+    def __init__(self, pre_pop, post_pop,
+                 matrix, target_segs,
+                 gap_resistance, gap_delay, rec_cond=False):
+        """Like tmgsynConnection but connectivity is given by the matrix
+        parameter. The matrix should have shape (output, input)"""
+        self.init_parameters = locals()
+        self.pre_pop = pre_pop
+        self.post_pop = post_pop
+        pre_pop.add_connection(self)
+        post_pop.add_connection(self)
+
+        pre_cell_target = []
+        gap_junctions = []
+        netcons = []
+        connections = []
+
+        for idx, curr_cell_pos in enumerate(matrix):
+            for tar_c in np.argwhere(matrix[idx]).flatten():
+                if {idx, tar_c} in connections:
+                    continue
+                curr_syns = []
+                curr_netcons = []
+                curr_conductances = []
+
+                curr_seg_pool = post_pop[tar_c].get_segs_by_name(target_segs)
+                chosen_seg = np.random.choice(curr_seg_pool)
+                
+                curr_seg_pool_pre = pre_pop[idx].get_segs_by_name(target_segs)
+                chosen_seg_pre = np.random.choice(curr_seg_pool)
+
+                curr_gap = h.gap(chosen_seg(0.5))
+                curr_gap.r = gap_resistance
+                curr_gap.delay = gap_delay
+                
+                h.setpointer(chosen_seg_pre(0.5)._ref_v, "v_pair", curr_gap)
+
+                gap_junctions.append(curr_gap)
+                
+                curr_gap = h.gap(chosen_seg_pre(0.5))
+                curr_gap.r = gap_resistance
+                curr_gap.delay = gap_delay
+                
+                h.setpointer(chosen_seg(0.5)._ref_v, "v_pair", curr_gap)
+                
+                gap_junctions.append(curr_gap)
+                
+                connections.append({idx, tar_c})
+
+        self.pre_cell_targets = np.array(pre_cell_target)
+        self.gap_junctions = gap_junctions
+        self.gap_pairs = connections
+
 
 class tmgsynConnectionExponentialProb(GenConnection):
 
@@ -974,6 +1079,12 @@ class Population(object):
     def get_timestamps(self):
         ap_list = [np.array(x[0]) for x in self.ap_counters]
         return ap_list
+    
+    def get_times_units(self):
+        ap_list = np.array([[np.array(x[0]), [idx] * len(x[0])] for idx, x in enumerate(self.ap_counters)], dtype=object)
+        times = np.concatenate(ap_list[:,0])
+        units = np.concatenate(ap_list[:,1])
+        return times, units
 
     def current_clamp_rnd(self, n_cells, amp=0.3, dur=5, delay=3):
         """DEPRECATE"""

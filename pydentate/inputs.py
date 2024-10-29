@@ -14,6 +14,178 @@ from skimage.measure import profile_line
 from scipy import stats
 import pdb
 
+import numpy as np
+from numpy.typing import NDArray
+from scipy.interpolate import interp1d
+
+def sigmoid(x, amplitude, center, spread):
+    """
+    Compute the sigmoid function for a given input array.
+
+    The sigmoid function is defined as:
+    f(x) = amplitude * (1 / (1 + exp((x - center) / spread)))
+
+    Parameters:
+    -----------
+    x : numpy.ndarray
+        The input array for which the sigmoid function will be computed.
+
+    amplitude : float
+        The amplitude parameter of the sigmoid function, controlling the vertical scaling.
+
+    center : float
+        The center parameter of the sigmoid function, specifying the horizontal shift.
+
+    spread : float
+        The spread parameter of the sigmoid function, influencing the slope of the curve.
+
+    Returns:
+    --------
+    numpy.ndarray
+        The result of applying the sigmoid function to the input array `x`.
+
+    Examples:
+    ---------
+    >>> import numpy as np
+    >>> x = np.array([-2.0, -1.0, 0.0, 1.0, 2.0])
+    >>> sigmoid(x, amplitude=1.0, center=0.0, spread=1.0)
+    array([0.11920292, 0.26894142, 0.5       , 0.73105858, 0.88079708])
+    """
+    return amplitude * (1 / (1 + np.exp((x - center) / spread)))
+
+def inhomogeneous_poisson_process(
+    t_start: float,
+    t_stop: float,
+    sampling_interval: float,
+    rate_profile_frequency: int,
+    rate_profile_amplitude: int,
+    refractory_period: float
+) -> NDArray[np.float64]:
+    """
+    Generate a spike train from an inhomogeneous Poisson process.
+
+    Parameters
+    ----------
+    t_start : float
+        Start time of the spike train in seconds.
+    t_stop : float
+        Stop time of the spike train in seconds.
+    sampling_interval : float
+        Time interval between consecutive time points in seconds.
+    rate_profile_frequency : int
+        Frequency of the rate profile oscillation in Hz.
+    rate_profile_amplitude : int
+        Amplitude of the rate profile.
+    refractory_period : float | None, optional
+        Minimum time between consecutive spikes. If None, no refractory period is enforced.
+
+    Returns
+    -------
+    spike_times : NDArray[np.float64]
+        An array containing spike times generated from the inhomogeneous Poisson process.
+
+    Notes
+    -----
+    This function generates spike times according to an inhomogeneous Poisson process
+    with a specified rate profile. The rate profile is modulated by a sinusoidal function.
+
+    If a refractory period is provided, consecutive spikes will be separated by at least
+    the refractory period.
+
+    All units are in seconds.
+
+    Examples
+    --------
+    >>> spike_train = inhomogeneous_poisson_process(0.0, 10.0, 0.001, 10, 5)
+    """
+
+    t = np.arange(t_start, t_stop, sampling_interval)
+
+    rate_profile = rate_profile_amplitude * (np.sin(t * rate_profile_frequency * np.pi * 2 - np.pi / 2) + 1) / 2
+
+    cumulative_rate = np.cumsum(rate_profile) * sampling_interval
+    max_cumulative_rate = cumulative_rate[-1]
+    n_spikes = np.round(max_cumulative_rate).astype(int)
+
+    random_numbers = np.random.uniform(0, max_cumulative_rate, n_spikes)
+
+    inv_cumulative_rate_func = interp1d(cumulative_rate, t)
+
+    spike_times: NDArray[np.float64] = inv_cumulative_rate_func(random_numbers)
+    spike_times.sort()
+
+    if refractory_period is None:
+        return spike_times
+
+    thinned_spike_times = np.empty(0, dtype=np.float64)
+    previous_spike_time = t_start - refractory_period
+
+    for spike_time in spike_times:
+        if spike_time - previous_spike_time > refractory_period:
+            thinned_spike_times = np.append(thinned_spike_times, spike_time)
+            previous_spike_time = spike_time
+
+    return thinned_spike_times
+
+def homogeneous_poisson_process(
+    t_start: float,
+    t_stop: float,
+    rate: float,
+    refractory_period: float
+) -> NDArray[np.float64]:
+    """
+    Generate a spike train from a homogeneous Poisson process.
+
+    Parameters
+    ----------
+    t_start : float
+        Start time of the spike train in seconds.
+    t_stop : float
+        Stop time of the spike train in seconds.
+    rate : float
+        Average firing rate of the Poisson process in Hz.
+    refractory_period : float | None, optional
+        Minimum time between consecutive spikes. If None, no refractory period is enforced.
+
+    Returns
+    -------
+    spike_times : NDArray[np.float64]
+        An array containing spike times generated from the homogeneous Poisson process.
+
+    Notes
+    -----
+    This function generates spike times from a homogeneous Poisson process with a
+    constant firing rate over time. Spike times are randomly drawn from an exponential
+    distribution characterized by the provided rate. The spike times are sorted in
+    ascending order.
+
+    If a refractory period is provided, consecutive spikes will be separated by at least
+    the refractory period.
+
+    All units are in seconds.
+
+    Examples
+    --------
+    >>> spike_train = homogeneous_poisson_process(0.0, 10.0, 5.0)
+    """
+
+    n_spikes = np.random.poisson((t_stop - t_start) * rate)
+
+    spike_times = np.random.uniform(t_start, t_stop, n_spikes)
+    spike_times.sort()
+
+    if refractory_period is None:
+        return spike_times
+
+    thinned_spike_times = np.empty(0)
+    previous_spike_time = t_start - refractory_period
+
+    for spike_time in spike_times:
+        if spike_time - previous_spike_time > refractory_period:
+            thinned_spike_times = np.append(thinned_spike_times, spike_time)
+            previous_spike_time = spike_time
+
+    return thinned_spike_times
 
 def inhom_poiss(modulation_rate=10, max_rate=100, n_cells=400):
     """Generate spike trains from an inhomogeneous poisson process.

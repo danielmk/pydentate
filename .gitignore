@@ -105,3 +105,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+/mechs
+
+/output
+
+/archive
