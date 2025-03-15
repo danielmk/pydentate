@@ -22,7 +22,7 @@ from pydentate.inputs import inhom_poiss, homogeneous_poisson_process, sigmoid
 
 # Directories
 dirname = os.path.dirname(__file__)
-data_dir = os.path.join(dirname, 'output', 'figure_1_connectivity')
+data_dir = os.path.join(dirname, 'output', 'figure_1_S7_input_variance')
 all_files = [os.path.join(data_dir, x) for x in os.listdir(data_dir)]
 
 # Constants
@@ -56,7 +56,8 @@ data_dict = {
     'one_ms_delta_slope_coherence': [],
     'area_over_line': [],
     'area_over_line_normalized': [],
-    'mean_pearson_r': []
+    'mean_pearson_r': [],
+    'input_sigma': []
 }
 
 # Process files
@@ -79,6 +80,8 @@ for curr_file in all_files:
     data_dict['gap_junctions'].append(params.gap_junction.read())
     data_dict['mean_frequency'].append(analysis.frequencies.read().mean())
     data_dict['mean_rec_synapses'].append(params.n_rec_synapses.read().mean())
+    data_dict['input_sigma'].append(float(curr_file.split("_")[-2]))
+
 
     # Calculate Powers
     freq = analysis.fft.freq.read()
@@ -116,8 +119,8 @@ plt.rcParams['svg.fonttype'] = 'none'
 plt.rcParams.update({'font.size': 22})
 
 # Get files with min and max synapses
-min_synapses_idx = df['mean_rec_synapses'].argmin()
-max_synapses_idx = df['mean_rec_synapses'].argmax()
+min_synapses_idx = df['input_sigma'].argmin()
+max_synapses_idx = df['input_sigma'].argmax()
 min_synapses_file = df['file'][min_synapses_idx]
 max_synapses_file = df['file'][max_synapses_idx]
 
@@ -148,26 +151,26 @@ t_conv_full = np.arange(0, min_synapses_file.root.analysis.coherence.synaptic_fi
 
 fig, ax = plt.subplots(3, 3)
 ax[0, 0].scatter(min_synapses_file.root.times, min_synapses_file.root.units, marker='|', color=colors[3])
-ax[0, 0].set_xlim((0, 200))
+ax[0, 0].set_xlim((0, 1000))
 ax[0, 0].set_xlabel("Time (ms)")
 ax[0, 0].set_ylabel("Neuron #")
-ax[0, 0].set_title("Mean $N_{syn}$:\n" + f"{min_synapses_file.root.parameters.n_rec_synapses.read().mean():.2f}")
+ax[0, 0].set_title("Input sigma:\n" + f"{df['input_sigma'].min()}")
 
 ax[0, 1].scatter(max_synapses_file.root.times, max_synapses_file.root.units, marker='|', color=colors[4])
-ax[0, 1].set_xlim((0, 200))
+ax[0, 1].set_xlim((0, 1000))
 ax[0, 1].set_xlabel("Time (ms)")
 ax[0, 1].set_ylabel("Neuron #")
-ax[0, 1].set_title("Mean $N_{syn}$:\n" + f"{max_synapses_file.root.parameters.n_rec_synapses.read().mean():.2f}")
+ax[0, 1].set_title("INput sigma:\n" + f"{df['input_sigma'].max()}")
 
 ax[1, 0].plot(t_conv_full, min_synapses_file.root.analysis.coherence.synaptic_field.read(), color=colors[3])
-ax[1, 0].set_xlim((0, 200))
-ax[1, 0].set_ylim((0, 2))
+ax[1, 0].set_xlim((0, 1000))
+ax[1, 0].set_ylim((0, 7))
 ax[1, 0].set_xlabel("Time (ms)")
 ax[1, 0].set_ylabel("Synaptic Field")
 
 ax[1, 1].plot(t_conv_full, max_synapses_file.root.analysis.coherence.synaptic_field.read(), color=colors[4])
-ax[1, 1].set_xlim((0, 200))
-ax[1, 1].set_ylim((0, 2))
+ax[1, 1].set_xlim((0, 1000))
+ax[1, 1].set_ylim((0, 7))
 ax[1, 1].set_xlabel("Time (ms)")
 ax[1, 1].set_ylabel("Synaptic Field")
 
@@ -205,9 +208,9 @@ sync_peak_coherence = np.nanmean(oscillations_analysis.pairwise_coherence(sync_b
 ax[2, 0].plot([0, async_peak_tau], [0, async_peak_coherence], color='k', marker='o', linestyle='dashed')
 ax[2, 1].plot([0, sync_peak_tau], [0, sync_peak_coherence], color='k', marker='o', linestyle='dashed')
 
-sns.scatterplot(data=df, x='mean_rec_synapses', y='mean_pearson_r', ax=ax[0, 2], color='k')
-sns.scatterplot(data=df, x='mean_rec_synapses', y='k_point_1_over_f', ax=ax[1, 2], color='k')
-sns.scatterplot(data=df, x='mean_rec_synapses', y='area_over_line', ax=ax[2, 2], color='k')
+sns.scatterplot(data=df, x='input_sigma', y='mean_pearson_r', ax=ax[0, 2], color='k')
+sns.scatterplot(data=df, x='input_sigma', y='k_point_1_over_f', ax=ax[1, 2], color='k')
+sns.scatterplot(data=df, x='input_sigma', y='area_over_line', ax=ax[2, 2], color='k')
 
 # Additional plotting
 fig, ax = plt.subplots(1, 4)

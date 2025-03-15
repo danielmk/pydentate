@@ -26,7 +26,7 @@ import pdb
 
 
 dirname = os.path.dirname(__file__)
-data_dir = os.path.join(dirname, 'output', 'figure_1_S4_homeostatic_synapse_number')
+data_dir = os.path.join(dirname, 'output', 'figure_1_S7_input_variance')
 
 all_files = [os.path.join(data_dir, x) for x in os.listdir(data_dir)]
 
@@ -108,7 +108,7 @@ for curr_file in all_files:
         curr_data.create_array('/analysis/coherence', 'area_over_line', obj=area_over_line)
         curr_data.create_array('/analysis/coherence', 'area_over_line_normalized', obj=area_over_line_normalized)
         curr_data.create_array('/analysis/coherence', 'linearity_n_points', obj=linearity_n_points)
-        pdb.set_trace()
+        # pdb.set_trace()
         # pdb.set_trace()
     else:
         Warning(f"In {curr_file} coherence already existed in analysis and was skipped.")

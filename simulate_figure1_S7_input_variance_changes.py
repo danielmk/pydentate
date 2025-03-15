@@ -26,11 +26,11 @@ import networkx
 
 
 dirname = os.path.dirname(__file__)
-results_dir = os.path.join(dirname, 'output')
+results_dir = os.path.join(dirname, 'output', 'figure_1_S7_input_variance')
 if not os.path.isdir(results_dir):
     os.mkdir(results_dir)
 
-seed = 467
+seed = 475
 
 np.random.seed(seed)
 
@@ -38,7 +38,7 @@ plotting = True
 gap_resistance = 6e2
 gap_delay = 0
 dt = 0.1  # In ms
-duration = 2.5  # In s
+duration = 2  # In s
 warmup = 2000  # In ms
 input_rate = 10
 n_pvbcs = 120
@@ -48,10 +48,9 @@ rec_weight = 7.6e-3
 # pp_bc_weight: 2e-3, 1.9e-3, 1.8e-3, 1.7e-3, 1.6e-3, 1.5e-3, 1.4e-3, 1.3e-3, 1.2e-3, 1.1e-3, 1e-3, 9e-4, 8e-4, 7e-4, 6e-4, 5e-4, 4e-4, 3e-4,, 2e-4, 1e-4
 pp_bc_weight = 0
 input_current = 0.3  # in nA
-input_current_sigma = 0.05  # in nA
+# input_current_sigma = 0.05  # in nA
+input_current_sigma = 1.0  # in nA
 fully_connected_on = False
-# shifts = np.arange(0.0, 0.04, 0.002)
-shift = 0.0
 
 gaps_on = True
 
@@ -60,29 +59,8 @@ neuron_tools.load_compiled_mechanisms(path=r'C:\Users\Daniel\repos\pydentate\mec
 
 # Generate Input
 n_inputs = 192
-max_time = 2.4
-rate = 10
-n_stim = 20
-offset = 0.1
 
-indices_unsorted = np.arange(0, n_inputs)
-
-n_active = 150 + np.random.randint(0,42+1, n_stim)
-
-units_times = [[np.sort(np.random.permutation(indices_unsorted)[:n]), np.array([offset+idx*(1/rate)]*n)] for idx, n in enumerate(n_active)]
-
-units_arr = np.concatenate([x[0] for x in units_times], dtype=int)
-
-times_arr = np.concatenate([x[1] for x in units_times])
-
-units_times_tuple = (units_arr, times_arr + np.random.normal(scale=shift, size=times_arr.shape[0]))
-
-temporal_patterns = []
-for c in range(n_inputs):
-    bool_idc = units_times_tuple[0] == c
-    temporal_patterns.append(units_times_tuple[1][bool_idc] * 1000)
-
-# temporal_patterns = np.array([homogeneous_poisson_process(0.0, duration, input_rate, refractory_period=0.001) for x in range(n_inputs)], dtype=object) * 1000
+temporal_patterns = np.array([homogeneous_poisson_process(0.0, duration, input_rate, refractory_period=0.001) for x in range(n_inputs)], dtype=object) * 1000
 spatial_patterns = [np.random.choice(range(n_pvbcs), size=n_input_syns, replace=False) for x in range(n_inputs)]
 
 # Create the recurrent connectivity matrix for chemical connections
@@ -115,6 +93,8 @@ probability_matrix = sigmoid(distance_matrix, gap_amplitude, gap_center, gap_spr
 gap_connection_matrix = np.array([[np.random.choice([0, 1], p=[1-x, x]) for x in out] for out in probability_matrix])
 np.fill_diagonal(gap_connection_matrix, 0)
 
+print(f"Mean: {n_mean_rec_syn} Variance: {chem_connection_matrix.sum(axis=1).var()} STD: {chem_connection_matrix.sum(axis=1).std()}")
+
 # sys.exit()
 
 """Create the network"""
@@ -133,7 +113,7 @@ neuron_tools.run_neuron_simulator(warmup=warmup, t_stop=duration*1000, dt_sim=dt
 """Save the output spikes"""
 times, units = nw.populations[0].get_times_units()
 
-fname = f'pvring_seed_rec-weight_n-pvbcs_gap-resistance_gap-junctions_input-current_input-current-sigma_n-rec-syn_shift_{seed}_{rec_weight}_{n_pvbcs}_{gap_resistance}_{gaps_on}_{input_current}_{input_current_sigma}_{n_mean_rec_syn:.4f}_{shift:.4f}.h5'
+fname = f'pvring_seed_rec-weight_n-pvbcs_gap-resistance_gap-junctions_input-current_input-current-sigma_n-rec-syn_{seed}_{rec_weight}_{n_pvbcs}_{gap_resistance}_{gaps_on}_{input_current}_{input_current_sigma}_{n_mean_rec_syn:.4f}.h5'
 output_file_path = os.path.join(results_dir, fname)
 
 output_file = tables.File(output_file_path, mode='a')

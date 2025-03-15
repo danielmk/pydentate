@@ -48,6 +48,7 @@ rec_weight = 0
 pp_weight = 1e-3
 fully_connected_on = False
 
+
 gaps_on = True
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
@@ -104,7 +105,6 @@ nw = net_tunedrev_basket_ring.TunedNetwork(seed+2,
                                            network_type='full',
                                            pp_weight=pp_weight)  # 7.6e-3
 
-sys.exit()
 
 # sys.exit()
 
@@ -137,6 +137,7 @@ for cell in nw.populations[0]:
 neuron_tools.run_neuron_simulator(warmup=warmup, t_stop=duration*1000, dt_sim=dt)
 
 """Save the output spikes"""
+times, units = nw.populations[0].get_times_units()
 times_gc, units_gc = nw.populations[0].get_times_units()
 times_mc, units_mc = nw.populations[1].get_times_units()
 times_bc, units_bc = nw.populations[2].get_times_units()

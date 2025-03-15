@@ -379,7 +379,8 @@ class tmgsynConnectionMatrix(GenConnection):
                 curr_conductances = []
 
                 curr_seg_pool = post_pop[tar_c].get_segs_by_name(target_segs)
-                chosen_seg = np.random.choice(curr_seg_pool)
+                # chosen_seg = np.random.choice(curr_seg_pool)
+                chosen_seg = curr_seg_pool[0]
                 for seg in chosen_seg:
                     curr_syn = h.tmgsyn(chosen_seg(0.5))
                     curr_syn.tau_1 = tau_1

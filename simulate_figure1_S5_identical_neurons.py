@@ -24,13 +24,12 @@ import matplotlib
 import sys
 import networkx
 
-
 dirname = os.path.dirname(__file__)
-results_dir = os.path.join(dirname, 'output')
+results_dir = os.path.join(dirname, 'output', 'figure_1_S5_identical_neurons')
 if not os.path.isdir(results_dir):
     os.mkdir(results_dir)
 
-seed = 467
+seed = 5927
 
 np.random.seed(seed)
 
@@ -38,8 +37,8 @@ plotting = True
 gap_resistance = 6e2
 gap_delay = 0
 dt = 0.1  # In ms
-duration = 2.5  # In s
-warmup = 2000  # In ms
+duration = 2  # In s
+warmup = 10000  # In ms
 input_rate = 10
 n_pvbcs = 120
 n_input_syns = 100
@@ -50,39 +49,17 @@ pp_bc_weight = 0
 input_current = 0.3  # in nA
 input_current_sigma = 0.05  # in nA
 fully_connected_on = False
-# shifts = np.arange(0.0, 0.04, 0.002)
-shift = 0.0
+n_rec_syn = 8
 
-gaps_on = True
+gaps_on = False
 
 # Where to search for nrnmech.dll file. Must be adjusted for your machine.
 neuron_tools.load_compiled_mechanisms(path=r'C:\Users\Daniel\repos\pydentate\mechs\nrnmech.dll')
 
 # Generate Input
 n_inputs = 192
-max_time = 2.4
-rate = 10
-n_stim = 20
-offset = 0.1
 
-indices_unsorted = np.arange(0, n_inputs)
-
-n_active = 150 + np.random.randint(0,42+1, n_stim)
-
-units_times = [[np.sort(np.random.permutation(indices_unsorted)[:n]), np.array([offset+idx*(1/rate)]*n)] for idx, n in enumerate(n_active)]
-
-units_arr = np.concatenate([x[0] for x in units_times], dtype=int)
-
-times_arr = np.concatenate([x[1] for x in units_times])
-
-units_times_tuple = (units_arr, times_arr + np.random.normal(scale=shift, size=times_arr.shape[0]))
-
-temporal_patterns = []
-for c in range(n_inputs):
-    bool_idc = units_times_tuple[0] == c
-    temporal_patterns.append(units_times_tuple[1][bool_idc] * 1000)
-
-# temporal_patterns = np.array([homogeneous_poisson_process(0.0, duration, input_rate, refractory_period=0.001) for x in range(n_inputs)], dtype=object) * 1000
+temporal_patterns = np.array([homogeneous_poisson_process(0.0, duration, input_rate, refractory_period=0.001) for x in range(n_inputs)], dtype=object) * 1000
 spatial_patterns = [np.random.choice(range(n_pvbcs), size=n_input_syns, replace=False) for x in range(n_inputs)]
 
 # Create the recurrent connectivity matrix for chemical connections
@@ -94,10 +71,14 @@ chem_amplitude = 0.58
 chem_center = 141.0
 chem_spread = 80
 
-probability_matrix = sigmoid(distance_matrix, chem_amplitude, chem_center, chem_spread)
+chem_connection_matrix = np.zeros((n_pvbcs, n_pvbcs))
+chem_connection_indices = np.array([np.random.choice(n_pvbcs, size=n_rec_syn, replace=False) for x in range(n_pvbcs)])
 
-chem_connection_matrix = np.array([[np.random.choice([0, 1], p=[1-x, x]) for x in out] for out in probability_matrix])
-np.fill_diagonal(chem_connection_matrix, 0)
+for row, idc in enumerate(chem_connection_indices):
+    # chem_connection_matrix[row, idc] = 1
+    chem_connection_matrix[idc, row] = 1
+
+# np.fill_diagonal(chem_connection_matrix, 0)
 
 n_mean_rec_syn = chem_connection_matrix.sum(axis=1).mean()
 
@@ -115,17 +96,19 @@ probability_matrix = sigmoid(distance_matrix, gap_amplitude, gap_center, gap_spr
 gap_connection_matrix = np.array([[np.random.choice([0, 1], p=[1-x, x]) for x in out] for out in probability_matrix])
 np.fill_diagonal(gap_connection_matrix, 0)
 
-# sys.exit()
-
 """Create the network"""
 nw = net_basket_cell_ring.BasketCellRing(seed+2, temporal_patterns, spatial_patterns, chem_connection_matrix, gap_connection_matrix, rec_weight=rec_weight, n_bcs=n_pvbcs, gap_resistance=6e2, gap_delay=0.0, gap_junctions=gaps_on, pp_bc_weight=pp_bc_weight)  # 7.6e-3
+
+# sys.exit()
 
 """Create Current Clamp input"""
 current_list = []
 for cell in nw.populations[0]:
-    rnd_current = np.random.normal(loc=input_current, scale=input_current_sigma)
-    current_list.append(rnd_current)
-    cell._current_clamp_soma(amp=rnd_current, dur=duration*1000, delay=0)
+    # rnd_current = np.random.normal(loc=input_current, scale=0)
+    current_list.append(input_current)
+    cell._current_clamp_soma(amp=input_current, dur=duration*1000, delay=0)
+
+nw.populations[0].voltage_recording(range(120))
 
 """Run the simulation"""
 neuron_tools.run_neuron_simulator(warmup=warmup, t_stop=duration*1000, dt_sim=dt)
@@ -133,7 +116,7 @@ neuron_tools.run_neuron_simulator(warmup=warmup, t_stop=duration*1000, dt_sim=dt
 """Save the output spikes"""
 times, units = nw.populations[0].get_times_units()
 
-fname = f'pvring_seed_rec-weight_n-pvbcs_gap-resistance_gap-junctions_input-current_input-current-sigma_n-rec-syn_shift_{seed}_{rec_weight}_{n_pvbcs}_{gap_resistance}_{gaps_on}_{input_current}_{input_current_sigma}_{n_mean_rec_syn:.4f}_{shift:.4f}.h5'
+fname = f'pvring_seed_rec-weight_n-pvbcs_gap-resistance_gap-junctions_input-current_input-current-sigma_n-rec-syn_{seed}_{rec_weight}_{n_pvbcs}_{gap_resistance}_{gaps_on}_{input_current}_{input_current_sigma}_{n_rec_syn}.h5'
 output_file_path = os.path.join(results_dir, fname)
 
 output_file = tables.File(output_file_path, mode='a')
@@ -165,6 +148,17 @@ output_file.close()
 
 """Optional analysis/plotting"""
 if plotting:
+    def exp_decay(t, tau, V):
+        '''Exponential decay helper function'''
+        return V * np.e ** (-t / tau)
+
+
+    """Create the synaptic Kernel"""
+    decay_tau = 0.0018
+    t = np.arange(0,0.020, 0.0001)
+    kernel = exp_decay(t, decay_tau, 1)
+    kernel = kernel / kernel.sum()
+    
     n_timepoints = int((duration * 1000) / dt)
     
     spike_counts = np.unique(times, return_counts=True)
@@ -175,42 +169,18 @@ if plotting:
     
     spike_counts_full[spike_occurences_indices] = spike_counts[1]
     
-    gaussian_sigma = 1 / dt
-    gaussian_width = gaussian_sigma * 10
-    gaussian_kernel = windows.gaussian(gaussian_width, gaussian_sigma)
-    gaussian_kernel = gaussian_kernel / gaussian_kernel.sum()
-    
-    spike_counts_full_convolved = convolve(spike_counts_full, gaussian_kernel)
-    
     # hist, bins = np.histogram(output_spiketimes, bins=1000)
     
     sampling_rate = 1 / (dt / 1000)
     # sampling_rate = 5000
     
-    sp = fftshift(fft(spike_counts_full_convolved))
-    freq = fftshift(fftfreq(len(spike_counts_full_convolved), 1/sampling_rate))
-    
-    amp = np.abs(sp)
-    
+
     plt.rcParams['svg.fonttype'] = 'none'
     
     font = {'family' : 'Arial',
             'size'   : 22}
     matplotlib.rc('font', **font)
-    
-    fig, ax = plt.subplots(2, 1)
-    ax[1].plot(freq[len(freq)//2:], amp[len(amp)//2:])
-    ax[1].set_title('FFT')
-    ax[1].set_xlabel('Frequency (Hz)')
-    ax[1].set_ylabel('Amplitude')
-    ax[1].set_xlim(0,300)
-    ax[1].set_ylim(0, 10000)
-    ax[0].set_xlim((0, 200))
-    
-    fig.tight_layout()
-    
-    ax[0].scatter(times, units, marker='|')
-    
+
     # gap_graph = networkx.from_numpy_matrix(gap_connection_matrix, create_using=networkx.Graph)
     # networkx.draw_circular(gap_graph)
     
@@ -221,12 +191,33 @@ if plotting:
                                                    total_time=duration * 1000 + 1)
     curr_binary = np.array(curr_binary, dtype=int)
     
+    curr_binary_convolved = np.array([np.convolve(x, kernel, 'full') for x in curr_binary])
+    pr = np.corrcoef(x=curr_binary_convolved)
+    ut_idc = np.triu_indices(pr.shape[0], 1)
+    mean_pearson_r = np.nanmean(pr[ut_idc])
+    
+    synaptic_field = curr_binary_convolved.sum(axis=0)
+    
+    t = np.arange(0, 2001.0, 0.1)
+    t_conv_full = np.arange(0, synaptic_field.shape[0] * 0.1, 0.1)
+
+    fig, ax = plt.subplots(2, 1)
+    ax[1].plot(t_conv_full, synaptic_field)
+    ax[1].set_xlabel('Time (ms)')
+    ax[1].set_ylabel('Amplitude')
+    ax[1].set_xlim(0, 2000)
+    ax[0].set_xlim(0, 2000)
+    
+    fig.tight_layout()
+    
+    ax[0].scatter(times, units, marker='|')
+    
     bin_size_ms = [0.1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 25, 30, 35, 40]
     coherence_list = []
     for bs in bin_size_ms:
         coherence = np.nanmean(oscillations_analysis.pairwise_coherence(curr_binary, bin_size=int(bs/dt)))
         coherence_list.append(coherence)
-    
+
     plt.figure()
     plt.plot(bin_size_ms, coherence_list, marker='o')
     plt.ylim((0, 1))
@@ -236,10 +227,17 @@ if plotting:
     units_counts = np.unique(units, return_counts=True)
     print(f"Average frequency: {(units_counts[1] / duration).mean()}")
     
+    gaussian_sigma = 1 / dt
+    gaussian_width = gaussian_sigma * 10
+    gaussian_kernel = windows.gaussian(gaussian_width, gaussian_sigma)
+    gaussian_kernel = gaussian_kernel / gaussian_kernel.sum()
+    
+    spike_counts_full_convolved = convolve(spike_counts_full, gaussian_kernel)
+    
     """Progress Report Plot"""
     plt.figure()
     plt.scatter(times, units, marker='|', color='k')
-    plt.xlim((0, 200))
+    plt.xlim((0, 2000))
     plt.xlabel("Time (ms)")
     plt.ylabel("Unit #")
     
@@ -249,7 +247,7 @@ if plotting:
     plt.xlabel("Bin Size (ms)")
     plt.ylabel("Average Coherence")
     plt.xlim((0, 30))
-    
+
     """Shuffling Oscillation Analysis"""
     # shuffle = oscillations_analysis.shuffling_coherence(times, dt, duration)
     
@@ -258,11 +256,29 @@ if plotting:
     avg_freq = (units_counts[1] / duration).mean()
     
     avg_freq_tau = ((1/avg_freq) * 1000)  # ms
-    
-    avg_freq_coherence = np.nanmean(oscillations_analysis.pairwise_coherence(curr_binary, bin_size=int(avg_freq_tau/dt)))
 
-    plt.plot([0, avg_freq_tau], [0, avg_freq_coherence], 'k', linestyle='dashed')
+    """Calculate Coherence Measures"""   
+    area_over_line, area_over_line_normalized = oscillations_analysis.linearity_analysis(curr_binary, dt, duration, n_points=30)
     
-    tau_values = np.linspace(0.1, avg_freq_tau, 30)
+    def exp_decay(t, tau, V):
+        '''Exponential decay helper function'''
+        return V * np.e ** (-t / tau)
+
+    delta_t_point_1 = (0.1 / avg_freq) * 1000
+
+    k_point_one_over_f = np.nanmean(oscillations_analysis.pairwise_coherence(curr_binary, bin_size=int(delta_t_point_1 / dt)))
+
+    """Create the synaptic Kernel"""   
+    curr_binary = np.array(curr_binary, dtype=int)
     
-    coherence_estimators = np.array([np.nanmean(oscillations_analysis.pairwise_coherence(curr_binary, bin_size=int(x/dt))) for x in tau_values])
+    curr_binary_convolved = np.array([np.convolve(x, kernel, 'full') for x in curr_binary])
+    pr = np.corrcoef(x=curr_binary_convolved)
+    ut_idc = np.triu_indices(pr.shape[0], 1)
+    mean_pearson_r = np.nanmean(pr[ut_idc])
+    
+    
+    
+    
+    
+    
+

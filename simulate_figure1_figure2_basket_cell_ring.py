@@ -92,7 +92,9 @@ probability_matrix = sigmoid(distance_matrix, gap_amplitude, gap_center, gap_spr
 gap_connection_matrix = np.array([[np.random.choice([0, 1], p=[1-x, x]) for x in out] for out in probability_matrix])
 np.fill_diagonal(gap_connection_matrix, 0)
 
-# sys.exit()
+print(f"Mean: {n_mean_rec_syn} Variance: {chem_connection_matrix.sum(axis=1).var()} STD: {chem_connection_matrix.sum(axis=1).std()}")
+
+sys.exit()
 
 """Create the network"""
 nw = net_basket_cell_ring.BasketCellRing(seed+2, temporal_patterns, spatial_patterns, chem_connection_matrix, gap_connection_matrix, rec_weight=rec_weight, n_bcs=n_pvbcs, gap_resistance=6e2, gap_delay=0.0, gap_junctions=gaps_on, pp_bc_weight=pp_bc_weight)  # 7.6e-3

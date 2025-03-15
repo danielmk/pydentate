@@ -33,7 +33,7 @@ class BasketCellRing(gennetwork.GenNetwork):
     name = "BasketCellRing"
 
     def __init__(self, seed, temporal_patterns, spatial_patterns_bcs, rec_matrix, gap_matrix,
-                 rec_weight=7.6e-3, n_bcs=120, gap_resistance=6e2, gap_delay=0.0, gap_junctions=True, pp_bc_weight=1e-3):
+                 rec_weight=7.6e-3, n_bcs=120, gap_resistance=6e2, gap_delay=0.0, gap_junctions=True, pp_bc_weight=1e-3, pv_reversal=-70):
         self.init_params = locals()
         self.init_params['self'] = str(self.init_params['self'])
 
@@ -60,9 +60,11 @@ class BasketCellRing(gennetwork.GenNetwork):
                                                   'ddend', 6.3, 0, 1, 0, 0,
                                                   pp_bc_weight)
 
+
+
         # BC -> BC
         gennetwork.tmgsynConnectionMatrix(self.populations[0], self.populations[0],
-                                    rec_matrix, 'proxd', 1.8, 0, 1, 0, -70, 10,
+                                    rec_matrix, 'proxd', 1.8, 0, 1, 0, pv_reversal, 10,
                                     0.8, rec_weight)
         
         if gap_junctions:

@@ -76,6 +76,42 @@ def phase_locked(max_time, n_trial, rate, amplitude, num_phase):
 
     return np.array(input_spiketimes, dtype=object)
 
+
+def phase_locked(max_time, n_trial, rate, amplitude, num_phase):
+    """
+    Generates a set of spike times with sinusoidally varying rates.
+    
+    Parameters:
+        max_time (float): Maximum time for simulation.
+        n_trial (int): Number of trials.
+        rate (float): Base firing rate.
+        amplitude (float): Amplitude of the sinusoidal modulation.
+        num_phase (int): Number of phases in the sinusoidal modulation.
+    
+    Returns:
+        input_spiketimes (list of lists): List of spike times for each trial.
+    """
+    dt = 0.001
+    input_spiketimes = []
+
+    for trial_ind in range(n_trial):
+        these_spiketimes = []
+        n_spike = 0
+
+        for time_ind in range(int(np.ceil(max_time / dt))):
+            t_here = (time_ind + 0.5) * dt
+            rate_here = rate * (1 + amplitude * np.sin(2 * np.pi * num_phase * t_here / max_time))
+            p = np.random.rand()
+
+            if p < (dt * rate_here):
+                n_spike += 1
+                these_spiketimes.append(t_here)
+
+        input_spiketimes.append(np.array(these_spiketimes))
+
+    return np.array(input_spiketimes, dtype=object)
+
+
 if __name__=='__main__':
     max_time = 2
     n_trial = 192
@@ -102,6 +138,7 @@ if __name__=='__main__':
     ax[0].eventplot(pl_sts[0])
     ax[1].eventplot(pl_sts[-1])
     """
+    
     x=np.arange(1, n_trial+1)
     y = scipy.stats.norm.pdf(x, loc=n_trial/2, scale=1)
     y = y / y.sum()

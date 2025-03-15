@@ -32,8 +32,8 @@ from statsmodels.stats.anova import anova_lm
 import matplotlib as mpl
 
 
+
 dirname = os.path.dirname(__file__)
-# data_dir = os.path.join(dirname, 'output', 'figure_2_on_off')
 data_dir = os.path.join(dirname, 'output', 'figure_2_on_off')
     
 all_files = [os.path.join(data_dir, x) for x in os.listdir(data_dir)]
@@ -320,7 +320,16 @@ syn_stats = np.array(syn_stats)
 idc_sorted = np.argsort(syn_stats[:, 0])
 
 syn_stats = syn_stats[idc_sorted,:]
+    
+sd_color = 'r'
+fig, ax1 = plt.subplots()
+ax1.scatter(syn_stats[:,0], syn_stats[:,1], color='r')
+ax1.set_xlabel("Mean N Syn")
+ax1.set_ylabel("SD", color=sd_color)
+ax1.tick_params(axis='y', labelcolor=sd_color)
 
-
-
-
+color = 'tab:blue'
+ax2 = ax1.twinx()
+ax2.scatter(syn_stats[:,0], syn_stats[:,2], color=color)
+ax2.set_ylabel("Variance", color=color)
+ax2.tick_params(axis='y', labelcolor=color)

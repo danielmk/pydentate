@@ -54,7 +54,6 @@ def linearity_analysis(binary_spiketrain, dt, duration=2, n_points=30):
     
     peak_bin_size = int(peak_tau_ms / dt)
     
-    
     peak_tau_ms_coherence = np.nanmean(pairwise_coherence(binary_spiketrain, peak_bin_size))
 
     line_slope = peak_tau_ms_coherence / peak_tau_ms

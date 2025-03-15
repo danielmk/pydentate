@@ -12,7 +12,7 @@ save them. The .h5 file is further analyzed in calculate_oscillation_synchrony.p
 
 from neuron import h, gui  # gui necessary for some parameters to h namespace
 import numpy as np
-from pydentate import net_basket_cell_ring, neuron_tools, oscillations_analysis, spike_to_x
+from pydentate import net_tunedrev_basket_ring, neuron_tools, oscillations_analysis, spike_to_x
 from pydentate.inputs import homogeneous_poisson_process, sigmoid
 import os
 import matplotlib.pyplot as plt
@@ -22,15 +22,14 @@ from numpy.fft import fft, fftshift, fftfreq
 import tables
 import matplotlib
 import sys
-import networkx
 
 
 dirname = os.path.dirname(__file__)
-results_dir = os.path.join(dirname, 'output')
+results_dir = os.path.join(dirname, 'output', 'input_output_synchrony')
 if not os.path.isdir(results_dir):
     os.mkdir(results_dir)
 
-seed = 467
+seed = 342351
 
 np.random.seed(seed)
 
@@ -40,18 +39,16 @@ gap_delay = 0
 dt = 0.1  # In ms
 duration = 2.5  # In s
 warmup = 2000  # In ms
-input_rate = 10
+input_rate = 15
 n_pvbcs = 120
-n_input_syns = 100
+n_input_syns = 300
 rec_weight = 7.6e-3
 # rec_weight = 0
 # pp_bc_weight: 2e-3, 1.9e-3, 1.8e-3, 1.7e-3, 1.6e-3, 1.5e-3, 1.4e-3, 1.3e-3, 1.2e-3, 1.1e-3, 1e-3, 9e-4, 8e-4, 7e-4, 6e-4, 5e-4, 4e-4, 3e-4,, 2e-4, 1e-4
-pp_bc_weight = 0
-input_current = 0.3  # in nA
-input_current_sigma = 0.05  # in nA
+pp_weight = 1e-3
 fully_connected_on = False
 # shifts = np.arange(0.0, 0.04, 0.002)
-shift = 0.0
+shift = 0.022
 
 gaps_on = True
 
@@ -59,15 +56,17 @@ gaps_on = True
 neuron_tools.load_compiled_mechanisms(path=r'C:\Users\Daniel\repos\pydentate\mechs\nrnmech.dll')
 
 # Generate Input
-n_inputs = 192
-max_time = 2.4
+n_inputs = 120
+
+# Generate Input
+# max_time = 2.4
 rate = 10
 n_stim = 20
 offset = 0.1
 
 indices_unsorted = np.arange(0, n_inputs)
 
-n_active = 150 + np.random.randint(0,42+1, n_stim)
+n_active = 90 + np.random.randint(0,30+1, n_stim)
 
 units_times = [[np.sort(np.random.permutation(indices_unsorted)[:n]), np.array([offset+idx*(1/rate)]*n)] for idx, n in enumerate(n_active)]
 
@@ -82,8 +81,9 @@ for c in range(n_inputs):
     bool_idc = units_times_tuple[0] == c
     temporal_patterns.append(units_times_tuple[1][bool_idc] * 1000)
 
-# temporal_patterns = np.array([homogeneous_poisson_process(0.0, duration, input_rate, refractory_period=0.001) for x in range(n_inputs)], dtype=object) * 1000
-spatial_patterns = [np.random.choice(range(n_pvbcs), size=n_input_syns, replace=False) for x in range(n_inputs)]
+
+spatial_patterns_gc = np.array([np.random.choice(range(10000), size=n_input_syns, replace=False) for x in range(n_inputs)])
+spatial_patterns_bc = np.array([np.random.choice(range(n_pvbcs), size=1, replace=False) for x in range(n_inputs)])
 
 # Create the recurrent connectivity matrix for chemical connections
 x = np.linspace(0, np.pi, n_pvbcs)
@@ -115,31 +115,78 @@ probability_matrix = sigmoid(distance_matrix, gap_amplitude, gap_center, gap_spr
 gap_connection_matrix = np.array([[np.random.choice([0, 1], p=[1-x, x]) for x in out] for out in probability_matrix])
 np.fill_diagonal(gap_connection_matrix, 0)
 
+"""Create the network"""
+nw = net_tunedrev_basket_ring.TunedNetwork(seed+2,
+                                           chem_connection_matrix,
+                                           gap_connection_matrix,
+                                           temporal_patterns,
+                                           spatial_patterns_gc,
+                                           spatial_patterns_bc,
+                                           rec_weight,
+                                           gap_resistance=6e2,
+                                           gap_delay=0.0,
+                                           gap_junctions=gaps_on,
+                                           network_type='full',
+                                           pp_weight=pp_weight)  # 7.6e-3
+
+
+
 # sys.exit()
 
-"""Create the network"""
-nw = net_basket_cell_ring.BasketCellRing(seed+2, temporal_patterns, spatial_patterns, chem_connection_matrix, gap_connection_matrix, rec_weight=rec_weight, n_bcs=n_pvbcs, gap_resistance=6e2, gap_delay=0.0, gap_junctions=gaps_on, pp_bc_weight=pp_bc_weight)  # 7.6e-3
+"""
+def __init__(self, 
+             seed,
+             rec_matrix,
+             gap_matrix,
+             temporal_patterns=np.array([]),
+             spatial_patterns_gcs=np.array([]),
+             spatial_patterns_bcs=np.array([]),
+             rec_weight=7.6e-3,
+             gap_resistance=6e2,
+             gap_delay=0.0,
+             gap_junctions=True,
+             network_type='full',
+             pp_weight=1e-3):
+"""
 
 """Create Current Clamp input"""
+"""
 current_list = []
 for cell in nw.populations[0]:
     rnd_current = np.random.normal(loc=input_current, scale=input_current_sigma)
     current_list.append(rnd_current)
     cell._current_clamp_soma(amp=rnd_current, dur=duration*1000, delay=0)
+"""
 
 """Run the simulation"""
 neuron_tools.run_neuron_simulator(warmup=warmup, t_stop=duration*1000, dt_sim=dt)
 
 """Save the output spikes"""
 times, units = nw.populations[0].get_times_units()
+times_gc, units_gc = nw.populations[0].get_times_units()
+times_mc, units_mc = nw.populations[1].get_times_units()
+times_bc, units_bc = nw.populations[2].get_times_units()
+times_hc, units_hc = nw.populations[3].get_times_units()
 
-fname = f'pvring_seed_rec-weight_n-pvbcs_gap-resistance_gap-junctions_input-current_input-current-sigma_n-rec-syn_shift_{seed}_{rec_weight}_{n_pvbcs}_{gap_resistance}_{gaps_on}_{input_current}_{input_current_sigma}_{n_mean_rec_syn:.4f}_{shift:.4f}.h5'
+fname = f'fulldg_seed_rec-weight_n-pvbcs_gap-resistance_gap-junctions_n-rec-syn_shift_{seed}_{rec_weight}_{n_pvbcs}_{gap_resistance}_{gaps_on}_{n_mean_rec_syn:.4f}_{shift:.4f}.h5'
 output_file_path = os.path.join(results_dir, fname)
 
 output_file = tables.File(output_file_path, mode='a')
 
-output_file.create_array('/', 'times', obj=times)
-output_file.create_array('/', 'units', obj=units)
+output_file.create_group('/', 'times')
+output_file.create_group('/', 'units')
+
+output_file.create_array('/times', 'times_gc', obj=times_gc)
+output_file.create_array('/times', 'times_mc', obj=times_mc)
+output_file.create_array('/times', 'times_bc', obj=times_bc)
+output_file.create_array('/times', 'times_hc', obj=times_hc)
+output_file.create_array('/times', 'times_input', obj=units_times_tuple[1])
+
+output_file.create_array('/units', 'units_gc', obj=units_gc)
+output_file.create_array('/units', 'units_mc', obj=units_mc)
+output_file.create_array('/units', 'units_bc', obj=units_bc)
+output_file.create_array('/units', 'units_hc', obj=units_hc)
+output_file.create_array('/units', 'units_input', obj=units_times_tuple[0])
 
 parameters_group = output_file.create_group('/', 'parameters')
 output_file.create_array('/parameters', 'dt', obj=dt)
@@ -154,14 +201,13 @@ output_file.create_array('/parameters', 'n_rec_synapses', obj=chem_connection_ma
 output_file.create_array('/parameters', 'gap_connection_matrix', obj=gap_connection_matrix)
 output_file.create_array('/parameters', 'gap_resistance', obj=gap_resistance)
 output_file.create_array('/parameters', 'gap_delay', obj=gap_delay)
-output_file.create_array('/parameters', 'input_current', obj=input_current)
-output_file.create_array('/parameters', 'input_current_sigma', obj=input_current_sigma)
-output_file.create_array('/parameters', 'pp_bc_weight', obj=pp_bc_weight)
 output_file.create_array('/parameters', 'gap_junction', obj=gaps_on)
 output_file.create_array('/parameters', 'rec_weight', obj=rec_weight)
 
 """Finish up by closing file"""
 output_file.close()
+
+sys.exit()
 
 """Optional analysis/plotting"""
 if plotting:
@@ -216,7 +262,7 @@ if plotting:
     
     """Coherence Analysis"""
     curr_binary = spike_to_x.units_times_to_binary(np.array(units, dtype=int), times,
-                                                   n_units=n_pvbcs,
+                                                   n_units=10000,
                                                    dt=dt,
                                                    total_time=duration * 1000 + 1)
     curr_binary = np.array(curr_binary, dtype=int)

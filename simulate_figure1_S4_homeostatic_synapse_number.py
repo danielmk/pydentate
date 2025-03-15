@@ -76,7 +76,7 @@ chem_connection_matrix = np.zeros((n_pvbcs, n_pvbcs))
 chem_connection_indices = np.array([np.random.choice(n_pvbcs, size=n_rec_syn, replace=False) for x in range(n_pvbcs)])
 
 for row, idc in enumerate(chem_connection_indices):
-    chem_connection_matrix[row, idc] = 1
+    chem_connection_matrix[idc, row] = 1
 
 # np.fill_diagonal(chem_connection_matrix, 0)
 

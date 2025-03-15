@@ -119,4 +119,16 @@ for a in ax:
     a.set_xlim((0, 500))
     a.set_ylim((0, 1))
 
+fig, ax = plt.subplots()
 
+ax.plot(x, y_chem, color='#8A963F')
+ax.plot(x, y_gap, color='#EA521C')
+
+ax.set_xlabel("Distance ($\mu$m)")
+
+ax.set_ylabel("Connection Probability")
+
+plt.legend(("Sy", "GJ"))
+
+ax.set_xlim((0, 500))
+ax.set_ylim((0, 1))
