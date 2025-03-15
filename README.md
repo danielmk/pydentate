@@ -9,8 +9,9 @@ pydentate is a biophysically realistic computational model of the dentate gyrus,
 
   <li><p>The installation is now complete and you can get started by running the example script</p><blockquote>python paradigm_pattern_separation_baseline.py</blockquote>This will take a long time. If no errors are raised your pydentate is working.</li>
 </ol>
-If you encounter problems with running pydentate or have questions feel free to contact me (muellerkomorowska@protonmail.com
- or https://twitter.com/scidanm).
+
+# Reproducibility of Müller-Komorowska, Fujishige & Fukai (2025), eNeuro
+The package release eNeuro2025 is dedicated to the reproducibility of the results in Müller-Komorowska, Fujishige & Fukai (2025), eNeuro. 
 
 # References
 pydentate builds on a computational model from this paper: Santhakumar, V., Aradi, I., & Soltesz, I. (2005). Role of mossy fiber sprouting and mossy cell loss in hyperexcitability: a network model of the dentate gyrus incorporating cell types and axonal topography. Journal of Neurophysiology, 93(1), 437–453. https://doi.org/10.1152/jn.00777.2004
